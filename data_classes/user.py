@@ -1,4 +1,4 @@
-from user_access.access_level import AccessLevel
+from abstractions.access_level import AccessLevel
 
 
 class User:

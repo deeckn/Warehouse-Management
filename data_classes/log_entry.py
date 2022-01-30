@@ -1,9 +1,11 @@
+from dataclasses import dataclass
 
+
+@dataclass
 class LogEntry:
-    def __init__(self, date: str, time: str, description: str) -> None:
-        self.date = date
-        self.time = time
-        self.description = description
+    date: str
+    time: str
+    description: str
 
     def get_date(self) -> str:
         return self.date

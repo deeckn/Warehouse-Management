@@ -1,11 +1,12 @@
+from dataclasses import dataclass
 from abstractions.access_level import AccessLevel
 
 
+@dataclass
 class User:
-    def __init__(self, username: str, password: str, access: AccessLevel) -> None:
-        self.username = username
-        self.password = password
-        self.access = access
+    username: str
+    password: str
+    access: AccessLevel
 
     def get_username(self) -> str:
         return self.username

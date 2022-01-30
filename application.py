@@ -6,14 +6,9 @@ class Application:
     def __init__(self) -> None:
         self.app = QApplication(sys.argv)
 
-        """
-        For the view developers
-        Test your code through here, you only have to run main
-
-        self.current_view = MyView() <-- Just change the class view object
-        """
-        self.current_view = None
+        self.current_view = None  # <-- Change this to your view class
+        self.current_controller = None
 
     def start(self):
-        # self.current_view.show() <-- Uncomment this to run
+        # self.current_view.show() <-- Uncomment this to run for view testing
         sys.exit(self.app.exec())

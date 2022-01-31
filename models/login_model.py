@@ -25,6 +25,9 @@ class LoginModel(Model):
 
         return False
 
-    def get_user(self, username: str) -> User:
+    def retrive_user(self, username: str) -> User:
         """Queries a user from the database"""
         pass
+
+    def get_current_user(self) -> User:
+        return self.current_user

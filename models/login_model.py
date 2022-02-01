@@ -12,15 +12,15 @@ class LoginModel(Model):
         self.valid_access = False
 
     def get_input(self, username: str, password: str):
-        self.current_username = username
-        self.current_password = password
+        self.__current_username = username
+        self.__current_password = password
 
     def is_valid(self) -> bool:
         if self.__current_user is None:
             return False
 
-        if (self.current_username == self.__current_user.get_username()
-                and self.current_password == self.__current_user.get_password()):
+        if (self.__current_username == self.__current_user.get_username()
+                and self.__current_password == self.__current_user.get_password()):
             return True
 
         return False

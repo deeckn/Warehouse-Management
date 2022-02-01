@@ -3,31 +3,31 @@ from dataclasses import dataclass
 
 @dataclass
 class StorageShelf:
-    label: str
-    max_weight: float
-    length: float
-    width: float
-    height: float
-    rows: int
-    columns: int
+    __label: str
+    __max_weight: float
+    __length: float
+    __width: float
+    __height: float
+    __rows: int
+    __columns: int
 
     def get_label(self) -> str:
-        return self.label
+        return self.__label
 
     def get_max_weight(self) -> float:
-        return self.max_weight
+        return self.__max_weight
 
     def get_length(self) -> float:
-        return self.length
+        return self.__length
 
     def get_width(self) -> float:
-        return self.width
+        return self.__width
 
     def get_height(self) -> float:
-        return self.height
+        return self.__height
 
     def get_rows(self) -> int:
-        return self.rows
+        return self.__rows
 
     def get_columns(self) -> int:
-        return self.columns
+        return self.__columns

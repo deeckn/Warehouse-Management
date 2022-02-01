@@ -1,43 +1,43 @@
 from dataclasses import dataclass
 from customer import Customer
-from abstractions.category import ProductCategory
+from abstractions.categories import ProductCategory
 
 
 @dataclass
 class ProductItem:
-    owner: Customer
-    id: int
-    name: str
-    quantity: int
-    low_stock: int
-    location: str
-    weight: float
-    last_stored: str
-    categories: list[ProductCategory]
+    __owner: Customer
+    __id: int
+    __name: str
+    __quantity: int
+    __low_stock: int
+    __location: str
+    __weight: float
+    __last_stored: str
+    __categories: list[ProductCategory]
 
     def get_owner(self) -> Customer:
-        return self.owner
+        return self.__owner
 
     def get_id(self) -> int:
-        return self.id
+        return self.__id
 
     def get_name(self) -> str:
-        return self.name
+        return self.__name
 
     def get_quantity(self) -> int:
-        return self.quantity
+        return self.__quantity
 
     def get_low_stock(self) -> int:
-        return self.low_stock
+        return self.__low_stock
 
     def get_location(self) -> str:
-        return self.location
+        return self.__location
 
     def get_weight(self) -> float:
-        return self.weight
+        return self.__weight
 
     def get_last_stored(self) -> str:
-        return self.last_stored
+        return self.__last_stored
 
     def get_category_list(self) -> list[ProductCategory]:
-        return self.categories
+        return self.__categories

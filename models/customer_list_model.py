@@ -15,13 +15,18 @@ class CustomerListModel(Model):
         self.__customer_query = list()
 
     def query_customers(self, name: str):
+        """Search Customers from Database"""
         pass
 
     def find_customer(self, id: int):
+        """Get Customer by ID from Database"""
         pass
 
+    def set_current_customer(self, customer: Customer):
+        self.__current_customer = customer
+
     def get_current_customer(self) -> Customer:
-        pass
+        return self.__current_customer
 
     def add_customer(self, customer: Customer):
         pass

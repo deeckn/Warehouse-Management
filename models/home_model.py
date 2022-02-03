@@ -2,7 +2,7 @@ from model import Model
 from data_classes.customer import Customer
 from data_classes.product_item import ProductItem
 from data_classes.log_entry import LogEntry
-from abstractions.filter_options import FilterOption, NameFilter
+from abstractions.filter_options import FilterOption
 
 class HomeModel(Model):
     
@@ -19,10 +19,10 @@ class HomeModel(Model):
         self.__current_activity_logs = list()
         self.__search_query = ""
 
-    def set_current_search_filter(self, filter: FilterOption):
+    def set_home_search_filter(self, filter: FilterOption):
         self.__current_search_filter = filter
 
-    def set_search_query(self, query: str):
+    def set_home_search_query(self, query: str):
         self.__search_query = query
 
     def find_product(self):

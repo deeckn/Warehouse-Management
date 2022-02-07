@@ -30,10 +30,10 @@ class ProductListModel(Model):
         "get product information from database"
         pass
 
-    def update_product_information(self, product: ProductItem, quantity: int):
+    def update_product_information(self, product: ProductItem):
         "add & save product in database"
         pass
 
-    def delete_product_information(self, product: ProductItem, quantity: int):
+    def delete_product_information(self, product: ProductItem):
         "update product in database"
         pass

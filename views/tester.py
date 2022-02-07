@@ -7,4 +7,4 @@ if __name__ == "__main__":
     view = MyView()
     view.set_user_label("TESTER00")
     view.showFullScreen()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

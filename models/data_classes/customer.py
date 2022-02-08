@@ -3,6 +3,8 @@ from dataclasses import dataclass
 
 @dataclass
 class Customer:
+
+    __id: int
     __name: str
     __phone: str
     __email: str
@@ -11,6 +13,9 @@ class Customer:
     __date_joined: str
     __expiry_date: str
     __total_payment: float
+
+    def get_id(self) -> int:
+        return self.__id
 
     def get_name(self) -> str:
         return self.__name

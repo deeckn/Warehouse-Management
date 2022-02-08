@@ -3,21 +3,26 @@ from dataclasses import dataclass
 
 @dataclass
 class LogEntry:
-    date: str
-    time: str
-    description: str
+
+    __id = int
+    __date: str
+    __time: str
+    __description: str
+
+    def get_id(self) -> int:
+        return self.__id
 
     def get_date(self) -> str:
-        return self.date
+        return self.__date
 
     def get_time(self) -> str:
-        return self.time
+        return self.__time
 
     def get_description(self) -> str:
-        return self.description
+        return self.__description
 
     def get_data(self) -> tuple:
-        return self.date, self.time, self.description
+        return self.__date, self.__time, self.__description
 
     def __str__(self) -> str:
-        return f"Date: {self.date}, Time: {self.time}, Description: {self.description}"
+        return f"Date: {self.__date}, Time: {self.__time}, Description: {self.__description}"

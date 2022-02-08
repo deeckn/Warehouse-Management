@@ -5,7 +5,7 @@ from abstractions.categories import ProductCategory
 
 @dataclass
 class ProductItem:
-    __owner: Customer
+
     __id: int
     __name: str
     __quantity: int
@@ -13,6 +13,7 @@ class ProductItem:
     __location: str
     __weight: float
     __last_stored: str
+    __owner: Customer
     __categories: list[ProductCategory]
 
     def get_owner(self) -> Customer:

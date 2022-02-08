@@ -1,6 +1,6 @@
 from model import Model
-from data_classes.user import User
-from data_classes.customer import Customer
+from user import User
+from customer import Customer
 
 
 class CustomerListModel(Model):

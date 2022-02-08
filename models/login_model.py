@@ -1,5 +1,5 @@
-from models.model import Model
-from models.data_classes.user import User
+from model import Model
+from user import User
 
 
 class LoginModel(Model):

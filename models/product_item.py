@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from customer import Customer
-from abstractions.categories import ProductCategory
+from categories import ProductCategory
 
 
 @dataclass

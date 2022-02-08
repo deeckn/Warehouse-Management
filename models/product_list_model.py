@@ -1,7 +1,8 @@
 from model import Model
-from data_classes.customer import Customer
-from data_classes.product_item import ProductItem
-from abstractions.filter_options import FilterOption
+from customer import Customer
+from product_item import ProductItem
+from filter_options import FilterOption
+
 
 class ProductListModel(Model):
 
@@ -12,8 +13,8 @@ class ProductListModel(Model):
 
     def __init__(self):
         self.__current_customer = None
-        self.__current_products =  list()
-        self.__current_search_filter = None 
+        self.__current_products = list()
+        self.__current_search_filter = None
         self.__search_query = ""
 
     def set_product_search_filter(self, filter: FilterOption):
@@ -25,7 +26,7 @@ class ProductListModel(Model):
     def find_product_information(self):
         "find product depending on search filter"
         pass
-    
+
     def load_product_information(self):
         "get product information from database"
         pass

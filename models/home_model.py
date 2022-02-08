@@ -1,11 +1,12 @@
 from model import Model
-from data_classes.customer import Customer
-from data_classes.product_item import ProductItem
-from data_classes.log_entry import LogEntry
-from abstractions.filter_options import FilterOption
+from customer import Customer
+from product_item import ProductItem
+from log_entry import LogEntry
+from filter_options import FilterOption
+
 
 class HomeModel(Model):
-    
+
     __current_search_filter: FilterOption
     __search_query: str
     __current_customer: Customer
@@ -14,8 +15,8 @@ class HomeModel(Model):
 
     def __init__(self):
         self.__current_customer = None
-        self.__current_products =  list()
-        self.__current_search_filter = None 
+        self.__current_products = list()
+        self.__current_search_filter = None
         self.__current_activity_logs = list()
         self.__search_query = ""
 
@@ -28,7 +29,7 @@ class HomeModel(Model):
     def find_product(self):
         "find product depending on search filter"
         pass
-    
+
     def load_activity_log(self):
         "get activities from database"
         pass

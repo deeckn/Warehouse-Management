@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from abstractions.access_level import AccessLevel
+from models.abstractions.access_level import AccessLevel
 
 
 @dataclass

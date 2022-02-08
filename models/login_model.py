@@ -1,5 +1,5 @@
-from model import Model
-from data_classes.user import User
+from models.model import Model
+from models.data_classes.user import User
 
 
 class LoginModel(Model):
@@ -15,19 +15,21 @@ class LoginModel(Model):
         self.__current_username = username
         self.__current_password = password
 
-    def is_valid(self) -> bool:
+    def verify_login(self):
         if self.__current_user is None:
-            return False
+            self.valid_access = False
+            return
 
         if (self.__current_username == self.__current_user.get_username()
                 and self.__current_password == self.__current_user.get_password()):
-            return True
+            self.valid_access = True
 
-        return False
-
-    def retrive_user(self, username: str) -> User:
+    def retrive_user(self, username: str):
         """Queries a user from the database"""
         pass
+
+    def is_valid(self) -> bool:
+        return self.valid_access
 
     def get_current_user(self) -> User:
         return self.__current_user

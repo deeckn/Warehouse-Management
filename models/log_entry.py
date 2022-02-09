@@ -4,7 +4,7 @@ from dataclasses import dataclass
 @dataclass
 class LogEntry:
 
-    __id = int
+    __id: int
     __date: str
     __time: str
     __description: str

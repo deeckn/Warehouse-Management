@@ -57,8 +57,27 @@ class UserDAO:
         access = AdminAccess() if data[5] == "admin" else EmployeeAccess()
         return User(data[0], data[1], data[2], data[3], data[4], access)
 
-    def update_user(self, user: User) -> None:
-        """Updates the data of the given user"""
+    def add_user(self, user: User) -> None:
+        access = "admin" if isinstance(
+            user.get_access_level(), AdminAccess) else "employee"
+        self.__cursor.execute(f"""
+            INSERT INTO {UserDAO.__table_name}
+            ({UserDAO.__COLUMN_FIRST_NAME},
+            {UserDAO.__COLUMN_LAST_NAME},
+            {UserDAO.__COLUMN_USERNAME},
+            {UserDAO.__COLUMN_PASSWORD},
+            {UserDAO.__COLUMN_ACCESS})
+            VALUES 
+            ('{user.get_first_name()}',
+            '{user.get_last_name()}',
+            '{user.get_username()}',
+            '{user.get_password()}',
+            '{access}')
+        """)
+        self.__connection.commit()
+
+    def update_user(self, user_id: int) -> None:
+        """Updates the data of a user given by the id"""
         pass
 
     def delete_user_by_username(self, username: str) -> None:

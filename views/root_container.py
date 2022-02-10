@@ -1,6 +1,8 @@
-from views.forms.base_view import BaseView
-from views.forms.login_view import LoginView
+from forms.base_view import BaseView
+from forms.login_view import LoginView
 from PySide6.QtWidgets import QStackedWidget
+
+import rc_icons
 
 
 class RootContainer(QStackedWidget):

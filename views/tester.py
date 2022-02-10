@@ -1,4 +1,4 @@
-from views import RootContainer
+from root_container import RootContainer
 from PySide6.QtWidgets import QApplication
 import sys
 

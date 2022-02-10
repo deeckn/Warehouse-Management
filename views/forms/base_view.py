@@ -4,7 +4,7 @@ from PySide6.QtWidgets import (
     QLabel, QWidget, QSpacerItem, QSizePolicy,
     QVBoxLayout, QHBoxLayout, QStackedWidget)
 
-from views.items.sideMenuItem import SideMenuItem
+from items.sideMenuItem import SideMenuItem
 
 
 class BaseView(QWidget):

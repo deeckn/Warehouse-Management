@@ -27,11 +27,7 @@ class LogDAO:
         """Converts raw data to User objects"""
         temp = list()
         for data in self.__query_list:
-            log_entry = LogEntry(
-                data[0],
-                data[1],
-                data[2]
-            )
+            log_entry = LogEntry(data[0], data[1], data[2], data[3])
             temp.append(log_entry)
         self.__query_list = temp
 

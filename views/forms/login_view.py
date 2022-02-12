@@ -91,8 +91,6 @@ class LoginView(QWidget):
                                              "border: none;")
         self.password_lineedit.setEchoMode(QLineEdit.Password)
 
-        self.login_button.clicked.connect(self.show_error_label)
-
     # UI
 
     def clear_info(self) -> None:

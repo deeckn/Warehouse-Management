@@ -1,7 +1,7 @@
 from abc import ABC
 from data.data_classes import *
 from data.filter_options import FilterOption
-from data.app_dao import AppDAO
+from data.app_dao import AppDAO, UserDAO
 
 
 class Model(ABC):
@@ -16,7 +16,7 @@ class LoginModel(Model):
         self.__current_username = str()
         self.__current_password = str()
         self.valid_access = False
-        self.app_dao = AppDAO()
+        self.user_dao: UserDAO = AppDAO.get_dao("user")
 
     def get_input(self, username: str, password: str):
         self.__current_username = username
@@ -31,7 +31,7 @@ class LoginModel(Model):
                              and self.__current_password == self.__current_user.get_password())
 
     def retrive_user(self, username: str):
-        self.__current_user = self.app_dao.get_user_by_username(username)
+        self.__current_user = self.user_dao.get_user_by_username(username)
 
     def is_valid(self) -> bool:
         return self.valid_access

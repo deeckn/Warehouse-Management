@@ -27,9 +27,8 @@ class LoginModel(Model):
             self.valid_access = False
             return
 
-        if (self.__current_username == self.__current_user.get_username()
-                and self.__current_password == self.__current_user.get_password()):
-            self.valid_access = True
+        self.valid_access = (self.__current_username == self.__current_user.get_username()
+                             and self.__current_password == self.__current_user.get_password())
 
     def retrive_user(self, username: str):
         self.__current_user = self.app_dao.get_user_by_username(username)

@@ -2,55 +2,41 @@ import sqlite3
 import os.path
 from data.access_level import *
 from data.data_classes import *
+from abc import ABC
+
+
+class DAO(ABC):
+    pass
 
 
 class AppDAO:
 
     __BASE_DIR = os.path.dirname(os.path.abspath(__file__))
     __DB_PATH = os.path.join(__BASE_DIR, "geb_arai_dee.db")
+    __connection: sqlite3.Connection = sqlite3.connect(__DB_PATH)
 
-    def __init__(self):
-        self.connection = sqlite3.connect(AppDAO.__DB_PATH)
-        self.user_dao = UserDAO(self.connection)
-        self.customer_dao = CustomerDAO(self.connection)
-        self.product_dao = ProductDAO()
-        self.shelf_dao = ShelfDAO()
-        self.log_dao = LogDAO(self.connection)
-
-    """User Data Access CRUD Methods"""
-
-    def get_all_users(self) -> list[User]:
-        """Returns a list of User objects from the database"""
-        return self.user_dao.get_all_users()
-
-    def get_user_by_id(self, id: int) -> User:
-        """Returns a User object given by an id"""
-        return self.user_dao.get_user_by_id(id)
-
-    def get_user_by_username(self, username: str) -> User:
-        """Returns a User object given by a username"""
-        return self.user_dao.get_user_by_username(username)
-
-    def insert_user(self, user: User):
-        """Inserts a user into the database"""
-        self.user_dao.add_user(user)
-
-    """Log Data Access CRUD Methods"""
-
-    def insert_log_entry(self, log_entry: LogEntry):
-        """Inserts a log entry to the database"""
-        self.log_dao.add_log_entry(log_entry)
-
-    def get_all_log_entries(self) -> list[LogEntry]:
-        """Returns a list of log entries from the database"""
-        return self.log_dao.get_all_log_entries()
-
+    @staticmethod
     def close_db(self):
         """Disconnects the connection to the database"""
-        self.connection.close()
+        AppDAO.__connection.close()
+
+    @staticmethod
+    def get_dao(type: str) -> DAO:
+        if type == "user":
+            return UserDAO(AppDAO.__connection)
+        elif type == "customer":
+            return CustomerDAO(AppDAO.__connection)
+        elif type == "product":
+            return ProductDAO()
+        elif type == "shelf":
+            return ShelfDAO()
+        elif type == "log":
+            return LogDAO(AppDAO.__connection)
+        else:
+            return None
 
 
-class UserDAO:
+class UserDAO(DAO):
 
     __table_name = "USERS"
     __COLUMN_ID = "id"
@@ -105,6 +91,7 @@ class UserDAO:
         return User(data[0], data[1], data[2], data[3], data[4], access)
 
     def add_user(self, user: User) -> None:
+        """Adds a User object to the database"""
         access = "admin" if isinstance(
             user.get_access_level(), AdminAccess) else "employee"
         self.__cursor.execute(f"""
@@ -114,7 +101,7 @@ class UserDAO:
             {UserDAO.__COLUMN_USERNAME},
             {UserDAO.__COLUMN_PASSWORD},
             {UserDAO.__COLUMN_ACCESS})
-            VALUES 
+            VALUES
             ('{user.get_first_name()}',
             '{user.get_last_name()}',
             '{user.get_username()}',
@@ -123,15 +110,48 @@ class UserDAO:
         """)
         self.__connection.commit()
 
-    def update_user(self, user_id: int) -> None:
-        """Updates the data of a user given by the id"""
-        pass
+    def update_user(
+        self,
+        user_id: int,
+        first_name: str = None,
+        last_name: str = None,
+        username: str = None,
+        password: str = None,
+        access: AccessLevel = None
+    ) -> None:
+        """
+        Updates user data given an id.
+        Example: update_user(4, first_name="John", username="john.tr", access=AdminAccess())
+        """
+        query = f"UPDATE {UserDAO.__table_name} SET "
 
-    def delete_user_by_username(self, username: str) -> None:
-        pass
+        if first_name is not None:
+            query += f'{UserDAO.__COLUMN_FIRST_NAME}="{first_name}", '
+        if last_name is not None:
+            query += f'{UserDAO.__COLUMN_LAST_NAME}="{last_name}", '
+        if username is not None:
+            query += f'{UserDAO.__COLUMN_USERNAME}="{username}", '
+        if password is not None:
+            query += f'{UserDAO.__COLUMN_PASSWORD}="{password}", '
+        if access is not None:
+            value = "admin" if isinstance(access, AdminAccess) else "employee"
+            query += f'{UserDAO.__COLUMN_ACCESS} = "{value}"'
+
+        if query[-2] == ",":
+            query = query[:-2]
+
+        query += f" WHERE {UserDAO.__COLUMN_ID}={user_id}"
+        self.__cursor.execute(query)
+        self.__connection.commit()
+
+    def delete_user_by_id(self, id: int) -> None:
+        """Deletes user data given an id"""
+        self.__cursor.execute(
+            f"DELETE FROM {UserDAO.__table_name} WHERE {UserDAO.__COLUMN_ID}={id}")
+        self.__connection.commit()
 
 
-class LogDAO:
+class LogDAO(DAO):
 
     __table_name = "LOG_ENTRIES"
     __COLUMN_ID = "id"
@@ -164,13 +184,15 @@ class LogDAO:
         """Appends a log entry to the LOG_ENTRIES table"""
         self.__cursor.execute(f"""
             INSERT INTO {LogDAO.__table_name}
-            ({LogDAO.__COLUMN_DATE}, {LogDAO.__COLUMN_TIME}, {LogDAO.__COLUMN_DESCRIPTION})
-            VALUES ('{log_entry.get_date()}', '{log_entry.get_time()}', '{log_entry.get_description()}')
+            ({LogDAO.__COLUMN_DATE}, {LogDAO.__COLUMN_TIME},
+             {LogDAO.__COLUMN_DESCRIPTION})
+            VALUES ('{log_entry.get_date()}', '{log_entry.get_time()}',
+                    '{log_entry.get_description()}')
         """)
         self.__connection.commit()
 
 
-class CustomerDAO:
+class CustomerDAO(DAO):
 
     __table_name = "CUSTOMERS"
     __COLUMN_ID = "id"
@@ -228,9 +250,9 @@ class CustomerDAO:
         pass
 
 
-class ProductDAO:
+class ProductDAO(DAO):
     pass
 
 
-class ShelfDAO:
+class ShelfDAO(DAO):
     pass

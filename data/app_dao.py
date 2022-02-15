@@ -16,7 +16,7 @@ class AppDAO:
     __connection: sqlite3.Connection = sqlite3.connect(__DB_PATH)
 
     @staticmethod
-    def close_db(self):
+    def close_db():
         """Disconnects the connection to the database"""
         AppDAO.__connection.close()
 
@@ -184,7 +184,8 @@ class LogDAO(DAO):
         """Appends a log entry to the LOG_ENTRIES table"""
         self.__cursor.execute(f"""
             INSERT INTO {LogDAO.__table_name}
-            ({LogDAO.__COLUMN_DATE}, {LogDAO.__COLUMN_TIME},
+            ({LogDAO.__COLUMN_DATE}, 
+             {LogDAO.__COLUMN_TIME}, 
              {LogDAO.__COLUMN_DESCRIPTION})
             VALUES ('{log_entry.get_date()}', '{log_entry.get_time()}',
                     '{log_entry.get_description()}')
@@ -238,7 +239,29 @@ class CustomerDAO(DAO):
         self.__query_list = temp
 
     def add_customer(self, customer: Customer):
-        pass
+        """Adds a Customer object to the database"""
+        packing_service = 1 if customer.get_packing_service() else 0
+
+        self.__cursor.execute(f"""
+            INSERT INTO {CustomerDAO.__table_name}
+            ({CustomerDAO.__COLUMN_NAME}, 
+             {CustomerDAO.__COLUMN_PHONE}, 
+             {CustomerDAO.__COLUMN_EMAIL}, 
+             {CustomerDAO.__COLUMN_PACKING_SERVICE}, 
+             {CustomerDAO.__COLUMN_RENTAL_DURATION}, 
+             {CustomerDAO.__COLUMN_DATE_JOINED}, 
+             {CustomerDAO.__COLUMN_EXPIRY_DATE}, 
+             {CustomerDAO.__COLUMN_TOTAL_PAYMENT})
+            VALUES ('{customer.get_name()}', 
+            '{customer.get_phone()}', 
+            '{customer.get_email()}', 
+            {packing_service}, 
+            '{customer.get_rental_duration()}', 
+            '{customer.get_date_joined()}', 
+            '{customer.get_expiry_date()}', 
+            {customer.get_total_payment()})
+        """)
+        self.__connection.commit()
 
     def update_customer(self, customer: Customer):
         pass
@@ -246,8 +269,11 @@ class CustomerDAO(DAO):
     def get_customer_by_name(self, name: str) -> Customer:
         pass
 
-    def delete_customer(self, customer: Customer):
-        pass
+    def delete_customer(self, customer_id: int):
+        """Deletes customer data given an id"""
+        self.__cursor.execute(
+            f"DELETE FROM {CustomerDAO.__table_name} WHERE {CustomerDAO.__COLUMN_ID}={customer_id}")
+        self.__connection.commit()
 
 
 class ProductDAO(DAO):

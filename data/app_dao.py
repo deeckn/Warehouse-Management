@@ -314,10 +314,26 @@ class CustomerDAO(DAO):
         self.__connection.commit()
 
     def get_customer(self, customer_id: int) -> Customer:
-        pass
+        """Retreives a Customer object given an id"""
+        self.__cursor.execute(
+            f"SELECT * FROM {CustomerDAO.__table_name} WHERE {CustomerDAO.__COLUMN_ID}={customer_id}")
+        data = self.__cursor.fetchone()
+        if data is None:
+            return None
+
+        packing_service = data[4] == 1
+        return Customer(data[0], data[1], data[2], data[3], packing_service, data[5], data[6], data[7], data[8])
 
     def get_customer_by_name(self, name: str) -> Customer:
-        pass
+        """Retreives a Customer object given a name"""
+        self.__cursor.execute(
+            f"SELECT * FROM {CustomerDAO.__table_name} WHERE {CustomerDAO.__COLUMN_NAME}={name}")
+        data = self.__cursor.fetchone()
+        if data is None:
+            return None
+
+        packing_service = data[4] == 1
+        return Customer(data[0], data[1], data[2], data[3], packing_service, data[5], data[6], data[7], data[8])
 
     def delete_customer(self, customer_id: int):
         """Deletes customer data given an id"""

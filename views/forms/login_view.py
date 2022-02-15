@@ -79,7 +79,8 @@ class LoginView(QWidget):
         self.username_lineedit.setStyleSheet(u"background-color: rgb(221, 221, 221);\n"
                                              "padding-left: 50;\n"
                                              "padding-top: 10;\n"
-                                             "border: none;")
+                                             "border: none;\n"
+                                             "color: black;")
 
         self.password_lineedit = QLineEdit(self)
         self.password_lineedit.setObjectName(u"password_lineedit")
@@ -88,7 +89,8 @@ class LoginView(QWidget):
         self.password_lineedit.setStyleSheet(u"background-color: rgb(221, 221, 221);\n"
                                              "padding-left: 50;\n"
                                              "padding-top: 10;\n"
-                                             "border: none;")
+                                             "border: none;\n"
+                                             "color: black")
         self.password_lineedit.setEchoMode(QLineEdit.Password)
 
     # UI

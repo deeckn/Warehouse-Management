@@ -270,7 +270,50 @@ class CustomerDAO(DAO):
         """)
         self.__connection.commit()
 
-    def update_customer(self, customer: Customer):
+    def update_customer(
+        self,
+        id: int,
+        name: str = None,
+        phone: str = None,
+        email: str = None,
+        packing_service: bool = None,
+        rental_duration: str = None,
+        date_joined: str = None,
+        expiry_date: str = None,
+        total_payment: float = None
+    ) -> None:
+        """
+        Updates customer data given an id.
+        Example: update_customer(5, phone="1357924680", total_payment=12500)
+        """
+        query = f"UPDATE {CustomerDAO.__table_name} SET "
+
+        if name is not None:
+            query += f'{CustomerDAO.__COLUMN_NAME}="{name}", '
+        if phone is not None:
+            query += f'{CustomerDAO.__COLUMN_PHONE}="{phone}", '
+        if email is not None:
+            query += f'{CustomerDAO.__COLUMN_EMAIL}="{email}", '
+        if packing_service is not None:
+            status = 1 if packing_service else 0
+            query += f'{CustomerDAO.__COLUMN_PACKING_SERVICE}={status}, '
+        if rental_duration is not None:
+            query += f'{CustomerDAO.__COLUMN_RENTAL_DURATION}="{rental_duration}", '
+        if date_joined is not None:
+            query += f'{CustomerDAO.__COLUMN_DATE_JOINED}="{date_joined}", '
+        if expiry_date is not None:
+            query += f'{CustomerDAO.__COLUMN_EXPIRY_DATE}="{expiry_date}", '
+        if total_payment is not None:
+            query += f'{CustomerDAO.__COLUMN_TOTAL_PAYMENT}={total_payment}, '
+
+        if query[-2] == ",":
+            query = query[:-2]
+
+        query += f" WHERE {CustomerDAO.__COLUMN_ID}={id}"
+        self.__cursor.execute(query)
+        self.__connection.commit()
+
+    def get_customer(self, customer_id: int) -> Customer:
         pass
 
     def get_customer_by_name(self, name: str) -> Customer:

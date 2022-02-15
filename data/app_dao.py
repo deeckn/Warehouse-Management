@@ -22,6 +22,13 @@ class AppDAO:
 
     @staticmethod
     def get_dao(type: str) -> DAO:
+        """
+        'user' returns UserDAO,
+        'customer' returns CustomerDAO,
+        'product' returns ProductDAO,
+        'shelf' returns ShelfDAO,
+        'log' returns LogDAO
+        """
         if type == "user":
             return UserDAO(AppDAO.__connection)
         elif type == "customer":

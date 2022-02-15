@@ -1,8 +1,9 @@
-from forms.base_view import BaseView
-from forms.login_view import LoginView
-from PySide6.QtWidgets import QStackedWidget
+from views.forms.main_app_view import MainAppView
+from views.forms.admin_app_view import AdminAppView
+from views.forms.login_view import LoginView
+from PySide6.QtWidgets import QStackedWidget, QWidget
 
-import rc_icons
+import views.rc_icons
 
 
 class RootContainer(QStackedWidget):
@@ -12,38 +13,41 @@ class RootContainer(QStackedWidget):
         self.setStyleSheet("background-color: #1A374D")
         self.setWindowTitle("GEB-ARAI-DEE")
         self.login_Page = LoginView()
+        self.main_app_view = MainAppView() 
+        self.admin_app_view = AdminAppView()
+        
+        self.login_Page.set_login_button_listener(self.move_login_to_admin)  # Tester
+        self.main_app_view.set_logout_bt_listener(self.move_to_login)
+        self.main_app_view.set_admin_bt_listener(self.move_main_to_admin)
+        self.admin_app_view.set_logout_bt_listener(self.move_to_login)
+        self.admin_app_view.set_main_button_listener(self.move_admin_to_main)
+        
+
         self.addWidget(self.login_Page)
-        self.login_Page.set_login_button_listener(self.move_to_admin)  # Tester
-        self.base_view = BaseView()  # Base View
-        self.base_view.set_logout_bt_events(self.move_to_login_page)
-        self.addWidget(self.base_view)
+        self.addWidget(self.main_app_view)
+        self.addWidget(self.admin_app_view)
+
 
     # Move
-    def move_to_login_page(self):
-        self.login_Page.clear_info()
-        self.base_view.clear_side_menu()
+    def reset_admin_and_main(self):
+        self.main_app_view.reset()
+        self.admin_app_view.reset()
+
+    def move_to_login(self):
+        self.reset_admin_and_main()
         self.setCurrentIndex(0)
 
-    def move_to_main(self):
+    def move_login_to_main(self):
+        self.login_Page.clear_info()
         self.setCurrentIndex(1)
-        self.base_view.clear_side_menu()
-        self.base_view.set_up_main()
 
-    def move_to_admin(self):
+    def move_login_to_admin(self):
+        self.login_Page.clear_info()
+        self.setCurrentIndex(2)
+
+    def move_admin_to_main(self):
         self.setCurrentIndex(1)
-        self.base_view.clear_side_menu()
-        self.base_view.set_up_admin()
-        self.base_view.set_function_bar_bt(4, self.move_to_main_admin)
+        self.main_app_view.show_admin_bt()
 
-    def move_to_main_admin(self):
-        self.base_view.clear_side_menu()
-        self.setCurrentIndex(1)
-        self.base_view.set_up_main("admin")
-        self.base_view.set_function_bar_bt(4, self.move_to_admin)
-
-    # Setter
-    def set_user_label(self, username: str):
-        self.base_view.set_user_label(username)
-
-    def set_function_login_bt(self, function):
-        self.login_Page.set_login_button_listener(function)
+    def move_main_to_admin(self):
+        self.setCurrentIndex(2)

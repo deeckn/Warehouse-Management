@@ -1,11 +1,24 @@
 from PySide6.QtWidgets import QWidget, QLabel
 from PySide6.QtGui import QFont, QColor, QPainter, QPixmap, QMouseEvent
 
+"""
+img = {
+    "home",
+    "user",
+    "product",
+    "notification",
+    "goto",
+    "fix",
+    "files",
+    "docs"
+}
+"""
+
 
 class SideMenuItem(QWidget):
     def __init__(self, img_type: str, text: str) -> None:
         QWidget.__init__(self, None)
-        self.function = None                # Keeping function that tides to the item
+        self.function = None               # Keeping function that tides to the item
         self.img_type = img_type            # Keep which type of picture is the item
         self.setFixedSize(400, 74)
         self.setContentsMargins(38, 21, 0, 21)
@@ -27,10 +40,6 @@ class SideMenuItem(QWidget):
         self.text_label.setFont(font)
         self.text_label.setStyleSheet("color: #F8F8FF")
         self.text_label.setGeometry(74, 20, 322, 36)
-
-    # Set click state when clicked
-    def set_click(self) -> None:
-        self.set_function(self.click)
 
     # Set a function when clicked
     def set_function(self, function) -> None:

@@ -11,7 +11,7 @@ class BaseView(QWidget):
     def __init__(self) -> None:
         QWidget.__init__(self, None)
         self.setStyleSheet("background-color: #F8F8FF")
-        font = QFont("Poppins", 18)
+        font = QFont("Poppins", 24)
         font.setBold(True)
         self.current_bt = None
         self.spacer = QSpacerItem(
@@ -54,6 +54,8 @@ class BaseView(QWidget):
         self.stack = QStackedWidget()
         self.main_layout.addWidget(self.stack)
 
+        self.set_user_label("USER00") # Testing purpose
+
 
     # Setter
     def set_current_bt(self, bt:SideMenuItem):
@@ -84,6 +86,9 @@ class BaseView(QWidget):
 
     def add_spacer_side_menu(self):
         self.side_menu_bt_bar_layout.addItem(self.spacer)
+
+    def add_page(self, new_page: QWidget):
+        self.stack.addWidget(new_page)
 
     def unclick_current_bt(self):
         self.current_bt.unclick()

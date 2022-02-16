@@ -161,12 +161,15 @@ class AccountModel(Model):
         self.__user_dao = AppDAO.get_dao("user")
 
     def get_employee_accounts(self) -> list[User]:
+        """Returns all user objects from the database"""
         return self.__user_dao.get_all_users()
 
     def create_new_account(self, user: User):
+        """Adds a new user object to the database"""
         self.__user_dao.add_user(user)
 
     def generate_username(self, first_name: str, last_name: str) -> str:
+        """Returns a valid username based on the user's name"""
         username = str()
 
         first_name = first_name.lower()
@@ -189,10 +192,14 @@ class AccountModel(Model):
         return username
 
     def verify_create_password(self, password: str, confirm: str) -> bool:
+        """Returns the status of password confirmation"""
         return password == confirm
 
     def update_user_info(self, new_user_info: User):
+        """Updates an existing user information"""
         previous_info = self.__user_dao.get_user_by_id(new_user_info.get_id())
+        if previous_info is None:
+            return
 
         first_name = None if new_user_info.get_first_name(
         ) == previous_info.get_first_name() else new_user_info.get_first_name()
@@ -218,7 +225,9 @@ class AccountModel(Model):
         )
 
     def admin_confirmation(self, password: str) -> bool:
+        """Returns the status of admin password confirmation"""
         return self.__current_admin.get_password() == password
 
     def delete_user_account(self, user: User):
+        """Deletes a user object from the database"""
         self.__user_dao.delete_user_by_id(user.get_id())

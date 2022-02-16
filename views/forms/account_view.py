@@ -1,7 +1,8 @@
 import sys
 from PySide6.QtWidgets import *
 from PySide6.QtCore import *
-from account_ui import AccountUI
+# from views.forms.account_ui import AccountUI # for real testing
+from account_ui import AccountUI # for local testing
 # from data_classes import User
 
 

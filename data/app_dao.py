@@ -343,7 +343,46 @@ class CustomerDAO(DAO):
 
 
 class ProductDAO(DAO):
-    pass
+
+    __table_name = "PRODUCTS"
+    __COLUMN_ID = "id"
+    __COLUMN_NAME = "name"
+    __COLUMN_QUANTITY = "quantity"
+    __COLUMN_LOW_STOCK = "low_stock"
+    __COLUMN_WEIGHT = "weight"
+    __COLUMN_LAST_STORED = "last_stored"
+    __COLUMN_LOCATION = "location"
+    __COLUMN_OWNER = "owner"
+
+    def __init__(self, connection: sqlite3.Connection):
+        self.__connection = connection
+        self.__cursor = self.__connection.cursor()
+        self.__query_list = list()
+
+    def add_product(self, product: ProductItem):
+        pass
+
+    def get_product(self, product_id: int) -> ProductItem:
+        pass
+
+    def get_all_products(self) -> list[ProductItem]:
+        pass
+
+    def update_product(
+        self,
+        id: int,
+        name: str = None,
+        quantity: int = None,
+        low_stock: int = None,
+        weight: float = None,
+        last_stored: str = None,
+        location: int = None,
+        owner_id: int = None
+    ):
+        pass
+
+    def delete_product(self, product_id: int):
+        pass
 
 
 class ShelfDAO(DAO):

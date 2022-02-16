@@ -9,6 +9,7 @@ class StackPage(QWidget):
         QWidget.__init__(self, None)
         self.setFixedSize(1520,1080)
         self.setStyleSheet("background-color: #F8F8FF;")
-        self.viewFont = QFont("Poppins", 64)
+        self.viewFont = QFont("Poppins")
+        self.viewFont.setPixelSize(64)
         self.viewFont.setBold(True)
         

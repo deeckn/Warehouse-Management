@@ -24,7 +24,8 @@ class SideMenuItem(QWidget):
         self.setContentsMargins(38, 21, 0, 21)
 
         # Font
-        font = QFont("Poppins", 24)
+        font = QFont("Poppins")
+        font.setPixelSize(24)
         font.setBold(True)
 
         # IMG

@@ -33,7 +33,7 @@ class LoginView(QWidget):
 
         self.login_label = QLabel(self)
         self.login_label.setGeometry(QRect(342, 208, 301, 131))
-        font.setPointSize(72)
+        font.setPixelSize(72)
         self.login_label.setFont(font)
         self.login_label.setText("Log in")
         self.login_label.setStyleSheet(
@@ -41,7 +41,7 @@ class LoginView(QWidget):
 
         self.username_label = QLabel(self)
         self.username_label.setGeometry(QRect(342, 356, 271, 54))
-        font.setPointSize(36)
+        font.setPixelSize(36)
         self.username_label.setFont(font)
         self.username_label.setText("Username")
         self.username_label.setStyleSheet(
@@ -57,7 +57,7 @@ class LoginView(QWidget):
         self.error_label = QLabel(self)
         self.error_label.setText("Wrong Username or Password")
         self.error_label.setGeometry(QRect(352, 770, 711, 51))
-        font.setPointSize(18)
+        font.setPixelSize(18)
         self.error_label.setFont(font)
         self.error_label.hide()
         self.error_label.setStyleSheet(
@@ -67,14 +67,14 @@ class LoginView(QWidget):
         self.login_button.setText("Log in")
         self.login_button.setGeometry(QRect(1428, 782, 200, 80))
         font.setBold(False)
-        font.setPointSize(28)
+        font.setPixelSize(28)
         self.login_button.setFont(font)
         self.login_button.setStyleSheet(
             "color: white; background-color: #FDCB6E; border-radius: 25;")
 
         self.username_lineedit = QLineEdit(self)
         self.username_lineedit.setGeometry(QRect(342, 430, 1286, 109))
-        font.setPointSize(36)
+        font.setPixelSize(36)
         self.username_lineedit.setFont(font)
         self.username_lineedit.setStyleSheet(u"background-color: rgb(221, 221, 221);\n"
                                              "padding-left: 50;\n"

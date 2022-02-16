@@ -11,7 +11,8 @@ class BaseView(QWidget):
     def __init__(self) -> None:
         QWidget.__init__(self, None)
         self.setStyleSheet("background-color: #F8F8FF")
-        font = QFont("Poppins", 24)
+        font = QFont("Poppins")
+        font.setPixelSize(24)
         font.setBold(True)
         self.current_bt = None
         self.spacer = QSpacerItem(

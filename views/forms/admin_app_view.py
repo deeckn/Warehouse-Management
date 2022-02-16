@@ -1,4 +1,5 @@
 from views.forms.base_view import BaseView
+from views.forms.account_view import AccountView
 from views.items.side_menu_item import SideMenuItem
 
 class AdminAppView(BaseView):
@@ -23,6 +24,9 @@ class AdminAppView(BaseView):
         self.site_bt.set_function(self.move_site)
         self.overview_bt.set_function(self.move_overview)
         self.report_bt.set_function(self.move_report)
+
+        self.account_page = AccountView()
+        self.add_page(self.account_page)
 
     # Setter
     def set_main_button_listener(self, function):

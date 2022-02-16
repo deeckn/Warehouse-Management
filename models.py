@@ -150,3 +150,75 @@ class ProductListModel(Model):
     def delete_product_information(self, product: ProductItem):
         "update product in database"
         pass
+
+
+class AccountModel(Model):
+    __current_admin: User
+    __user_dao: UserDAO
+
+    def __init__(self, user: User = None):
+        self.__current_admin = user
+        self.__user_dao = AppDAO.get_dao("user")
+
+    def get_employee_accounts(self) -> list[User]:
+        return self.__user_dao.get_all_users()
+
+    def create_new_account(self, user: User):
+        self.__user_dao.add_user(user)
+
+    def generate_username(self, first_name: str, last_name: str) -> str:
+        username = str()
+
+        first_name = first_name.lower()
+        last_name = last_name.lower()
+        first_name_length = 4
+        last_name_length = 4
+
+        if len(first_name) <= first_name_length:
+            username += first_name
+        else:
+            username += first_name[0:first_name_length]
+
+        username += "."
+
+        if len(last_name) <= last_name_length:
+            username += last_name
+        else:
+            username += last_name[0:last_name_length]
+
+        return username
+
+    def verify_create_password(self, password: str, confirm: str) -> bool:
+        return password == confirm
+
+    def update_user_info(self, new_user_info: User):
+        previous_info = self.__user_dao.get_user_by_id(new_user_info.get_id())
+
+        first_name = None if new_user_info.get_first_name(
+        ) == previous_info.get_first_name() else new_user_info.get_first_name()
+
+        last_name = None if new_user_info.get_last_name(
+        ) == previous_info.get_last_name() else new_user_info.get_last_name()
+
+        username = self.generate_username(
+            new_user_info.get_first_name(),
+            new_user_info.get_last_name()
+        )
+        username = None if username == previous_info.get_username() else username
+
+        password = None if new_user_info.get_password(
+        ) == previous_info.get_password() else new_user_info.get_password()
+
+        self.__user_dao.update_user(
+            new_user_info.get_id(),
+            first_name=first_name,
+            last_name=last_name,
+            username=username,
+            password=password
+        )
+
+    def admin_confirmation(self, password: str) -> bool:
+        return self.__current_admin.get_password() == password
+
+    def delete_user_account(self, user: User):
+        self.__user_dao.delete_user_by_id(user.get_id())

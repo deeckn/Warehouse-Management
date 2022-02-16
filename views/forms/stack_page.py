@@ -4,7 +4,11 @@ from PySide6.QtWidgets import (
     QLabel, QWidget, QSpacerItem, QSizePolicy,
     QVBoxLayout, QHBoxLayout, QStackedWidget)
 
-class Stack_Page(QWidget):
+class StackPage(QWidget):
     def __init__(self) -> None:
         QWidget.__init__(self, None)
         self.setFixedSize(1520,1080)
+        self.setStyleSheet("background-color: #F8F8FF;")
+        self.viewFont = QFont("Poppins", 64)
+        self.viewFont.setBold(True)
+        

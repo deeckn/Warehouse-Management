@@ -1,0 +1,181 @@
+QWidget {
+    background-color:#F8F8FF;
+}
+
+QLabel#account_setting_label {
+    color: #1A374D;
+    background-color:#F8F8FF;
+}
+
+QWidget#employee_acc_list_widget {
+    background-color:#ffffff;
+    border-radius: 10px;
+}
+
+QLabel#employee_acc_list_label {
+    color: #1A374D;
+    background-color:none;
+}
+
+QScrollArea#scrollArea {
+    border: none;
+}
+
+QWidget#scrollArea_widget {
+    background-color:#ffffff;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+QWidget#create_new_acc_widget {
+    background-color:#ffffff;
+    border-radius: 10px;
+}
+
+QLabel#create_new_acc_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLabel#create_first_name_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLabel#create_last_name_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLabel#create_username_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLabel#create_password_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLabel#create_confirm_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLineEdit#usin_create_first_name {
+    background-color: #DDDDDD;
+    border-radius: 0px;
+}
+
+QLineEdit#usin_create_last_name {
+    background-color: #DDDDDD;
+    border-radius: 0px;
+}
+
+QLabel#create_username {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLineEdit#usin_create_password {
+    background-color: #DDDDDD;
+    border-radius: 0px;
+}
+
+QLineEdit#usin_create_confirm {
+    background-color: #DDDDDD;
+    border-radius: 0px;
+}
+
+QRadioButton#btn_create_admin {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QPushButton#btn_create_account {
+    color: #ffffff;
+    background: #FDCB6E;
+    border-radius: 10px;
+}
+
+QWidget#edit_employee_acc_widget {
+    background-color:#ffffff;
+    border-radius: 10px;
+}
+
+QLabel#edit_employee_acc_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLabel#edit_description_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLabel#edit_first_name_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLabel#edit_last_name_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLabel#edit_username_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLabel#edit_change_password_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLineEdit#usin_edit_first_name {
+    background-color: #DDDDDD;
+    border-radius: 0px;
+}
+
+QLineEdit#usin_edit_last_name {
+    background-color: #DDDDDD;
+    border-radius: 0px;
+}
+
+QLabel#edit_username {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLineEdit#usin_edit_change_password {
+    background-color: #DDDDDD;
+    border-radius: 0px;
+}
+
+QLabel#edit_admin_confirm_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLabel#edit_password_label {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QLineEdit#usin_edit_password {
+    background-color: #DDDDDD;
+    border-radius: 0px;
+}
+
+QPushButton#btn_delete {
+    color: #ffffff;
+    background: #FDCB6E;
+    border-radius: 10px;
+}
+
+QPushButton#btn_save_changes {
+    color: #ffffff;
+    background: #FDCB6E;
+    border-radius: 10px;
+}

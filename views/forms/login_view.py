@@ -95,6 +95,10 @@ class LoginView(QWidget):
 
     # UI
 
+    def reset(self):
+        self.clear_info()
+        self.hide_error_label()
+
     def clear_info(self) -> None:
         self.username_lineedit.setText("")
         self.password_lineedit.setText("")

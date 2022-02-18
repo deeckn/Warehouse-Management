@@ -46,7 +46,7 @@ class AppDAO:
 class UserDAO(DAO):
 
     __table_name = "USERS"
-    __COLUMN_ID = "id"
+    __COLUMN_ID = "user_id"
     __COLUMN_FIRST_NAME = "first_name"
     __COLUMN_LAST_NAME = "last_name"
     __COLUMN_USERNAME = "username"
@@ -161,7 +161,7 @@ class UserDAO(DAO):
 class LogDAO(DAO):
 
     __table_name = "LOG_ENTRIES"
-    __COLUMN_ID = "id"
+    __COLUMN_ID = "log_id"
     __COLUMN_DATE = "date"
     __COLUMN_TIME = "time"
     __COLUMN_DESCRIPTION = "description"
@@ -203,7 +203,7 @@ class LogDAO(DAO):
 class CustomerDAO(DAO):
 
     __table_name = "CUSTOMERS"
-    __COLUMN_ID = "id"
+    __COLUMN_ID = "customer_id"
     __COLUMN_NAME = "name"
     __COLUMN_PHONE = "phone"
     __COLUMN_EMAIL = "email"
@@ -345,7 +345,7 @@ class CustomerDAO(DAO):
 class ProductDAO(DAO):
 
     __table_name = "PRODUCTS"
-    __COLUMN_ID = "id"
+    __COLUMN_ID = "product_id"
     __COLUMN_NAME = "name"
     __COLUMN_QUANTITY = "quantity"
     __COLUMN_LOW_STOCK = "low_stock"
@@ -353,6 +353,7 @@ class ProductDAO(DAO):
     __COLUMN_LAST_STORED = "last_stored"
     __COLUMN_LOCATION = "location"
     __COLUMN_OWNER = "owner"
+    __COLUMN_CATEGORY = "category"
 
     def __init__(self, connection: sqlite3.Connection):
         self.__connection = connection

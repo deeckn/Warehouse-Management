@@ -38,16 +38,13 @@ class RootContainer(QStackedWidget):
         self.setCurrentIndex(0)
 
     def move_login_to_main(self):
-        self.login_Page.clear_info()
         self.setCurrentIndex(1)
 
     def move_login_to_admin(self):
-        self.login_Page.clear_info()
         self.setCurrentIndex(2)
 
     def move_admin_to_main(self):
         self.setCurrentIndex(1)
-        self.main_app_view.show_admin_bt()
 
     def move_main_to_admin(self):
         self.setCurrentIndex(2)

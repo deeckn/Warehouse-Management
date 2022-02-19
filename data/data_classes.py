@@ -79,6 +79,7 @@ class ProductItem:
     __name: str
     __quantity: int
     __low_stock: int
+    __is_low_stock: bool
     __location: str
     __weight: float
     __last_stored: str
@@ -97,8 +98,11 @@ class ProductItem:
     def get_quantity(self) -> int:
         return self.__quantity
 
-    def get_low_stock(self) -> int:
+    def get_low_stock_quantity(self) -> int:
         return self.__low_stock
+
+    def is_low_stock(self) -> bool:
+        return self.__is_low_stock
 
     def get_location(self) -> str:
         return self.__location

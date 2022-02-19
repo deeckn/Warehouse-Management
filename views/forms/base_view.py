@@ -15,8 +15,7 @@ class BaseView(QWidget):
         font.setPixelSize(24)
         font.setBold(True)
         self.current_bt = None
-        self.spacer = QSpacerItem(
-            0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.spacer = QSpacerItem(0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.main_layout = QHBoxLayout(self)
         self.main_layout.setSpacing(0)
@@ -55,9 +54,6 @@ class BaseView(QWidget):
         self.stack = QStackedWidget()
         self.main_layout.addWidget(self.stack)
 
-        self.set_user_label("USER00") # Testing purpose
-
-
     # Setter
     def set_current_bt(self, bt:SideMenuItem):
         self.current_bt = bt
@@ -67,8 +63,6 @@ class BaseView(QWidget):
 
     def set_logout_bt_listener(self, function):
         self.logout_bt.set_function(function)
-
-
 
     def set_function_all_bt(self, function):
         for i in range(self.count_bt):

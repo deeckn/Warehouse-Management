@@ -10,7 +10,9 @@ img = {
     "goto",
     "fix",
     "files",
-    "docs"
+    "docs",
+    "search",
+    "logout"
 }
 """
 

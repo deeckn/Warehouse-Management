@@ -2,6 +2,7 @@ import sqlite3
 import os.path
 from data.access_level import *
 from data.data_classes import *
+from data.categories import *
 from abc import ABC
 
 
@@ -27,7 +28,8 @@ class AppDAO:
         'customer' returns CustomerDAO,
         'product' returns ProductDAO,
         'shelf' returns ShelfDAO,
-        'log' returns LogDAO
+        'log' returns LogDAO,
+        'categories' returns CategoryDAO
         """
         if type == "user":
             return UserDAO(AppDAO.__connection)
@@ -39,6 +41,8 @@ class AppDAO:
             return ShelfDAO()
         elif type == "log":
             return LogDAO(AppDAO.__connection)
+        elif type == "categories":
+            return CategoryDAO(AppDAO.__connection)
         else:
             return None
 
@@ -342,6 +346,70 @@ class CustomerDAO(DAO):
         self.__connection.commit()
 
 
+class CategoryDAO(DAO):
+
+    __table_name = "PRODUCT_CATEGORIES"
+    __COLUMN_PRODUCT_ID = "product_id"
+    __COLUMN_CATEGORY = "category"
+
+    def __init__(self, connection: sqlite3.Connection):
+        self.__connection = connection
+        self.__cursor = self.__connection.cursor()
+
+    def add_product_category(self, product_id: int, category: ProductCategory):
+        """Appends a product category to the PRODUCT_CATEGORIES table"""
+        self.__cursor.execute(f"""
+            INSERT INTO {CategoryDAO.__table_name}
+            ({CategoryDAO.__COLUMN_PRODUCT_ID}, 
+             {CategoryDAO.__COLUMN_CATEGORY})
+            VALUES ('{product_id}', 
+                    '{category.get_category()}')
+        """)
+        self.__connection.commit()
+
+    def get_product_categories(self, product_id: int) -> list[ProductCategory]:
+        """Returns a list of ProductCategory objects"""
+        self.__cursor.execute(f"""
+            SELECT {CategoryDAO.__COLUMN_CATEGORY} 
+            FROM {CategoryDAO.__table_name} 
+            WHERE {CategoryDAO.__COLUMN_PRODUCT_ID}={product_id}
+        """)
+
+        data = self.__cursor.fetchall()
+        categories = list()
+        for category in data:
+            category_name = category[0]
+            category_class = CategoryFactory.get_category(category_name)
+            categories.append(category_class)
+        return categories
+
+    def remove_product_category(self, product_id: int, category: ProductCategory):
+        self.__cursor.execute(f"""
+            DELETE FROM {CategoryDAO.__table_name} 
+            WHERE {CategoryDAO.__COLUMN_PRODUCT_ID}={product_id}
+            AND {CategoryDAO.__COLUMN_CATEGORY}='{category.get_category()}'""")
+        self.__connection.commit()
+
+
+class LocationDAO(DAO):
+    __table_name = "PRODUCT_CATEGORIES"
+    __COLUMN_PRODUCT_ID = "product_id"
+    __COLUMN_LOCATION = "location"
+
+    def __init__(self, connection: sqlite3.Connection):
+        self.__connection = connection
+        self.__cursor = self.__connection.cursor()
+
+    def add_product_location(self, product_id: int, location: str):
+        pass
+
+    def get_product_location(self, product_id: int) -> str:
+        pass
+
+    def remove_product_location(self, product_id: int, location: str):
+        pass
+
+
 class ProductDAO(DAO):
 
     __table_name = "PRODUCTS"
@@ -349,6 +417,7 @@ class ProductDAO(DAO):
     __COLUMN_NAME = "name"
     __COLUMN_QUANTITY = "quantity"
     __COLUMN_LOW_STOCK = "low_stock"
+    __COLUMN_IS_LOW_STOCK = "is_low_stock"
     __COLUMN_WEIGHT = "weight"
     __COLUMN_LAST_STORED = "last_stored"
     __COLUMN_LOCATION = "location"

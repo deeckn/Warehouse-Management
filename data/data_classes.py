@@ -73,51 +73,6 @@ class Customer:
 
 
 @dataclass
-class ProductItem:
-
-    __id: int
-    __name: str
-    __quantity: int
-    __low_stock: int
-    __is_low_stock: bool
-    __location: str
-    __weight: float
-    __last_stored: str
-    __owner: Customer
-    __categories: list[ProductCategory]
-
-    def get_owner(self) -> Customer:
-        return self.__owner
-
-    def get_id(self) -> int:
-        return self.__id
-
-    def get_name(self) -> str:
-        return self.__name
-
-    def get_quantity(self) -> int:
-        return self.__quantity
-
-    def get_low_stock_quantity(self) -> int:
-        return self.__low_stock
-
-    def is_low_stock(self) -> bool:
-        return self.__is_low_stock
-
-    def get_location(self) -> str:
-        return self.__location
-
-    def get_weight(self) -> float:
-        return self.__weight
-
-    def get_last_stored(self) -> str:
-        return self.__last_stored
-
-    def get_category_list(self) -> list[ProductCategory]:
-        return self.__categories
-
-
-@dataclass
 class StorageShelf:
     __id: int
     __label: str
@@ -178,3 +133,64 @@ class LogEntry:
 
     def __str__(self) -> str:
         return f"Date: {self.__date}, Time: {self.__time}, Description: {self.__description}"
+
+
+@dataclass
+class Location:
+    shelf_label: str
+    starting_number: int
+    ending_number: int
+
+    def __str__(self):
+        return f"{self.shelf_label}{self.starting_number:03d} to {self.shelf_label}{self.ending_number:03d}"
+
+    def get_shelf_label(self) -> str:
+        return self.shelf_label
+
+    def get_range(self) -> tuple[int, int]:
+        return self.starting_number, self.ending_number
+
+
+@dataclass
+class ProductItem:
+
+    __id: int
+    __name: str
+    __quantity: int
+    __low_stock: int
+    __is_low_stock: bool
+    __locations: list[Location]
+    __weight: float
+    __last_stored: str
+    __owner: Customer
+    __categories: list[ProductCategory]
+
+    def get_owner(self) -> Customer:
+        return self.__owner
+
+    def get_id(self) -> int:
+        return self.__id
+
+    def get_name(self) -> str:
+        return self.__name
+
+    def get_quantity(self) -> int:
+        return self.__quantity
+
+    def get_low_stock_quantity(self) -> int:
+        return self.__low_stock
+
+    def is_low_stock(self) -> bool:
+        return self.__is_low_stock
+
+    def get_locations(self) -> list[Location]:
+        return self.__locations
+
+    def get_weight(self) -> float:
+        return self.__weight
+
+    def get_last_stored(self) -> str:
+        return self.__last_stored
+
+    def get_category_list(self) -> list[ProductCategory]:
+        return self.__categories

@@ -7,7 +7,9 @@ from abc import ABC
 
 
 class DAO(ABC):
-    pass
+    def __init__(self, connection: sqlite3.Connection):
+        self.connection = connection
+        self.cursor = self.connection.cursor()
 
 
 class AppDAO:
@@ -43,6 +45,8 @@ class AppDAO:
             return LogDAO(AppDAO.__connection)
         elif type == "categories":
             return CategoryDAO(AppDAO.__connection)
+        elif type == "location":
+            return LocationDAO(AppDAO.__connection)
         else:
             return None
 
@@ -58,19 +62,18 @@ class UserDAO(DAO):
     __COLUMN_ACCESS = "access_level"
 
     def __init__(self, connection: sqlite3.Connection):
-        self.__connection = connection
-        self.__cursor = self.__connection.cursor()
+        super().__init__(connection)
         self.__query_list = list()
 
     def get_all_users(self) -> list[User]:
         """Retrieves all users from the USERS table"""
-        self.__cursor.execute(f"SELECT * FROM {UserDAO.__table_name}")
-        users = self.__cursor.fetchall()
+        self.cursor.execute(f"SELECT * FROM {UserDAO.__table_name}")
+        users = self.cursor.fetchall()
         self.__query_list = users
         self.__convert_to_object()
         return self.__query_list
 
-    def __convert_to_object(self) -> None:
+    def __convert_to_object(self):
         """Converts raw data to User objects"""
         temp = list()
         for data in self.__query_list:
@@ -81,9 +84,9 @@ class UserDAO(DAO):
 
     def get_user_by_id(self, id: int) -> User:
         """Retreives a User object from an id"""
-        self.__cursor.execute(
+        self.cursor.execute(
             f"SELECT * FROM {UserDAO.__table_name} WHERE {UserDAO.__COLUMN_ID}={id}")
-        data = self.__cursor.fetchone()
+        data = self.cursor.fetchone()
         if data is None:
             return None
 
@@ -92,9 +95,9 @@ class UserDAO(DAO):
 
     def get_user_by_username(self, username: str) -> User:
         """Retreives a User object from a username"""
-        self.__cursor.execute(
+        self.cursor.execute(
             f"SELECT * FROM {UserDAO.__table_name} WHERE {UserDAO.__COLUMN_USERNAME}='{username}'")
-        data = self.__cursor.fetchone()
+        data = self.cursor.fetchone()
         if data is None:
             return None
 
@@ -105,7 +108,7 @@ class UserDAO(DAO):
         """Adds a User object to the database"""
         access = "admin" if isinstance(
             user.get_access_level(), AdminAccess) else "employee"
-        self.__cursor.execute(f"""
+        self.cursor.execute(f"""
             INSERT INTO {UserDAO.__table_name}
             ({UserDAO.__COLUMN_FIRST_NAME},
             {UserDAO.__COLUMN_LAST_NAME},
@@ -119,7 +122,7 @@ class UserDAO(DAO):
             '{user.get_password()}',
             '{access}')
         """)
-        self.__connection.commit()
+        self.connection.commit()
 
     def update_user(
         self,
@@ -152,14 +155,14 @@ class UserDAO(DAO):
             query = query[:-2]
 
         query += f" WHERE {UserDAO.__COLUMN_ID}={user_id}"
-        self.__cursor.execute(query)
-        self.__connection.commit()
+        self.cursor.execute(query)
+        self.connection.commit()
 
     def delete_user_by_id(self, id: int) -> None:
         """Deletes user data given an id"""
-        self.__cursor.execute(
+        self.cursor.execute(
             f"DELETE FROM {UserDAO.__table_name} WHERE {UserDAO.__COLUMN_ID}={id}")
-        self.__connection.commit()
+        self.connection.commit()
 
 
 class LogDAO(DAO):
@@ -171,14 +174,13 @@ class LogDAO(DAO):
     __COLUMN_DESCRIPTION = "description"
 
     def __init__(self, connection: sqlite3.Connection):
-        self.__connection = connection
-        self.__cursor = self.__connection.cursor()
+        super().__init__(connection)
         self.__query_list = list()
 
     def get_all_log_entries(self) -> list[LogEntry]:
         """Retreives all log entries"""
-        self.__cursor.execute(f"SELECT * FROM {LogDAO.__table_name}")
-        users = self.__cursor.fetchall()
+        self.cursor.execute(f"SELECT * FROM {LogDAO.__table_name}")
+        users = self.cursor.fetchall()
         self.__query_list = users
         self.__convert_to_object()
         return self.__query_list
@@ -193,7 +195,7 @@ class LogDAO(DAO):
 
     def add_log_entry(self, log_entry: LogEntry):
         """Appends a log entry to the LOG_ENTRIES table"""
-        self.__cursor.execute(f"""
+        self.cursor.execute(f"""
             INSERT INTO {LogDAO.__table_name}
             ({LogDAO.__COLUMN_DATE}, 
              {LogDAO.__COLUMN_TIME}, 
@@ -201,7 +203,7 @@ class LogDAO(DAO):
             VALUES ('{log_entry.get_date()}', '{log_entry.get_time()}',
                     '{log_entry.get_description()}')
         """)
-        self.__connection.commit()
+        self.connection.commit()
 
 
 class CustomerDAO(DAO):
@@ -218,14 +220,13 @@ class CustomerDAO(DAO):
     __COLUMN_TOTAL_PAYMENT = "total_payment"
 
     def __init__(self, connection: sqlite3.Connection):
-        self.__connection = connection
-        self.__cursor = self.__connection.cursor()
+        super().__init__(connection)
         self.__query_list = list()
 
     def get_all_customers(self) -> list[Customer]:
         """Retreives all log entries"""
-        self.__cursor.execute(f"SELECT * FROM {CustomerDAO.__table_name}")
-        users = self.__cursor.fetchall()
+        self.cursor.execute(f"SELECT * FROM {CustomerDAO.__table_name}")
+        users = self.cursor.fetchall()
         self.__query_list = users
         self.__convert_to_object()
         return self.__query_list
@@ -253,7 +254,7 @@ class CustomerDAO(DAO):
         """Adds a Customer object to the database"""
         packing_service = 1 if customer.get_packing_service() else 0
 
-        self.__cursor.execute(f"""
+        self.cursor.execute(f"""
             INSERT INTO {CustomerDAO.__table_name}
             ({CustomerDAO.__COLUMN_NAME}, 
              {CustomerDAO.__COLUMN_PHONE}, 
@@ -272,7 +273,7 @@ class CustomerDAO(DAO):
             '{customer.get_expiry_date()}', 
             {customer.get_total_payment()})
         """)
-        self.__connection.commit()
+        self.connection.commit()
 
     def update_customer(
         self,
@@ -314,14 +315,14 @@ class CustomerDAO(DAO):
             query = query[:-2]
 
         query += f" WHERE {CustomerDAO.__COLUMN_ID}={id}"
-        self.__cursor.execute(query)
-        self.__connection.commit()
+        self.cursor.execute(query)
+        self.connection.commit()
 
     def get_customer(self, customer_id: int) -> Customer:
         """Retreives a Customer object given an id"""
-        self.__cursor.execute(
+        self.cursor.execute(
             f"SELECT * FROM {CustomerDAO.__table_name} WHERE {CustomerDAO.__COLUMN_ID}={customer_id}")
-        data = self.__cursor.fetchone()
+        data = self.cursor.fetchone()
         if data is None:
             return None
 
@@ -330,9 +331,9 @@ class CustomerDAO(DAO):
 
     def get_customer_by_name(self, name: str) -> Customer:
         """Retreives a Customer object given a name"""
-        self.__cursor.execute(
+        self.cursor.execute(
             f"SELECT * FROM {CustomerDAO.__table_name} WHERE {CustomerDAO.__COLUMN_NAME}={name}")
-        data = self.__cursor.fetchone()
+        data = self.cursor.fetchone()
         if data is None:
             return None
 
@@ -341,9 +342,9 @@ class CustomerDAO(DAO):
 
     def delete_customer(self, customer_id: int):
         """Deletes customer data given an id"""
-        self.__cursor.execute(
+        self.cursor.execute(
             f"DELETE FROM {CustomerDAO.__table_name} WHERE {CustomerDAO.__COLUMN_ID}={customer_id}")
-        self.__connection.commit()
+        self.connection.commit()
 
 
 class CategoryDAO(DAO):
@@ -353,29 +354,28 @@ class CategoryDAO(DAO):
     __COLUMN_CATEGORY = "category"
 
     def __init__(self, connection: sqlite3.Connection):
-        self.__connection = connection
-        self.__cursor = self.__connection.cursor()
+        super().__init__(connection)
 
     def add_product_category(self, product_id: int, category: ProductCategory):
         """Appends a product category to the PRODUCT_CATEGORIES table"""
-        self.__cursor.execute(f"""
+        self.cursor.execute(f"""
             INSERT INTO {CategoryDAO.__table_name}
             ({CategoryDAO.__COLUMN_PRODUCT_ID}, 
              {CategoryDAO.__COLUMN_CATEGORY})
             VALUES ('{product_id}', 
                     '{category.get_category()}')
         """)
-        self.__connection.commit()
+        self.connection.commit()
 
     def get_product_categories(self, product_id: int) -> list[ProductCategory]:
         """Returns a list of ProductCategory objects"""
-        self.__cursor.execute(f"""
+        self.cursor.execute(f"""
             SELECT {CategoryDAO.__COLUMN_CATEGORY} 
             FROM {CategoryDAO.__table_name} 
             WHERE {CategoryDAO.__COLUMN_PRODUCT_ID}={product_id}
         """)
 
-        data = self.__cursor.fetchall()
+        data = self.cursor.fetchall()
         categories = list()
         for category in data:
             category_name = category[0]
@@ -384,30 +384,74 @@ class CategoryDAO(DAO):
         return categories
 
     def remove_product_category(self, product_id: int, category: ProductCategory):
-        self.__cursor.execute(f"""
+        self.cursor.execute(f"""
             DELETE FROM {CategoryDAO.__table_name} 
             WHERE {CategoryDAO.__COLUMN_PRODUCT_ID}={product_id}
             AND {CategoryDAO.__COLUMN_CATEGORY}='{category.get_category()}'""")
-        self.__connection.commit()
+        self.connection.commit()
 
 
 class LocationDAO(DAO):
-    __table_name = "PRODUCT_CATEGORIES"
+    __table_name = "PRODUCT_LOCATIONS"
     __COLUMN_PRODUCT_ID = "product_id"
-    __COLUMN_LOCATION = "location"
+    __COLUMN_SHELF_LABEL = "shelf_label"
+    __COLUMN_STARTING_NUMBER = "starting_number"
+    __COLUMN_ENDING_NUMBER = "ending_number"
 
     def __init__(self, connection: sqlite3.Connection):
-        self.__connection = connection
-        self.__cursor = self.__connection.cursor()
+        super().__init__(connection)
 
-    def add_product_location(self, product_id: int, location: str):
-        pass
+    def add_product_location(self, product_id: int, location: Location):
+        start, end = location.get_range()
 
-    def get_product_location(self, product_id: int) -> str:
-        pass
+        try:
+            self.cursor.execute(f"""
+                INSERT INTO {LocationDAO.__table_name}
+                ({LocationDAO.__COLUMN_PRODUCT_ID}, 
+                {LocationDAO.__COLUMN_SHELF_LABEL},
+                {LocationDAO.__COLUMN_STARTING_NUMBER},
+                {LocationDAO.__COLUMN_ENDING_NUMBER})
+                VALUES 
+                ({product_id}, 
+                '{location.get_shelf_label()}',
+                {start},
+                {end})
+            """)
+            self.connection.commit()
+        except sqlite3.IntegrityError:
+            print(
+                "Unable to insert a location, \
+                the there might be a product of the same id stored on this shelf"
+            )
+            return
 
-    def remove_product_location(self, product_id: int, location: str):
-        pass
+    def get_product_location(self, product_id: int) -> list[Location]:
+        self.cursor.execute(f"""
+            SELECT 
+            {LocationDAO.__COLUMN_SHELF_LABEL},
+            {LocationDAO.__COLUMN_STARTING_NUMBER},
+            {LocationDAO.__COLUMN_ENDING_NUMBER} 
+            FROM {LocationDAO.__table_name} 
+            WHERE {LocationDAO.__COLUMN_PRODUCT_ID}={product_id}
+        """)
+
+        data = self.cursor.fetchall()
+        locations = list()
+        for location in data:
+            shelf_label = location[0]
+            start = location[1]
+            end = location[2]
+            location_object = Location(shelf_label, start, end)
+            locations.append(location_object)
+
+        return locations
+
+    def remove_product_location(self, product_id: int, shelf_label: str):
+        self.cursor.execute(f"""
+            DELETE FROM {LocationDAO.__table_name} 
+            WHERE {LocationDAO.__COLUMN_PRODUCT_ID}={product_id}
+            AND {LocationDAO.__COLUMN_SHELF_LABEL}='{shelf_label}'""")
+        self.connection.commit()
 
 
 class ProductDAO(DAO):
@@ -425,8 +469,7 @@ class ProductDAO(DAO):
     __COLUMN_CATEGORY = "category"
 
     def __init__(self, connection: sqlite3.Connection):
-        self.__connection = connection
-        self.__cursor = self.__connection.cursor()
+        super().__init__(connection)
         self.__query_list = list()
 
     def add_product(self, product: ProductItem):

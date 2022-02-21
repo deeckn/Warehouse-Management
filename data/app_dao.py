@@ -675,4 +675,17 @@ class ProductDAO(DAO):
 
 
 class ShelfDAO(DAO):
-    pass
+    __table_name = "STORAGE_SHELF"
+    __COLUMN_LABEL = "label"
+    __COLUMN_MAX_WEIGHT = "max_weight"
+    __COLUMN_LENGTH = "length"
+    __COLUMN_WIDTH = "width"
+    __COLUMN_HEIGHT = "height"
+    __COLUMN_ROWS = "rows"
+    __COLUMN_COLUMNS = "columns"
+
+    """
+    TODO for Fay: CRUD Operation
+    Create, Retreive, Update, and Delete
+    See above DAOs for reference
+    """

@@ -38,12 +38,12 @@ class AppDAO:
         elif type == "customer":
             return CustomerDAO(AppDAO.__connection)
         elif type == "product":
-            return ProductDAO()
+            return ProductDAO(AppDAO.__connection)
         elif type == "shelf":
-            return ShelfDAO()
+            return ShelfDAO(AppDAO.__connection)
         elif type == "log":
             return LogDAO(AppDAO.__connection)
-        elif type == "categories":
+        elif type == "category":
             return CategoryDAO(AppDAO.__connection)
         elif type == "location":
             return LocationDAO(AppDAO.__connection)
@@ -135,7 +135,8 @@ class UserDAO(DAO):
     ) -> None:
         """
         Updates user data given an id.
-        Example: update_user(4, first_name="John", username="john.tr", access=AdminAccess())
+        Example: update_user(4, first_name="John",
+                             username="john.tr", access=AdminAccess())
         """
         query = f"UPDATE {UserDAO.__table_name} SET "
 
@@ -197,8 +198,8 @@ class LogDAO(DAO):
         """Appends a log entry to the LOG_ENTRIES table"""
         self.cursor.execute(f"""
             INSERT INTO {LogDAO.__table_name}
-            ({LogDAO.__COLUMN_DATE}, 
-             {LogDAO.__COLUMN_TIME}, 
+            ({LogDAO.__COLUMN_DATE},
+             {LogDAO.__COLUMN_TIME},
              {LogDAO.__COLUMN_DESCRIPTION})
             VALUES ('{log_entry.get_date()}', '{log_entry.get_time()}',
                     '{log_entry.get_description()}')
@@ -256,21 +257,21 @@ class CustomerDAO(DAO):
 
         self.cursor.execute(f"""
             INSERT INTO {CustomerDAO.__table_name}
-            ({CustomerDAO.__COLUMN_NAME}, 
-             {CustomerDAO.__COLUMN_PHONE}, 
-             {CustomerDAO.__COLUMN_EMAIL}, 
-             {CustomerDAO.__COLUMN_PACKING_SERVICE}, 
-             {CustomerDAO.__COLUMN_RENTAL_DURATION}, 
-             {CustomerDAO.__COLUMN_DATE_JOINED}, 
-             {CustomerDAO.__COLUMN_EXPIRY_DATE}, 
+            ({CustomerDAO.__COLUMN_NAME},
+             {CustomerDAO.__COLUMN_PHONE},
+             {CustomerDAO.__COLUMN_EMAIL},
+             {CustomerDAO.__COLUMN_PACKING_SERVICE},
+             {CustomerDAO.__COLUMN_RENTAL_DURATION},
+             {CustomerDAO.__COLUMN_DATE_JOINED},
+             {CustomerDAO.__COLUMN_EXPIRY_DATE},
              {CustomerDAO.__COLUMN_TOTAL_PAYMENT})
-            VALUES ('{customer.get_name()}', 
-            '{customer.get_phone()}', 
-            '{customer.get_email()}', 
-            {packing_service}, 
-            '{customer.get_rental_duration()}', 
-            '{customer.get_date_joined()}', 
-            '{customer.get_expiry_date()}', 
+            VALUES ('{customer.get_name()}',
+            '{customer.get_phone()}',
+            '{customer.get_email()}',
+            {packing_service},
+            '{customer.get_rental_duration()}',
+            '{customer.get_date_joined()}',
+            '{customer.get_expiry_date()}',
             {customer.get_total_payment()})
         """)
         self.connection.commit()
@@ -360,9 +361,9 @@ class CategoryDAO(DAO):
         """Appends a product category to the PRODUCT_CATEGORIES table"""
         self.cursor.execute(f"""
             INSERT INTO {CategoryDAO.__table_name}
-            ({CategoryDAO.__COLUMN_PRODUCT_ID}, 
+            ({CategoryDAO.__COLUMN_PRODUCT_ID},
              {CategoryDAO.__COLUMN_CATEGORY})
-            VALUES ('{product_id}', 
+            VALUES ('{product_id}',
                     '{category.get_category()}')
         """)
         self.connection.commit()
@@ -370,8 +371,8 @@ class CategoryDAO(DAO):
     def get_product_categories(self, product_id: int) -> list[ProductCategory]:
         """Returns a list of ProductCategory objects"""
         self.cursor.execute(f"""
-            SELECT {CategoryDAO.__COLUMN_CATEGORY} 
-            FROM {CategoryDAO.__table_name} 
+            SELECT {CategoryDAO.__COLUMN_CATEGORY}
+            FROM {CategoryDAO.__table_name}
             WHERE {CategoryDAO.__COLUMN_PRODUCT_ID}={product_id}
         """)
 
@@ -385,7 +386,7 @@ class CategoryDAO(DAO):
 
     def remove_product_category(self, product_id: int, category: ProductCategory):
         self.cursor.execute(f"""
-            DELETE FROM {CategoryDAO.__table_name} 
+            DELETE FROM {CategoryDAO.__table_name}
             WHERE {CategoryDAO.__COLUMN_PRODUCT_ID}={product_id}
             AND {CategoryDAO.__COLUMN_CATEGORY}='{category.get_category()}'""")
         self.connection.commit()
@@ -407,12 +408,12 @@ class LocationDAO(DAO):
         try:
             self.cursor.execute(f"""
                 INSERT INTO {LocationDAO.__table_name}
-                ({LocationDAO.__COLUMN_PRODUCT_ID}, 
+                ({LocationDAO.__COLUMN_PRODUCT_ID},
                 {LocationDAO.__COLUMN_SHELF_LABEL},
                 {LocationDAO.__COLUMN_STARTING_NUMBER},
                 {LocationDAO.__COLUMN_ENDING_NUMBER})
-                VALUES 
-                ({product_id}, 
+                VALUES
+                ({product_id},
                 '{location.get_shelf_label()}',
                 {start},
                 {end})
@@ -427,11 +428,11 @@ class LocationDAO(DAO):
 
     def get_product_location(self, product_id: int) -> list[Location]:
         self.cursor.execute(f"""
-            SELECT 
+            SELECT
             {LocationDAO.__COLUMN_SHELF_LABEL},
             {LocationDAO.__COLUMN_STARTING_NUMBER},
-            {LocationDAO.__COLUMN_ENDING_NUMBER} 
-            FROM {LocationDAO.__table_name} 
+            {LocationDAO.__COLUMN_ENDING_NUMBER}
+            FROM {LocationDAO.__table_name}
             WHERE {LocationDAO.__COLUMN_PRODUCT_ID}={product_id}
         """)
 
@@ -448,7 +449,7 @@ class LocationDAO(DAO):
 
     def remove_product_location(self, product_id: int, shelf_label: str):
         self.cursor.execute(f"""
-            DELETE FROM {LocationDAO.__table_name} 
+            DELETE FROM {LocationDAO.__table_name}
             WHERE {LocationDAO.__COLUMN_PRODUCT_ID}={product_id}
             AND {LocationDAO.__COLUMN_SHELF_LABEL}='{shelf_label}'""")
         self.connection.commit()
@@ -457,29 +458,155 @@ class LocationDAO(DAO):
 class ProductDAO(DAO):
 
     __table_name = "PRODUCTS"
-    __COLUMN_ID = "product_id"
+    __COLUMN_PRODUCT_ID = "product_id"
     __COLUMN_NAME = "name"
     __COLUMN_QUANTITY = "quantity"
     __COLUMN_LOW_STOCK = "low_stock"
     __COLUMN_IS_LOW_STOCK = "is_low_stock"
     __COLUMN_WEIGHT = "weight"
     __COLUMN_LAST_STORED = "last_stored"
-    __COLUMN_LOCATION = "location"
     __COLUMN_OWNER = "owner"
-    __COLUMN_CATEGORY = "category"
+
+    __category_dao: CategoryDAO
+    __location_dao: LocationDAO
+    __customer_dao: CustomerDAO
 
     def __init__(self, connection: sqlite3.Connection):
         super().__init__(connection)
-        self.__query_list = list()
+        self.__category_dao = AppDAO.get_dao("category")
+        self.__location_dao = AppDAO.get_dao("location")
+        self.__customer_dao = AppDAO.get_dao("customer")
 
     def add_product(self, product: ProductItem):
-        pass
+        """Adds a Product object to the PRODUCTS table"""
+        is_low_stock = 1 if product.is_low_stock() else 0
+
+        try:
+            self.cursor.execute(f"""
+                INSERT INTO {ProductDAO.__table_name}
+                ({ProductDAO.__COLUMN_NAME},
+                {ProductDAO.__COLUMN_QUANTITY},
+                {ProductDAO.__COLUMN_LOW_STOCK},
+                {ProductDAO.__COLUMN_WEIGHT},
+                {ProductDAO.__COLUMN_LAST_STORED},
+                {ProductDAO.__COLUMN_OWNER},
+                {ProductDAO.__COLUMN_IS_LOW_STOCK})
+                VALUES
+                ('{product.get_name()}',
+                {product.get_quantity()},
+                {product.get_low_stock_quantity()},
+                {product.get_weight()},
+                '{product.get_last_stored()}',
+                {product.get_owner().get_id()},
+                {is_low_stock})
+            """)
+            self.connection.commit()
+
+            current_product: ProductItem = self.get_product_by_name(
+                product.get_name(),
+                product.get_owner().get_id()
+            )
+
+            for category in product.get_category_list():
+                self.__category_dao.add_product_category(
+                    current_product.get_id(),
+                    category
+                )
+
+            for location in product.get_locations():
+                self.__location_dao.add_product_location(
+                    current_product.get_id(),
+                    location
+                )
+
+        except sqlite3.IntegrityError:
+            print(
+                "Unable to insert the product, \
+                the there might be a product with same id"
+            )
+            return
 
     def get_product(self, product_id: int) -> ProductItem:
-        pass
+        """Returns a ProductItem object given an id"""
+        self.cursor.execute(f"""
+            SELECT *
+            FROM {ProductDAO.__table_name}
+            WHERE {ProductDAO.__COLUMN_PRODUCT_ID}={product_id}
+        """)
+
+        data = self.cursor.fetchone()
+        categories = self.__category_dao.get_product_categories(product_id)
+        locations = self.__location_dao.get_product_location(product_id)
+        owner = self.__customer_dao.get_customer(data[6])
+        product = ProductItem(
+            data[0],
+            data[1],
+            data[2],
+            data[3],
+            data[7],
+            locations,
+            data[4],
+            data[5],
+            owner,
+            categories
+        )
+        return product
+
+    def get_product_by_name(self, product_name: str, owner_id: int) -> ProductItem:
+        """Returns a ProductItem object given the name and owner id"""
+        self.cursor.execute(f"""
+            SELECT *
+            FROM {ProductDAO.__table_name}
+            WHERE {ProductDAO.__COLUMN_NAME}='{product_name}'
+            AND {ProductDAO.__COLUMN_OWNER}={owner_id}
+        """)
+
+        data = self.cursor.fetchone()
+        categories = self.__category_dao.get_product_categories(data[0])
+        locations = self.__location_dao.get_product_location(data[0])
+        owner = self.__customer_dao.get_customer(data[6])
+        product = ProductItem(
+            data[0],
+            data[1],
+            data[2],
+            data[3],
+            data[7],
+            locations,
+            data[4],
+            data[5],
+            owner,
+            categories
+        )
+        return product
 
     def get_all_products(self) -> list[ProductItem]:
-        pass
+        """Returns all products as a list of ProductItem objects"""
+        self.cursor.execute(f"""
+            SELECT *
+            FROM {ProductDAO.__table_name}
+        """)
+
+        data = self.cursor.fetchall()
+        all_products: list[ProductItem] = list()
+        for product in data:
+            categories = self.__category_dao.get_product_categories(product[0])
+            locations = self.__location_dao.get_product_location(product[0])
+            owner = self.__customer_dao.get_customer(product[6])
+            product_object = ProductItem(
+                product[0],
+                product[1],
+                product[2],
+                product[3],
+                product[7],
+                locations,
+                product[4],
+                product[5],
+                owner,
+                categories
+            )
+            all_products.append(product_object)
+
+        return all_products
 
     def update_product(
         self,
@@ -489,7 +616,6 @@ class ProductDAO(DAO):
         low_stock: int = None,
         weight: float = None,
         last_stored: str = None,
-        location: int = None,
         owner_id: int = None
     ):
         pass

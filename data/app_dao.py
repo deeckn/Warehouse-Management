@@ -31,7 +31,8 @@ class AppDAO:
         'product' returns ProductDAO,
         'shelf' returns ShelfDAO,
         'log' returns LogDAO,
-        'categories' returns CategoryDAO
+        'category' returns CategoryDAO,
+        'location" returns LocationDAO
         """
         if type == "user":
             return UserDAO(AppDAO.__connection)
@@ -385,10 +386,19 @@ class CategoryDAO(DAO):
         return categories
 
     def remove_product_category(self, product_id: int, category: ProductCategory):
+        """Removes a category from a product"""
         self.cursor.execute(f"""
             DELETE FROM {CategoryDAO.__table_name}
             WHERE {CategoryDAO.__COLUMN_PRODUCT_ID}={product_id}
             AND {CategoryDAO.__COLUMN_CATEGORY}='{category.get_category()}'""")
+        self.connection.commit()
+
+    def remove_all_product_categories(self, product_id: int):
+        """Removes all categories of a product"""
+        self.cursor.execute(f"""
+            DELETE FROM {CategoryDAO.__table_name}
+            WHERE {CategoryDAO.__COLUMN_PRODUCT_ID}={product_id}
+        """)
         self.connection.commit()
 
 
@@ -403,6 +413,7 @@ class LocationDAO(DAO):
         super().__init__(connection)
 
     def add_product_location(self, product_id: int, location: Location):
+        """Adds a product and location entry to the PRODUCT_LOCATIONS table"""
         start, end = location.get_range()
 
         try:
@@ -427,6 +438,7 @@ class LocationDAO(DAO):
             return
 
     def get_product_location(self, product_id: int) -> list[Location]:
+        """Returns list of Location objects given the product id"""
         self.cursor.execute(f"""
             SELECT
             {LocationDAO.__COLUMN_SHELF_LABEL},
@@ -448,10 +460,19 @@ class LocationDAO(DAO):
         return locations
 
     def remove_product_location(self, product_id: int, shelf_label: str):
+        """Removes a shelf location of a product in the PRODUCT_LOCATIONS table"""
         self.cursor.execute(f"""
             DELETE FROM {LocationDAO.__table_name}
             WHERE {LocationDAO.__COLUMN_PRODUCT_ID}={product_id}
             AND {LocationDAO.__COLUMN_SHELF_LABEL}='{shelf_label}'""")
+        self.connection.commit()
+
+    def remove_all_product_locations(self, product_id: int):
+        """Removes the locations of a product"""
+        self.cursor.execute(f"""
+            DELETE FROM {LocationDAO.__table_name}
+            WHERE {LocationDAO.__COLUMN_PRODUCT_ID}={product_id}
+        """)
         self.connection.commit()
 
 
@@ -613,15 +634,44 @@ class ProductDAO(DAO):
         id: int,
         name: str = None,
         quantity: int = None,
-        low_stock: int = None,
+        low_stock: bool = None,
         weight: float = None,
         last_stored: str = None,
         owner_id: int = None
     ):
-        pass
+        query = f"UPDATE {ProductDAO.__table_name} SET "
+
+        if name is not None:
+            query += f'{ProductDAO.__COLUMN_NAME}="{name}", '
+        if quantity is not None:
+            query += f'{ProductDAO.__COLUMN_QUANTITY}={quantity}, '
+        if low_stock is not None:
+            status = 1 if low_stock else 0
+            query += f'{ProductDAO.__COLUMN_LOW_STOCK}={status}, '
+        if weight is not None:
+            query += f'{ProductDAO.__COLUMN_WEIGHT}={weight}, '
+        if last_stored is not None:
+            query += f'{ProductDAO.__COLUMN_LAST_STORED}="{last_stored}", '
+        if owner_id is not None:
+            query += f'{ProductDAO.__COLUMN_OWNER}={owner_id}, '
+
+        if query[-2] == ",":
+            query = query[:-2]
+
+        query += f" WHERE {CustomerDAO.__COLUMN_ID}={id}"
+        self.cursor.execute(query)
+        self.connection.commit()
 
     def delete_product(self, product_id: int):
-        pass
+        """Removes a product from the database"""
+        self.cursor.execute(f"""
+            DELETE FROM {ProductDAO.__table_name}
+            WHERE {ProductDAO.__COLUMN_PRODUCT_ID}={product_id}
+        """)
+        self.connection.commit()
+
+        self.__category_dao.remove_all_product_categories(product_id)
+        self.__location_dao.remove_all_product_locations(product_id)
 
 
 class ShelfDAO(DAO):

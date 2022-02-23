@@ -282,7 +282,7 @@ class SiteSettingView(QWidget):
         self.row_lineEdit.setText(text)
 
     def set_column_LineEdit(self, text:str) -> None:
-        self.column_LineEdit.setText(text)
+        self.column_lineEdit.setText(text)
 
     # Set Labels
     def set_total_label(self, text:str) -> None:

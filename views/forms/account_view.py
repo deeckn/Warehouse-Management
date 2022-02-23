@@ -1,17 +1,22 @@
-import sys
 import os.path
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
-from PySide6.QtWidgets import QApplication, QWidget, QLabel, QLineEdit, QPushButton, QRadioButton, QScrollArea, QVBoxLayout
+from PySide6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QRadioButton, QScrollArea, QVBoxLayout
+from data.access_level import AdminAccess, EmployeeAccess
 from data.data_classes import User
+from views.items.employee_card_item import EmployeeCardItem
 
 
 class AccountView(QWidget):
+
     def __init__(self):
         QWidget.__init__(self, None)
         self.set_styleSheet()
 
         self.setFixedSize(1520, 1080)
+
+        self.current_card = None
+        self.previous_card = QWidget()
 
         font = QFont("Poppins")
         font.setPixelSize(72)
@@ -33,11 +38,12 @@ class AccountView(QWidget):
         employee_acc_list_label.setGeometry(0, 0, 380, 80)
         employee_acc_list_label.setFont(font)
 
-        scrollArea = QScrollArea(employee_acc_list_widget)
-        scrollArea.setObjectName("scrollArea")
-        scrollArea.setGeometry(0, 80, 380, 685)
-        scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea = QScrollArea(employee_acc_list_widget)
+        self.scrollArea.setObjectName("scrollArea")
+        self.scrollArea.setGeometry(0, 80, 380, 685)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scrollArea.setWidgetResizable(True)
 
         self.scrollArea_widget = QWidget()
         self.scrollArea_widget.setObjectName("sub_widget")
@@ -45,8 +51,9 @@ class AccountView(QWidget):
 
         self.layout = QVBoxLayout()
         self.layout.setSpacing(0)
+        self.layout.setAlignment(Qt.AlignTop)
         self.scrollArea_widget.setLayout(self.layout)
-        scrollArea.setWidget(self.scrollArea_widget)
+        self.scrollArea.setWidget(self.scrollArea_widget)
 
         # Create new account
         create_new_acc_widget = QWidget(self)
@@ -117,6 +124,7 @@ class AccountView(QWidget):
         self.btn_create_account.setObjectName("yellow_btn")
         self.btn_create_account.setGeometry(590, 290, 200, 30)
         self.btn_create_account.setFont(font)
+        # self.btn_create_account.clicked.connect(self.add_employee_card)
 
         # Edit employee account
         edit_employee_acc_widget = QWidget(self)
@@ -249,18 +257,36 @@ class AccountView(QWidget):
 
     # Employee Account List
     def add_employee_card(self, employee: User) -> None:
-        card = QLabel()
-        txt = "First Name: " + employee.get_first_name() + "\nLast Name: " + \
-            employee.get_last_name() + "\nUsername: " + employee.get_username()
 
-        card.setText(txt)
-        card.setFixedSize(355, 500)
-        card.setStyleSheet(
-            "color:#000000; background-color:#980000; margin-top:0px; margin-bottom:10px;")
+        accessLevel = ""
+        if isinstance(employee.get_access_level(), AdminAccess):
+            accessLevel = "Admin"
+        else:
+            accessLevel = "Employee"
+
+        txt = "First Name: " + employee.get_first_name() + "\nLast Name: " + \
+            employee.get_last_name() + "\nUsername: " + employee.get_username() + \
+            "\nAccess Level: " + accessLevel
+
+        card = EmployeeCardItem(self)
+        card.set_employee_card(txt)
+
         self.scrollArea_widget.layout().addWidget(card)
 
-    def get_selected_account(self) -> int:
-        pass
+    def get_selected_account(self) -> QWidget:
+        return self.current_card
 
     def clear_employee_list(self) -> None:
-        pass
+        for i in reversed(range(self.layout.count())): 
+            self.layout.itemAt(i).widget().setParent(None)
+
+
+    # Set Button
+    def set_create_account_button_listener(self, function) -> None:
+        self.btn_create_account.clicked.connect(function)
+
+    def set_delete_button_listener(self, function) -> None:
+        self.btn_delete.clicked.connect(function)
+
+    def set_save_changes_button_listener(self, function) -> None:
+        self.btn_save_changes.clicked.connect(function)

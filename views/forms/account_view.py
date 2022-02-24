@@ -2,7 +2,6 @@ import os.path
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QRadioButton, QScrollArea, QVBoxLayout
-from data.access_level import AdminAccess, EmployeeAccess
 from data.data_classes import User
 from views.items.employee_card_item import EmployeeCardItem
 
@@ -15,7 +14,7 @@ class AccountView(QWidget):
 
         self.setFixedSize(1520, 1080)
 
-        self.current_card = None
+        self.current_card: EmployeeCardItem = None
         self.previous_card = QWidget()
 
         font = QFont("Poppins")
@@ -195,7 +194,7 @@ class AccountView(QWidget):
         self.usin_edit_password.setGeometry(170, 280, 265, 30)
         self.usin_edit_password.setFont(font)
 
-        self.btn_delete = QPushButton("delete", edit_employee_acc_widget)
+        self.btn_delete = QPushButton("Delete", edit_employee_acc_widget)
         self.btn_delete.setObjectName("yellow_btn")
         self.btn_delete.setGeometry(470, 280, 140, 30)
         self.btn_delete.setFont(font)
@@ -216,77 +215,80 @@ class AccountView(QWidget):
 
     # Create new account
     def get_first_name_input(self) -> str:
+        """Returns the first name (create new account) input as a string"""
         return self.usin_create_first_name.text()
 
     def get_last_name_input(self) -> str:
+        """Returns the last name (create new account) input as a string"""
         return self.usin_create_last_name.text()
 
-    def set_username_label(self, username: str) -> None:
+    def set_username_label(self, username: str):
+        """Sets the (create new account) username label to a given string"""
         self.create_username.setText(username)
 
     def get_password_input(self) -> str:
+        """Returns the password (create new account) input as a string"""
         return self.usin_create_password.text()
 
     def get_password_confirm_input(self) -> str:
+        """Returns the confirm password (create new account) input as a string"""
         return self.usin_create_confirm.text()
 
     def get_create_admin_status(self) -> bool:
+        """Returns the state of create admin radio button"""
         return self.btn_create_admin.isChecked()
 
     # Edit employee account
-    def set_first_name_edit(self, first_name: str) -> None:
+    def set_first_name_edit(self, first_name: str):
+        """Sets the (edit employee account) first name line edit to a given string"""
         self.edit_first_name_label.setText(first_name)
 
-    def set_last_name_edit(self, last_name: str) -> None:
+    def set_last_name_edit(self, last_name: str):
+        """Sets the (edit employee account) last name line edit to a given string"""
         self.edit_last_name_label.setText(last_name)
 
-    def set_username_edit(self, username: str) -> None:
+    def set_username_edit(self, username: str):
+        """Sets the (edit employee account) username label to a given string"""
         self.edit_username.setText(username)
 
     def get_change_password(self) -> str:
+        """Returns a string of the password line edit in edit employee account"""
         return self.usin_edit_change_password.text()
 
     def get_admin_password(self) -> str:
+        """Returns the admin password confirmation as a string"""
         return self.usin_edit_password.text()
 
     def get_delete_status(self) -> bool:
+        """Returns True if the delete button is pressed else False"""
         return self.btn_delete.isChecked()
 
     def get_save_changes_status(self) -> bool:
+        """Returns True if the save changes button is pressed else False"""
         return self.btn_save_changes.isChecked()
 
     # Employee Account List
-    def add_employee_card(self, employee: User) -> None:
-
-        accessLevel = ""
-        if isinstance(employee.get_access_level(), AdminAccess):
-            accessLevel = "Admin"
-        else:
-            accessLevel = "Employee"
-
-        txt = "First Name: " + employee.get_first_name() + "\nLast Name: " + \
-            employee.get_last_name() + "\nUsername: " + employee.get_username() + \
-            "\nAccess Level: " + accessLevel
-
-        card = EmployeeCardItem(self)
-        card.set_employee_card(txt)
-
+    def add_employee_card(self, employee: User):
+        """Inserts a new EmployeeCardItem object to the list given an User object"""
+        card = EmployeeCardItem(self, employee)
         self.scrollArea_widget.layout().addWidget(card)
 
-    def get_selected_account(self) -> QWidget:
-        return self.current_card
+    def get_selected_account(self) -> User:
+        """Returns the selected EmployeeCardItem object on the UI"""
+        return self.current_card.get_current_employee()
 
-    def clear_employee_list(self) -> None:
-        for i in reversed(range(self.layout.count())): 
+    def clear_employee_list(self):
+        """Clears the list represented in the scrollarea"""
+        for i in reversed(range(self.layout.count())):
             self.layout.itemAt(i).widget().setParent(None)
 
+    # Set Button Listeners
 
-    # Set Button
-    def set_create_account_button_listener(self, function) -> None:
+    def set_create_account_button_listener(self, function):
         self.btn_create_account.clicked.connect(function)
 
-    def set_delete_button_listener(self, function) -> None:
+    def set_delete_button_listener(self, function):
         self.btn_delete.clicked.connect(function)
 
-    def set_save_changes_button_listener(self, function) -> None:
+    def set_save_changes_button_listener(self, function):
         self.btn_save_changes.clicked.connect(function)

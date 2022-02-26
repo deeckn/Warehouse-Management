@@ -2,6 +2,7 @@ from PySide6.QtWidgets import QWidget, QLabel
 from PySide6.QtGui import QFont, QMouseEvent
 from data.access_level import AdminAccess
 from data.data_classes import User
+from views.theme import Theme
 
 
 class EmployeeCardItem(QWidget):
@@ -11,9 +12,9 @@ class EmployeeCardItem(QWidget):
         self.current_employee = employee
 
         self.setFixedSize(340, 170)
-        self.setStyleSheet("""
-            color: #000000; 
-            background-color: #F8F8FF; 
+        self.setStyleSheet(f"""
+            color: #{Theme.BLACK}; 
+            background-color: #{Theme.GHOST_WHITE}; 
             padding-left: 20px; 
             margin: 0px 20px 15px 35px; 
             border-radius: 10px;
@@ -45,18 +46,18 @@ class EmployeeCardItem(QWidget):
         return self.current_employee
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
-        self.parent_widget.previous_card.setStyleSheet("""
-            color: #000000; 
-            background-color: #F8F8FF; 
+        self.parent_widget.previous_card.setStyleSheet(f"""
+            color: #{Theme.BLACK}; 
+            background-color: #{Theme.GHOST_WHITE}; 
             padding-left: 20px; 
             margin: 0px 20px 15px 35px; 
             border-radius: 10px;
         """)
 
         self.parent_widget.current_card = self
-        self.setStyleSheet("""
-            color: #000000; 
-            background-color: #F8F8FF; 
+        self.setStyleSheet(f"""
+            color: #{Theme.BLACK}; 
+            background-color: #{Theme.GHOST_WHITE}; 
             padding-left: 20px; 
             margin: 0px 20px 15px 35px; 
             border-radius: 10px; 

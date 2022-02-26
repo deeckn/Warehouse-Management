@@ -26,12 +26,12 @@ class AppDAO:
     @staticmethod
     def get_dao(type: str) -> DAO:
         """
-        'user' returns UserDAO,
-        'customer' returns CustomerDAO,
-        'product' returns ProductDAO,
-        'shelf' returns ShelfDAO,
-        'log' returns LogDAO,
-        'category' returns CategoryDAO,
+        'user' returns UserDAO |
+        'customer' returns CustomerDAO |
+        'product' returns ProductDAO |
+        'shelf' returns ShelfDAO |
+        'log' returns LogDAO |
+        'category' returns CategoryDAO |
         'location" returns LocationDAO
         """
         if type == "user":
@@ -135,7 +135,7 @@ class UserDAO(DAO):
         access: AccessLevel = None
     ) -> None:
         """
-        Updates user data given an id.
+        Updates user data given an id |
         Example: update_user(4, first_name="John",
                              username="john.tr", access=AdminAccess())
         """

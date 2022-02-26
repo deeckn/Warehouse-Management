@@ -8,11 +8,11 @@ class NotificationView(QWidget):
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
         self.setFixedSize(1520, 1080)
-        self.setStyleSheet("background-color: #F8F8FF")
+        self.setStyleSheet(f"background-color: {Theme.GHOST_WHITE}")
 
         # Page Title
         title = QLabel("Notifications", self)
-        title.setStyleSheet("color: #1A374D")
+        title.setStyleSheet(f"color: {Theme.DARK_BLUE}")
         title.setGeometry(100, 60, 500, 96)
         title.setFont(Theme.POPPINS_BOLD_72)
 

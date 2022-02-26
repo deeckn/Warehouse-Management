@@ -9,15 +9,20 @@
 ################################################################################
 
 import sys
+
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-    QMetaObject, QObject, QPoint, QRect,
-    QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
-    QFont, QFontDatabase, QGradient, QIcon,
-    QImage, QKeySequence, QLinearGradient, QPainter,
-    QPalette, QPixmap, QRadialGradient, QTransform)
+                            QMetaObject, QObject, QPoint, QRect, QSize, Qt,
+                            QTime, QUrl)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
+                           QFontDatabase, QGradient, QIcon, QImage,
+                           QKeySequence, QLinearGradient, QPainter, QPalette,
+                           QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit,
-    QPushButton, QSizePolicy, QWidget)
+                               QPushButton, QScrollArea, QSizePolicy,
+                               QVBoxLayout, QWidget,QScrollArea )
+
+from views.items.shelf_item import ShelfItem
+from data.data_classes import StorageShelf
 
 class SiteSettingView(QWidget):
     def __init__(self):
@@ -25,6 +30,9 @@ class SiteSettingView(QWidget):
         self.resize(1552, 1080)
         self.setStyleSheet(u"background-color: #E5E5E5;")
         
+        self.current_shelf :ShelfItem = None
+        self.previous_shelf = QWidget()
+
         # font
         font = QFont()
         font.setFamilies([u"Poppins"])
@@ -199,7 +207,6 @@ class SiteSettingView(QWidget):
         font.setPixelSize(24)
         font.setBold(True)
 
-        
         self.save_button = QPushButton("SAVE", self)
         self.save_button.setGeometry(267, 948, 166, 65)
         self.save_button.setFont(font)
@@ -259,9 +266,49 @@ class SiteSettingView(QWidget):
         line_4.setStyleSheet(u"background-color: black;")
         line_4.setFrameShape(QFrame.HLine)
         line_4.setFrameShadow(QFrame.Sunken)
+        
+        base_widget = QWidget(self)
+        base_widget.setGeometry(704,273,680,686)
+        base_widget.setStyleSheet("background-color: transparent;")
+        
+        self.scroll_area = QScrollArea(base_widget)
+        self.scroll_area.setGeometry(0,0,680,686)
+        self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll_area.setStyleSheet("background-color: transparent;")
+        self.scroll_area.setWidgetResizable(True)
 
-        self.showFullScreen()
+        self.scroll_area_widget = QWidget()
+        self.scroll_area_widget.setGeometry(0, 0, 680, 686)
+
+        self.layout = QVBoxLayout()
+        self.layout.setSpacing(0)
+        self.layout.setAlignment(Qt.AlignTop)
+        self.scroll_area_widget.setLayout(self.layout)
+        self.scroll_area.setWidget(self.scroll_area_widget)
+
+    # Get data from current selected shelf
+    def get_shelf_current_shelf_item(self) -> str:
+        return self.current_shelf.get_shelf()
     
+    def get_max_weight_current_shelf_item(self) -> str:
+        return self.current_shelf.get_max_weight()
+    
+    def get_length_current_shelf_item(self) -> str:
+        return self.current_shelf.get_length()
+
+    def get_width_current_shelf_item(self) -> str:
+        return self.current_shelf.get_width()
+    
+    def get_height_current_shelf_item(self) -> str:
+        return self.current_shelf.get_height()
+    
+    def get_row_current_shelf_item(self) -> str:
+        return self.current_shelf.get_row()
+
+    def get_column_current_shelf_item(self) -> str:
+        return self.current_shelf.get_column()
+
     # Set LineEdits
     def set_shelf_LineEdit(self, text: str) -> None:
         self.shelf_label_informtion_lineEdit.setText(text)
@@ -284,12 +331,12 @@ class SiteSettingView(QWidget):
     def set_column_LineEdit(self, text:str) -> None:
         self.column_lineEdit.setText(text)
 
-    # Set Labels
+    # Set Total Labels
     def set_total_label(self, text:str) -> None:
         self.total_label.setText("Total : " + text)
 
     # Get LineEdits
-    def get_search(self) -> str:
+    def get_search_LineEdit(self) -> str:
         return self.search_lineEdit.text()
 
     def get_shelf_LineEdit(self) -> str:
@@ -326,7 +373,17 @@ class SiteSettingView(QWidget):
     def set_search_listener(self, function) -> None:
         self.search_button.clicked.connect(function)
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    w = SiteSettingView()
-    sys.exit(app.exec_())
+    # Employee Account List
+    def add_shelf(self, shelf: StorageShelf):
+        """Inserts a new ShelfItem object to the list"""
+        card = ShelfItem(self, shelf)
+        self.scroll_area_widget.layout().addWidget(card)
+
+    def get_selected_account(self) -> StorageShelf:
+        """Returns the selected ShelfItem object on the UI"""
+        return self.current_shelf.get_current_shelf()
+
+    def clear_shelf_list(self):
+        """Clears the list represented in the scrollarea"""
+        for i in reversed(range(self.layout.count())):
+            self.layout.itemAt(i).widget().setParent(None)

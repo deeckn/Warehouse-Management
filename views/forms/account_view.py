@@ -60,7 +60,9 @@ class AccountView(QWidget):
         create_new_acc_widget.setGeometry(560, 220, 850, 350)
 
         create_new_acc_label = QLabel(
-            "Create New Account", create_new_acc_widget)
+            "Create New Account",
+            create_new_acc_widget
+        )
         create_new_acc_label.setGeometry(50, 30, 271, 41)
         create_new_acc_label.setFont(font)
 
@@ -109,7 +111,9 @@ class AccountView(QWidget):
         font.setPixelSize(14)
         font.setBold(True)
         self.btn_create_admin = QRadioButton(
-            "Create as admin account ", create_new_acc_widget)
+            "Create as admin account ",
+            create_new_acc_widget
+        )
         self.btn_create_admin.setObjectName("btn_create_admin")
         self.btn_create_admin.setEnabled(True)
         self.btn_create_admin.setGeometry(50, 290, 211, 20)
@@ -119,11 +123,12 @@ class AccountView(QWidget):
         font.setPixelSize(18)
         font.setBold(False)
         self.btn_create_account = QPushButton(
-            "Create Account", create_new_acc_widget)
+            "Create Account",
+            create_new_acc_widget
+        )
         self.btn_create_account.setObjectName("yellow_btn")
         self.btn_create_account.setGeometry(590, 290, 200, 30)
         self.btn_create_account.setFont(font)
-        # self.btn_create_account.clicked.connect(self.add_employee_card)
 
         # Edit employee account
         edit_employee_acc_widget = QWidget(self)
@@ -133,20 +138,26 @@ class AccountView(QWidget):
         font.setPixelSize(24)
         font.setBold(True)
         edit_employee_acc_label = QLabel(
-            "Edit Employee Account", edit_employee_acc_widget)
+            "Edit Employee Account",
+            edit_employee_acc_widget
+        )
         edit_employee_acc_label.setGeometry(50, 30, 301, 41)
         edit_employee_acc_label.setFont(font)
 
         font.setPixelSize(14)
         font.setBold(False)
         edit_description_label = QLabel(
-            "Click on an employee card on the left to select an employee account", edit_employee_acc_widget)
+            "Click on an employee card on the left to select an employee account",
+            edit_employee_acc_widget
+        )
         edit_description_label.setGeometry(50, 70, 501, 16)
         edit_description_label.setFont(font)
 
         font.setPixelSize(18)
         edit_first_name_label = QLabel(
-            "First Name :", edit_employee_acc_widget)
+            "First Name :",
+            edit_employee_acc_widget
+        )
         edit_first_name_label.setGeometry(50, 100, 120, 30)
         edit_first_name_label.setFont(font)
 
@@ -159,7 +170,9 @@ class AccountView(QWidget):
         edit_username_label.setFont(font)
 
         edit_change_password_label = QLabel(
-            "Change Password :", edit_employee_acc_widget)
+            "Change Password :",
+            edit_employee_acc_widget
+        )
         edit_change_password_label.setGeometry(330, 200, 181, 30)
         edit_change_password_label.setFont(font)
 
@@ -181,7 +194,9 @@ class AccountView(QWidget):
 
         font.setPixelSize(14)
         edit_admin_confirm_label = QLabel(
-            "Admin Confirmation :", edit_employee_acc_widget)
+            "Admin Confirmation :",
+            edit_employee_acc_widget
+        )
         edit_admin_confirm_label.setGeometry(50, 255, 501, 16)
         edit_admin_confirm_label.setFont(font)
 
@@ -200,7 +215,9 @@ class AccountView(QWidget):
         self.btn_delete.setFont(font)
 
         self.btn_save_changes = QPushButton(
-            "Save Changes", edit_employee_acc_widget)
+            "Save Changes",
+            edit_employee_acc_widget
+        )
         self.btn_save_changes.setObjectName("yellow_btn")
         self.btn_save_changes.setGeometry(620, 280, 170, 30)
         self.btn_save_changes.setFont(font)

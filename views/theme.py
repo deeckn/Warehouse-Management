@@ -41,7 +41,7 @@ class Theme:
     # COLORS
     BLACK = "000000"
     GREY = "DDDDDD"
-    GHOST_WHITE = "#F8F8FF"
+    GHOST_WHITE = "F8F8FF"
     WHITE = "FFFFFF"
     DARK_BLUE = "1A374D"
     BLUE = "406882"

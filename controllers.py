@@ -59,11 +59,11 @@ class AccountPage(Controller):
 
         self.view.set_create_account_button_listener(self.create_account)
 
-        self.view.set_first_name_text_changed_listener(
-            self.update_create_username_field)
+        self.view.set_create_text_changed_listener(lambda:
+                                                   self.update_create_username_field("create"))
 
-        self.view.set_last_name_text_changed_listener(
-            self.update_create_username_field)
+        self.view.set_edit_text_change_listener(lambda:
+                                                self.update_create_username_field("edit"))
 
         self.view.set_card_selected_listener(self.fill_user_info)
 
@@ -76,6 +76,10 @@ class AccountPage(Controller):
         employees = self.model.get_employee_accounts()
         for user in employees:
             self.view.add_employee_card(user)
+
+    def update_user_cards(self):
+        self.view.clear_employee_list()
+        self.fill_user_cards()
 
     def create_account(self):
         """Creates a new account based on the user input"""
@@ -98,21 +102,34 @@ class AccountPage(Controller):
         if self.model.verify_create_password(password, pass_confirm):
             self.model.create_new_account(new_user)
             self.view.reset_create_account_inputs()
-            self.view.clear_employee_list()
-            self.fill_user_cards()
+            self.update_user_cards()
+            self.view.reset_admin_password()
         else:
             print("Invalid password confirmation")
 
-    def update_create_username_field(self):
+    def update_create_username_field(self, section: str):
         """Automatically updates the username label in the create account section"""
-        first_name = self.view.get_first_name_input()
-        last_name = self.view.get_last_name_input()
-        username = self.model.generate_username(first_name, last_name)
+        if section == "create":
+            first_name = self.view.get_first_name_input()
+            last_name = self.view.get_last_name_input()
+            username = self.model.generate_username(first_name, last_name)
 
-        if username != ".":
-            self.view.set_username_label(username)
+            if username != ".":
+                self.view.set_username_label(username)
+            else:
+                self.view.set_username_label("")
+
+        elif section == "edit":
+            first_name = self.view.get_first_name_edit()
+            last_name = self.view.get_last_name_edit()
+            username = self.model.generate_username(first_name, last_name)
+
+            if username != ".":
+                self.view.set_username_edit(username)
+            else:
+                self.view.set_username_edit("")
         else:
-            self.view.set_username_label("")
+            return
 
     def fill_user_info(self):
         """Fills the edit user section with information based on the selected card"""
@@ -124,8 +141,8 @@ class AccountPage(Controller):
     def update_user_info(self):
         """Updates user data if changes occur"""
         current_user = self.view.get_selected_account()
-        first_name = self.view.get_first_name_input()
-        last_name = self.view.get_last_name_input()
+        first_name = self.view.get_first_name_edit()
+        last_name = self.view.get_last_name_edit()
         username = self.model.generate_username(first_name, last_name)
         password = self.view.get_change_password()
 
@@ -140,7 +157,9 @@ class AccountPage(Controller):
 
         admin_confirmation = self.view.get_admin_password()
         if self.model.admin_confirmation(admin_confirmation):
-            self.model.update_user_info(new_info)
+            self.model.update_user_info(current_user, new_info)
+            self.update_user_cards()
+            self.view.reset_admin_password()
         else:
             print("Invalid admin password")
 
@@ -150,5 +169,7 @@ class AccountPage(Controller):
         admin_confirmation = self.view.get_admin_password()
         if self.model.admin_confirmation(admin_confirmation):
             self.model.delete_user_account(current_user)
+            self.update_user_cards()
+            self.view.reset_edit_account_inputs()
         else:
             print("Invalid admin password")

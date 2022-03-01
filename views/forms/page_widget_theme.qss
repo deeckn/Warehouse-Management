@@ -1,0 +1,55 @@
+QLabel#h1 {
+    color: #406882; 
+    background-color: none;
+}
+
+QLabel#linebreak_top_bottom {
+    border-top: 1px solid black; 
+    border-bottom: 1px solid black; 
+    background-color: none;
+}
+
+QLabel#linebreak_top {
+    border-top: 1px solid black; 
+    background-color: none;
+}
+
+QLabel#legend {
+    background-color: none; 
+    color: black;
+}
+
+QWidget#scroll_area {
+    background-color: white;
+}
+
+QScrollArea {
+    border: none;
+}
+
+QLineEdit { 
+    background-color: #EAEAEA;
+    border-radius: 0px;
+    color: black;
+    padding-left: 10px; 
+}
+
+QRadioButton#btn_create_admin {
+    background-color:#ffffff;
+    color:#1A374D;
+}
+
+QPushButton#yellow_btn {
+    color: #ffffff;
+    background: #FDCB6E;
+    border-radius: 10px;
+}
+
+QWidget#option {
+    background-color: none;
+}
+
+QRadioButton {
+    background-color:#ffffff;
+    color:#1A374D;
+}

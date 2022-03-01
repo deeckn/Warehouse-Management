@@ -12,6 +12,8 @@ class ProductSearchView(QWidget):
         QWidget.__init__(self, parent)
         self.set_styleSheet("page_widget_theme.qss")
 
+        self.current_filter = "id"
+
         header_product_search = QLabel("Product Search", self)
         header_product_search.setFont(Theme.POPPINS_BOLD_24)
         header_product_search.setObjectName("h1")
@@ -35,9 +37,11 @@ class ProductSearchView(QWidget):
         self.filter_id = QRadioButton("ID")
         self.filter_id.setFixedWidth(45)
         self.filter_id.setFont(Theme.POPPINS_BOLD_14)
+
         self.filter_product_name = QRadioButton("Product Name")
         self.filter_product_name.setFixedWidth(130)
         self.filter_product_name.setFont(Theme.POPPINS_BOLD_14)
+
         self.filter_customer_name = QRadioButton("Customer Name")
         self.filter_customer_name.setFont(Theme.POPPINS_BOLD_14)
         option_layout.addWidget(self.filter_id)
@@ -54,8 +58,7 @@ class ProductSearchView(QWidget):
         ui_guide.setFont(Theme.POPPINS_REGULAR_14)
         ui_guide.setAlignment(Qt.AlignCenter)
         ui_guide.setGeometry(243, 187, 300, 21)
-        ui_guide.setStyleSheet(
-            "background-color: white; color: black")
+        ui_guide.setObjectName("guide")
 
         ui_img = QLabel(self)
         ui_img.setGeometry(250, 32, 30, 30)
@@ -73,16 +76,17 @@ class ProductSearchView(QWidget):
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll_area.setWidgetResizable(True)
         scroll_area.setGeometry(53, 222, 699, 520)
-        scroll_area_widget = QWidget()
-        scroll_area_widget.setObjectName("scroll_area")
-        self.scroll_area_layout = QVBoxLayout(scroll_area_widget)
+        self.scroll_area_widget = QWidget()
+        self.scroll_area_widget.setObjectName("scroll_area")
+        self.scroll_area_layout = QVBoxLayout(self.scroll_area_widget)
         self.scroll_area_layout.setSpacing(10)
         self.scroll_area_layout.setContentsMargins(0, 10, 20, 10)
-        scroll_area.setWidget(scroll_area_widget)
+        scroll_area.setWidget(self.scroll_area_widget)
         self.spacer = QSpacerItem(
             0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-    def add_product_card(self, product_item: ProductItem):
+    def add_product_card(self, product_item: ProductItem) -> None:
+        """Add product card on Product search window"""
         self.scroll_area_layout.removeItem(self.spacer)
         # card = ProductSearchCardController(product_item).get_view()
         # self.scroll_area_layout.addWidget(card)
@@ -93,6 +97,29 @@ class ProductSearchView(QWidget):
         item = ProductCardItem(item_container, product_item)
         self.scroll_area_layout.addWidget(item_container)
         self.scroll_area_layout.addItem(self.spacer)
+
+    def clear_product_card(self) -> None:
+        childs = self.scroll_area_widget.children()
+        if len(childs) > 1:
+            childs = childs[1:]
+            for widget in childs:
+                widget.close()
+
+    def get_filter(self) -> str:
+        if self.filter_customer_name.isChecked():
+            return "customer name"
+        elif self.filter_product_name.isChecked():
+            return "product name"
+        elif self.filter_id.isChecked():
+            return "id"
+        else:
+            return "None"
+
+    def get_search_input(self) -> str:
+        return self.product_search_input.text()
+
+    def set_search_bt_listener(self, function) -> None:
+        self.product_search_button.clicked.connect(function)
 
     def set_styleSheet(self, file_name) -> None:
         file_path = os.path.dirname(os.path.abspath(__file__))

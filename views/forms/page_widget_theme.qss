@@ -53,3 +53,8 @@ QRadioButton {
     background-color:#ffffff;
     color:#1A374D;
 }
+
+QLabel#guide {
+    background-color: white; 
+    color: black;
+}

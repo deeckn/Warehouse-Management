@@ -1,0 +1,14 @@
+QLabel#h1 {
+    color: #1A374D;
+}
+
+QWidget#page_widget { 
+    background-color: white; 
+    border-radius: 25px;
+}
+
+
+
+
+
+

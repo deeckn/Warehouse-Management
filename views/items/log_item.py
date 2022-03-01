@@ -12,8 +12,6 @@ class LogItem(QWidget):
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        self.log_entry = log_entry
-
         date_label = QLabel(log_entry.get_date())
         time_label = QLabel(log_entry.get_time())
         event_label = QLabel(log_entry.get_description())

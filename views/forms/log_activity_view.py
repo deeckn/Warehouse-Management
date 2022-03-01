@@ -37,12 +37,12 @@ class LogWindowView(QWidget):
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll_area.setWidgetResizable(True)
         scroll_area.setGeometry(60, 147, 390, 620)
-        scroll_area_widget = QWidget()
-        scroll_area_widget.setObjectName("scroll_area")
-        self.scroll_area_layout = QVBoxLayout(scroll_area_widget)
+        self.scroll_area_widget = QWidget()
+        self.scroll_area_widget.setObjectName("scroll_area")
+        self.scroll_area_layout = QVBoxLayout(self.scroll_area_widget)
         self.scroll_area_layout.setSpacing(15)
         self.scroll_area_layout.setContentsMargins(10, 5, 10, 0)
-        scroll_area.setWidget(scroll_area_widget)
+        scroll_area.setWidget(self.scroll_area_widget)
         self.spacer = QSpacerItem(
             0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -50,6 +50,13 @@ class LogWindowView(QWidget):
         self.scroll_area_layout.removeItem(self.spacer)
         self.scroll_area_layout.addWidget(LogItem(log_entry))
         self.scroll_area_layout.addItem(self.spacer)
+
+    def clear_log(self):
+        childs = self.scroll_area_widget.children()
+        if len(childs) > 1:
+            childs = childs[1:]
+            for widget in childs:
+                widget.close()
 
     def set_styleSheet(self, file_name) -> None:
         file_path = os.path.dirname(os.path.abspath(__file__))

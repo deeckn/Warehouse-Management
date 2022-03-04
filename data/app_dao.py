@@ -716,8 +716,99 @@ class ShelfDAO(DAO):
     __COLUMN_ROWS = "rows"
     __COLUMN_COLUMNS = "columns"
 
-    """
-    TODO for Fay: CRUD Operation
-    Create, Retreive, Update, and Delete
-    See above DAOs for reference
-    """
+    def __init__(self, connection: sqlite3.Connection):
+        super().__init__(connection)
+
+    def add_shelf(self, shelf: StorageShelf):
+        """Add shelf object to the STORAGE_SHELF table"""
+        try:
+            self.cursor.execute(f"""
+                INSERT INTO {ShelfDAO.__table_name}
+                ({ShelfDAO.__COLUMN_LABEL}, 
+                {ShelfDAO.__COLUMN_MAX_WEIGHT}, 
+                {ShelfDAO.__COLUMN_LENGTH}, 
+                {ShelfDAO.__COLUMN_WIDTH}, 
+                {ShelfDAO.__COLUMN_HEIGHT}, 
+                {ShelfDAO.__COLUMN_ROWS}, 
+                {ShelfDAO.__COLUMN_COLUMNS})
+                VALUES
+                ('{shelf.get_label()}', 
+                {shelf.get_max_weight()}, 
+                {shelf.get_length()}, 
+                {shelf.get_width()}, 
+                {shelf.get_height()}, 
+                {shelf.get_rows()}, 
+                {shelf.get_columns()})
+            """)
+            self.connection.commit()
+
+        except sqlite3.IntegrityError:
+            print(
+                "Unable to insert shelf, \
+                the there might be a shelf with same label"
+            )
+            return
+
+    def get_shelf_by_label(self, shelf_label: str) -> StorageShelf:
+        """Returns a StorageShelf object given a label"""
+        self.cursor.execute(f"""
+            SELECT *
+            FROM {ShelfDAO.__table_name}
+            WHERE {ShelfDAO.__COLUMN_LABEL}='{shelf_label}'
+        """)
+
+        data = self.cursor.fetchone()
+        if data is None:
+            return None
+
+        shelf = StorageShelf(
+            data[0],
+            data[1],
+            data[2],
+            data[3],
+            data[4],
+            data[5],
+            data[6],
+        )
+        return shelf
+
+    def update_shelf(
+        self,
+        label: str,
+        max_weight: float = None,
+        length: float = None,
+        width: float = None,
+        height: float = None,
+        rows: int = None,
+        columns: int = None
+    ):
+        query = f"UPDATE {ShelfDAO.__table_name} SET "
+
+        if max_weight is not None:
+            query += f'{ShelfDAO.__COLUMN_MAX_WEIGHT}="{max_weight}", '
+        if length is not None:
+            query += f'{ShelfDAO.__COLUMN_LENGTH}="{length}", '
+        if width is not None:
+            query += f'{ShelfDAO.__COLUMN_WIDTH}="{width}", '
+        if height is not None:
+            query += f'{ShelfDAO.__COLUMN_HEIGHT}="{height}", ' 
+        if rows is not None:
+            query += f'{ShelfDAO.__COLUMN_ROWS}="{rows}", '
+        if columns is not None:
+            query += f'{ShelfDAO.__COLUMN_COLUMNS}="{columns}", '
+
+        if query[-2] == ",":
+            query = query[:-2]
+
+        query += f" WHERE {ShelfDAO.__COLUMN_LABEL}='{label}'"
+        self.cursor.execute(query)
+        self.connection.commit()
+
+    def delete_shelf(self, shelf_label: str):
+        """Removes a shelf from the database"""
+        self.cursor.execute(f"""
+            DELETE FROM {ShelfDAO.__table_name}
+            WHERE {ShelfDAO.__COLUMN_LABEL}='{shelf_label}'
+        """)
+        self.connection.commit()
+

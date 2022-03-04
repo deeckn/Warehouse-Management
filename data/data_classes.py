@@ -74,7 +74,6 @@ class Customer:
 
 @dataclass
 class StorageShelf:
-    __id: int
     __label: str
     __max_weight: float
     __length: float
@@ -82,9 +81,6 @@ class StorageShelf:
     __height: float
     __rows: int
     __columns: int
-
-    def get_id(self) -> int:
-        return self.__id
 
     def get_label(self) -> str:
         return self.__label

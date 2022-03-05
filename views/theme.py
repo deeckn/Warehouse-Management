@@ -18,6 +18,12 @@ class Theme:
     POPPINS_REGULAR_24 = QFont("Poppins")
     POPPINS_REGULAR_24.setPixelSize(24)
 
+    POPPINS_REGULAR_18 = QFont("Poppins")
+    POPPINS_REGULAR_18.setPixelSize(18)
+
+    POPPINS_REGULAR_14 = QFont("Poppins")
+    POPPINS_REGULAR_14.setPixelSize(14)
+
     POPPINS_BOLD_72 = QFont("Poppins")
     POPPINS_BOLD_72.setPixelSize(72)
     POPPINS_BOLD_72.setBold(True)
@@ -38,10 +44,18 @@ class Theme:
     POPPINS_BOLD_24.setPixelSize(24)
     POPPINS_BOLD_24.setBold(True)
 
+    POPPINS_BOLD_18 = QFont("Poppins")
+    POPPINS_BOLD_18.setPixelSize(18)
+    POPPINS_BOLD_18.setBold(True)
+
+    POPPINS_BOLD_14 = QFont("Poppins")
+    POPPINS_BOLD_14.setPixelSize(14)
+    POPPINS_BOLD_14.setBold(True)
+
     # COLORS
     BLACK = "000000"
     GREY = "DDDDDD"
-    GHOST_WHITE = "#F8F8FF"
+    GHOST_WHITE = "F8F8FF"
     WHITE = "FFFFFF"
     DARK_BLUE = "1A374D"
     BLUE = "406882"

@@ -222,6 +222,8 @@ class AccountView(QWidget):
         self.btn_save_changes.setGeometry(620, 280, 170, 30)
         self.btn_save_changes.setFont(font)
 
+        self.card_selected_function = None
+
     def set_styleSheet(self) -> None:
         file_path = os.path.dirname(os.path.abspath(__file__))
         real_path = os.path.join(file_path, "account_view_theme.qss")
@@ -230,7 +232,8 @@ class AccountView(QWidget):
             self.setStyleSheet(style)
         f.close()
 
-    # Create new account
+    """Create new account section"""
+
     def get_first_name_input(self) -> str:
         """Returns the first name (create new account) input as a string"""
         return self.usin_create_first_name.text()
@@ -255,22 +258,42 @@ class AccountView(QWidget):
         """Returns the state of create admin radio button"""
         return self.btn_create_admin.isChecked()
 
-    # Edit employee account
+    def set_create_text_changed_listener(self, function):
+        self.usin_create_first_name.textChanged.connect(function)
+        self.usin_create_last_name.textChanged.connect(function)
+
+    """Edit account section"""
+
     def set_first_name_edit(self, first_name: str):
         """Sets the (edit employee account) first name line edit to a given string"""
-        self.edit_first_name_label.setText(first_name)
+        self.usin_edit_first_name.setText(first_name)
+
+    def get_first_name_edit(self):
+        """Returns the first name line edit text (edit)"""
+        return self.usin_edit_first_name.text()
 
     def set_last_name_edit(self, last_name: str):
         """Sets the (edit employee account) last name line edit to a given string"""
-        self.edit_last_name_label.setText(last_name)
+        self.usin_edit_last_name.setText(last_name)
+
+    def get_last_name_edit(self):
+        """Returns the last name line edit text (edit)"""
+        return self.usin_edit_last_name.text()
+
+    def set_edit_text_change_listener(self, function):
+        self.usin_edit_first_name.textChanged.connect(function)
+        self.usin_edit_last_name.textChanged.connect(function)
 
     def set_username_edit(self, username: str):
         """Sets the (edit employee account) username label to a given string"""
         self.edit_username.setText(username)
 
     def get_change_password(self) -> str:
-        """Returns a string of the password line edit in edit employee account"""
+        """Returns a string of the password line edit in edit employee account (edit)"""
         return self.usin_edit_change_password.text()
+
+    def reset_admin_password(self):
+        self.usin_edit_password.setText("")
 
     def get_admin_password(self) -> str:
         """Returns the admin password confirmation as a string"""
@@ -309,3 +332,19 @@ class AccountView(QWidget):
 
     def set_save_changes_button_listener(self, function):
         self.btn_save_changes.clicked.connect(function)
+
+    def set_card_selected_listener(self, function):
+        self.card_selected_function = function
+
+    # Resets
+    def reset_create_account_inputs(self):
+        self.usin_create_first_name.setText("")
+        self.usin_create_last_name.setText("")
+        self.usin_create_password.setText("")
+        self.usin_create_confirm.setText("")
+
+    def reset_edit_account_inputs(self):
+        self.usin_edit_first_name.setText("")
+        self.usin_edit_last_name.setText("")
+        self.reset_admin_password()
+        self.set_username_edit("")

@@ -195,9 +195,8 @@ class AccountModel(Model):
         """Returns the status of password confirmation"""
         return password == confirm
 
-    def update_user_info(self, new_user_info: User):
+    def update_user_info(self, previous_info, new_user_info: User):
         """Updates an existing user information"""
-        previous_info = self.__user_dao.get_user_by_id(new_user_info.get_id())
         if previous_info is None:
             return
 

@@ -74,7 +74,6 @@ class Customer:
 
 @dataclass
 class StorageShelf:
-    __id: int
     __label: str
     __max_weight: float
     __length: float
@@ -82,9 +81,6 @@ class StorageShelf:
     __height: float
     __rows: int
     __columns: int
-
-    def get_id(self) -> int:
-        return self.__id
 
     def get_label(self) -> str:
         return self.__label
@@ -158,7 +154,6 @@ class ProductItem:
     __name: str
     __quantity: int
     __low_stock: int
-    __is_low_stock: bool
     __locations: list[Location]
     __weight: float
     __last_stored: str
@@ -181,7 +176,7 @@ class ProductItem:
         return self.__low_stock
 
     def is_low_stock(self) -> bool:
-        return self.__is_low_stock
+        return self.__quantity <= self.__low_stock
 
     def get_locations(self) -> list[Location]:
         return self.__locations

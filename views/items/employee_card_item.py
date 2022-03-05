@@ -13,10 +13,10 @@ class EmployeeCardItem(QWidget):
 
         self.setFixedSize(340, 170)
         self.setStyleSheet(f"""
-            color: #{Theme.BLACK}; 
-            background-color: #{Theme.GHOST_WHITE}; 
-            padding-left: 20px; 
-            margin: 0px 20px 15px 35px; 
+            color: #{Theme.BLACK};
+            background-color: #{Theme.GHOST_WHITE};
+            padding-left: 20px;
+            margin: 0px 20px 15px 35px;
             border-radius: 10px;
         """)
 
@@ -64,3 +64,4 @@ class EmployeeCardItem(QWidget):
             border: 3px solid #FDCB6E;
         """)
         self.parent_widget.previous_card = self.parent_widget.current_card
+        self.parent_widget.card_selected_function()

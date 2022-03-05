@@ -103,7 +103,7 @@ class LoginView(QWidget):
         self.password_lineedit.setGeometry(QRect(342, 633, 1286, 109))
         self.password_lineedit.setFont(font)
         self.password_lineedit.setStyleSheet(f"""
-            background-color: rgb(221, 221, 221) 
+            background-color: rgb(221, 221, 221);
             padding-left: 50; 
             padding-top: 10; 
             border: none; 

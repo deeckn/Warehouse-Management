@@ -483,7 +483,6 @@ class ProductDAO(DAO):
     __COLUMN_NAME = "name"
     __COLUMN_QUANTITY = "quantity"
     __COLUMN_LOW_STOCK = "low_stock"
-    __COLUMN_IS_LOW_STOCK = "is_low_stock"
     __COLUMN_WEIGHT = "weight"
     __COLUMN_LAST_STORED = "last_stored"
     __COLUMN_OWNER = "owner"
@@ -500,7 +499,6 @@ class ProductDAO(DAO):
 
     def add_product(self, product: ProductItem):
         """Adds a Product object to the PRODUCTS table"""
-        is_low_stock = 1 if product.is_low_stock() else 0
 
         try:
             self.cursor.execute(f"""
@@ -510,16 +508,14 @@ class ProductDAO(DAO):
                 {ProductDAO.__COLUMN_LOW_STOCK},
                 {ProductDAO.__COLUMN_WEIGHT},
                 {ProductDAO.__COLUMN_LAST_STORED},
-                {ProductDAO.__COLUMN_OWNER},
-                {ProductDAO.__COLUMN_IS_LOW_STOCK})
+                {ProductDAO.__COLUMN_OWNER})
                 VALUES
                 ('{product.get_name()}',
                 {product.get_quantity()},
                 {product.get_low_stock_quantity()},
                 {product.get_weight()},
                 '{product.get_last_stored()}',
-                {product.get_owner().get_id()},
-                {is_low_stock})
+                {product.get_owner().get_id()})
             """)
             self.connection.commit()
 
@@ -556,6 +552,9 @@ class ProductDAO(DAO):
         """)
 
         data = self.cursor.fetchone()
+        if data is None:
+            return None
+
         categories = self.__category_dao.get_product_categories(product_id)
         locations = self.__location_dao.get_product_location(product_id)
         owner = self.__customer_dao.get_customer(data[6])
@@ -564,7 +563,6 @@ class ProductDAO(DAO):
             data[1],
             data[2],
             data[3],
-            data[7],
             locations,
             data[4],
             data[5],
@@ -583,6 +581,9 @@ class ProductDAO(DAO):
         """)
 
         data = self.cursor.fetchone()
+        if data is None:
+            return None
+
         categories = self.__category_dao.get_product_categories(data[0])
         locations = self.__location_dao.get_product_location(data[0])
         owner = self.__customer_dao.get_customer(data[6])
@@ -591,7 +592,6 @@ class ProductDAO(DAO):
             data[1],
             data[2],
             data[3],
-            data[7],
             locations,
             data[4],
             data[5],
@@ -608,6 +608,9 @@ class ProductDAO(DAO):
         """)
 
         data = self.cursor.fetchall()
+        if data is None:
+            return None
+
         all_products: list[ProductItem] = list()
         for product in data:
             categories = self.__category_dao.get_product_categories(product[0])
@@ -618,7 +621,6 @@ class ProductDAO(DAO):
                 product[1],
                 product[2],
                 product[3],
-                product[7],
                 locations,
                 product[4],
                 product[5],
@@ -629,12 +631,43 @@ class ProductDAO(DAO):
 
         return all_products
 
+    def get_low_quantity_products(self) -> list[ProductItem]:
+        self.cursor.execute(f"""
+            SELECT *
+            FROM {ProductDAO.__table_name} 
+            WHERE {ProductDAO.__COLUMN_QUANTITY}<={ProductDAO.__COLUMN_LOW_STOCK}
+        """)
+
+        data = self.cursor.fetchall()
+        if data is None:
+            return None
+
+        low_stock_products: list[ProductItem] = list()
+        for product in data:
+            categories = self.__category_dao.get_product_categories(product[0])
+            locations = self.__location_dao.get_product_location(product[0])
+            owner = self.__customer_dao.get_customer(product[6])
+            product_object = ProductItem(
+                product[0],
+                product[1],
+                product[2],
+                product[3],
+                locations,
+                product[4],
+                product[5],
+                owner,
+                categories
+            )
+            low_stock_products.append(product_object)
+
+        return low_stock_products
+
     def update_product(
         self,
         id: int,
         name: str = None,
         quantity: int = None,
-        low_stock: bool = None,
+        low_stock: int = None,
         weight: float = None,
         last_stored: str = None,
         owner_id: int = None
@@ -646,8 +679,7 @@ class ProductDAO(DAO):
         if quantity is not None:
             query += f'{ProductDAO.__COLUMN_QUANTITY}={quantity}, '
         if low_stock is not None:
-            status = 1 if low_stock else 0
-            query += f'{ProductDAO.__COLUMN_LOW_STOCK}={status}, '
+            query += f'{ProductDAO.__COLUMN_LOW_STOCK}={low_stock}, '
         if weight is not None:
             query += f'{ProductDAO.__COLUMN_WEIGHT}={weight}, '
         if last_stored is not None:
@@ -658,7 +690,7 @@ class ProductDAO(DAO):
         if query[-2] == ",":
             query = query[:-2]
 
-        query += f" WHERE {CustomerDAO.__COLUMN_ID}={id}"
+        query += f" WHERE {ProductDAO.__COLUMN_PRODUCT_ID}={id}"
         self.cursor.execute(query)
         self.connection.commit()
 
@@ -684,8 +716,99 @@ class ShelfDAO(DAO):
     __COLUMN_ROWS = "rows"
     __COLUMN_COLUMNS = "columns"
 
-    """
-    TODO for Fay: CRUD Operation
-    Create, Retreive, Update, and Delete
-    See above DAOs for reference
-    """
+    def __init__(self, connection: sqlite3.Connection):
+        super().__init__(connection)
+
+    def add_shelf(self, shelf: StorageShelf):
+        """Add shelf object to the STORAGE_SHELF table"""
+        try:
+            self.cursor.execute(f"""
+                INSERT INTO {ShelfDAO.__table_name}
+                ({ShelfDAO.__COLUMN_LABEL}, 
+                {ShelfDAO.__COLUMN_MAX_WEIGHT}, 
+                {ShelfDAO.__COLUMN_LENGTH}, 
+                {ShelfDAO.__COLUMN_WIDTH}, 
+                {ShelfDAO.__COLUMN_HEIGHT}, 
+                {ShelfDAO.__COLUMN_ROWS}, 
+                {ShelfDAO.__COLUMN_COLUMNS})
+                VALUES
+                ('{shelf.get_label()}', 
+                {shelf.get_max_weight()}, 
+                {shelf.get_length()}, 
+                {shelf.get_width()}, 
+                {shelf.get_height()}, 
+                {shelf.get_rows()}, 
+                {shelf.get_columns()})
+            """)
+            self.connection.commit()
+
+        except sqlite3.IntegrityError:
+            print(
+                "Unable to insert shelf, \
+                the there might be a shelf with same label"
+            )
+            return
+
+    def get_shelf_by_label(self, shelf_label: str) -> StorageShelf:
+        """Returns a StorageShelf object given a label"""
+        self.cursor.execute(f"""
+            SELECT *
+            FROM {ShelfDAO.__table_name}
+            WHERE {ShelfDAO.__COLUMN_LABEL}='{shelf_label}'
+        """)
+
+        data = self.cursor.fetchone()
+        if data is None:
+            return None
+
+        shelf = StorageShelf(
+            data[0],
+            data[1],
+            data[2],
+            data[3],
+            data[4],
+            data[5],
+            data[6],
+        )
+        return shelf
+
+    def update_shelf(
+        self,
+        label: str,
+        max_weight: float = None,
+        length: float = None,
+        width: float = None,
+        height: float = None,
+        rows: int = None,
+        columns: int = None
+    ):
+        query = f"UPDATE {ShelfDAO.__table_name} SET "
+
+        if max_weight is not None:
+            query += f'{ShelfDAO.__COLUMN_MAX_WEIGHT}="{max_weight}", '
+        if length is not None:
+            query += f'{ShelfDAO.__COLUMN_LENGTH}="{length}", '
+        if width is not None:
+            query += f'{ShelfDAO.__COLUMN_WIDTH}="{width}", '
+        if height is not None:
+            query += f'{ShelfDAO.__COLUMN_HEIGHT}="{height}", ' 
+        if rows is not None:
+            query += f'{ShelfDAO.__COLUMN_ROWS}="{rows}", '
+        if columns is not None:
+            query += f'{ShelfDAO.__COLUMN_COLUMNS}="{columns}", '
+
+        if query[-2] == ",":
+            query = query[:-2]
+
+        query += f" WHERE {ShelfDAO.__COLUMN_LABEL}='{label}'"
+        self.cursor.execute(query)
+        self.connection.commit()
+
+    def delete_shelf(self, shelf_label: str):
+        """Removes a shelf from the database"""
+        self.cursor.execute(f"""
+            DELETE FROM {ShelfDAO.__table_name}
+            WHERE {ShelfDAO.__COLUMN_LABEL}='{shelf_label}'
+        """)
+        self.connection.commit()
+

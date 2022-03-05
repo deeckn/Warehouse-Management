@@ -19,7 +19,7 @@ class ShelfItem(QWidget):
 
         self.container = QWidget(self)
         self.container.setGeometry(0, 0, 680, 120)
-        self.container.setStyleSheet("background-color: #E5E5E5; border-radius: 30;")
+        self.container.setStyleSheet("background-color: #F8F8FF; border-radius: 30;")
 
         self.parent_widget = parent
         self.__shelf = shelf
@@ -138,9 +138,9 @@ class ShelfItem(QWidget):
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         if(self.parent_widget.previous_shelf != None):
-            self.parent_widget.previous_shelf.container.setStyleSheet("background-color: #E5E5E5; border-radius: 30;")
+            self.parent_widget.previous_shelf.container.setStyleSheet("background-color: #F8F8FF; border-radius: 30;")
         self.parent_widget.current_shelf = self
-        self.container.setStyleSheet("background-color: #E5E5E5; border-radius: 30; border: 3px solid #FDCB6E;")
+        self.container.setStyleSheet("background-color: #F8F8FF; border-radius: 30; border: 3px solid #FDCB6E;")
         self.shelf_label.setStyleSheet("background-color: transparent;\n"
         "border: 0px")
         self.max_weight_label.setStyleSheet("background-color: transparent;\n"

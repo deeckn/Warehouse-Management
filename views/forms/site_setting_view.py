@@ -29,7 +29,7 @@ class SiteSettingView(QWidget):
     def __init__(self):
         QWidget.__init__(self, None)
         self.resize(1552, 1080)
-        self.setStyleSheet(u"background-color: #E5E5E5;")
+        self.setStyleSheet(u"background-color: #F8F8FF;")
         
         self.current_shelf :ShelfItem = None
         self.previous_shelf = None
@@ -145,6 +145,7 @@ class SiteSettingView(QWidget):
         self.search_lineEdit.setGeometry(150, 324, 400, 42)
         self.search_lineEdit.setFont(font)
         self.search_lineEdit.setStyleSheet(u"border-radius: 0;\n"
+        "background-color: #DDDDDD;"
         "padding-left: 14;\n"
         "padding-top: 5;")
 
@@ -159,6 +160,7 @@ class SiteSettingView(QWidget):
         self.shelf_label_informtion_lineEdit.setGeometry(151, 516, 150, 42)
         self.shelf_label_informtion_lineEdit.setFont(font)
         self.shelf_label_informtion_lineEdit.setStyleSheet(u"border-radius: 0;\n"
+        "background-color: #DDDDDD;"
         "padding-left: 14;\n"
         "padding-top: 5;")
 
@@ -166,6 +168,7 @@ class SiteSettingView(QWidget):
         self.max_weight_lineEdit.setGeometry(311, 516, 150, 42)
         self.max_weight_lineEdit.setFont(font)
         self.max_weight_lineEdit.setStyleSheet(u"border-radius: 0; \n"
+        "background-color: #DDDDDD;"
         "padding-left: 14;\n"
         "padding-top: 5;")
 
@@ -173,6 +176,7 @@ class SiteSettingView(QWidget):
         self.length_lineEdit.setGeometry(307, 601, 125, 42)
         self.length_lineEdit.setFont(font)
         self.length_lineEdit.setStyleSheet(u"border-radius: 0;\n"
+        "background-color: #DDDDDD;"
         "padding-left: 14;\n"
         "padding-top: 5;")
 
@@ -180,6 +184,7 @@ class SiteSettingView(QWidget):
         self.weight_lineEdit.setGeometry(307, 650, 125, 42)
         self.weight_lineEdit.setFont(font)
         self.weight_lineEdit.setStyleSheet(u"border-radius: 0;\n"
+        "background-color: #DDDDDD;"
         "padding-left: 14;\n"
         "padding-top: 5;")
 
@@ -187,6 +192,7 @@ class SiteSettingView(QWidget):
         self.height_lineEdit.setGeometry(307, 699, 125, 42)
         self.height_lineEdit.setFont(font)
         self.height_lineEdit.setStyleSheet(u"border-radius: 0; \n"
+        "background-color: #DDDDDD;"
         "padding-left: 14;\n"
         "padding-top: 5;")
 
@@ -194,6 +200,7 @@ class SiteSettingView(QWidget):
         self.row_lineEdit.setGeometry(219, 786, 120, 42)
         self.row_lineEdit.setFont(font)
         self.row_lineEdit.setStyleSheet(u"border-radius: 0; \n"
+        "background-color: #DDDDDD;"
         "padding-left: 14; \n"
         "padding-top: 5;")
 
@@ -201,6 +208,7 @@ class SiteSettingView(QWidget):
         self.column_lineEdit.setGeometry(434, 786, 120, 42)
         self.column_lineEdit.setFont(font)
         self.column_lineEdit.setStyleSheet(u"border-radius: 0; \n"
+        "background-color: #DDDDDD;"
         "padding-left: 14; \n"
         "padding-top: 5;")
 

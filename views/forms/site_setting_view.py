@@ -8,6 +8,7 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
+from shelve import Shelf
 import sys
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
@@ -31,7 +32,7 @@ class SiteSettingView(QWidget):
         self.setStyleSheet(u"background-color: #E5E5E5;")
         
         self.current_shelf :ShelfItem = None
-        self.previous_shelf = QWidget()
+        self.previous_shelf = None
 
         # font
         font = QFont()
@@ -232,7 +233,6 @@ class SiteSettingView(QWidget):
         font.setPixelSize(14)
         font.setBold(False)
 
-
         search_label = QLabel("Search",self)
         search_label.setGeometry(325, 264, 50, 22)
         search_label.setFont(font)
@@ -268,23 +268,24 @@ class SiteSettingView(QWidget):
         line_4.setFrameShadow(QFrame.Sunken)
         
         base_widget = QWidget(self)
-        base_widget.setGeometry(704,273,680,686)
+        base_widget.setGeometry(694,273,700,686)
         base_widget.setStyleSheet("background-color: transparent;")
         
         self.scroll_area = QScrollArea(base_widget)
-        self.scroll_area.setGeometry(0,0,680,686)
+        self.scroll_area.setGeometry(0,0,700,686)
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scroll_area.setStyleSheet("background-color: transparent;")
+        self.scroll_area.setStyleSheet("background-color: transparent; border: none;")
         self.scroll_area.setWidgetResizable(True)
 
         self.scroll_area_widget = QWidget()
-        self.scroll_area_widget.setGeometry(0, 0, 680, 686)
+        self.scroll_area_widget.setGeometry(0, 0, 700, 686)
 
-        self.layout = QVBoxLayout()
-        self.layout.setSpacing(0)
-        self.layout.setAlignment(Qt.AlignTop)
-        self.scroll_area_widget.setLayout(self.layout)
+        self.layout_ = QVBoxLayout(self)
+        self.layout_.setSpacing(15)
+
+        self.layout_.setAlignment(Qt.AlignTop)
+        self.scroll_area_widget.setLayout(self.layout_)
         self.scroll_area.setWidget(self.scroll_area_widget)
 
     # Get data from current selected shelf
@@ -378,6 +379,7 @@ class SiteSettingView(QWidget):
         """Inserts a new ShelfItem object to the list"""
         card = ShelfItem(self, shelf)
         self.scroll_area_widget.layout().addWidget(card)
+        # self.layout_.addWidget(card)
 
     def get_selected_account(self) -> StorageShelf:
         """Returns the selected ShelfItem object on the UI"""
@@ -385,5 +387,5 @@ class SiteSettingView(QWidget):
 
     def clear_shelf_list(self):
         """Clears the list represented in the scrollarea"""
-        for i in reversed(range(self.layout.count())):
-            self.layout.itemAt(i).widget().setParent(None)
+        for i in reversed(range(self.layout_.count())):
+            self.layout_.itemAt(i).widget().setParent(None)

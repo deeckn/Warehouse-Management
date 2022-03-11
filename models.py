@@ -1,7 +1,7 @@
 from abc import ABC
 from data.data_classes import *
 from data.filter_options import FilterOption
-from data.app_dao import AppDAO, UserDAO
+from data.app_dao import *
 
 
 class Model(ABC):
@@ -230,3 +230,97 @@ class AccountModel(Model):
     def delete_user_account(self, user: User):
         """Deletes a user object from the database"""
         self.__user_dao.delete_user_by_id(user.get_id())
+
+
+class NotificationModel(Model):
+    __product_dao: ProductDAO
+
+    def __init__(self):
+        self.__product_dao = AppDAO.get_dao("product")
+
+    def get_low_stock_products(self) -> list[ProductItem]:
+        return self.__product_dao.get_low_quantity_products()
+
+
+class SiteSettingsModel(Model):
+    __shelf_dao: ShelfDAO
+
+    def __init__(self):
+        self.__shelf_dao = AppDAO.get_dao("shelf")
+
+    def add_shelf(
+        self,
+        label: str,
+        max_weight: float,
+        length: float,
+        width: float,
+        height: float,
+        rows: int,
+        columns: int
+    ) -> bool:
+        """Adds a new shelf unit to the system. Returns True for successful operation else False"""
+
+        if self.__shelf_dao.get_shelf_by_label(label):
+            return False
+
+        shelf = StorageShelf(
+            label,
+            max_weight,
+            length,
+            width,
+            height,
+            rows,
+            columns
+        )
+        self.__shelf_dao.add_shelf(shelf)
+        return True
+
+    def search_shelf(self, label: str) -> StorageShelf:
+        """Returns a StorageShelf object given the label"""
+        return self.__shelf_dao.get_shelf_by_label(label)
+
+    def update_shelf(self, previous_info: StorageShelf, new_info: StorageShelf):
+        """Updates shelf information based on new data"""
+        max_weight = new_info.get_max_weight() if previous_info.get_max_weight(
+        ) != new_info.get_max_weight() else None
+
+        length = new_info.get_length() if previous_info.get_length(
+        ) != new_info.get_length() else None
+
+        width = new_info.get_width() if previous_info.get_width(
+        ) != new_info.get_width() else None
+
+        height = new_info.get_height() if previous_info.get_height(
+        ) != new_info.get_height() else None
+
+        rows = new_info.get_rows() if previous_info.get_rows(
+        ) != new_info.get_rows() else None
+
+        columns = new_info.get_columns() if previous_info.get_columns(
+        ) != new_info.get_columns() else None
+
+        self.__shelf_dao.update_shelf(
+            new_info.get_label(),
+            max_weight=max_weight,
+            length=length,
+            width=width,
+            height=height,
+            rows=rows,
+            columns=columns
+        )
+
+    def delete_shelf(self, shelf: StorageShelf):
+        """Deletes a shelf from the database"""
+        self.__shelf_dao.delete_shelf(shelf.get_label())
+
+    def calculate_total_slots(self, rows, columns) -> int:
+        """Returns the total number of slots"""
+        return rows * columns
+
+    def get_shelves_contains_with(self, shelf_search: str) -> list[StorageShelf]:
+        """Returns a list of StorageShelf objects given a search query"""
+        return self.__shelf_dao.get_shelves_contains_with(shelf_search)
+
+    def get_all_shelves(self) -> list[StorageShelf]:
+        """Returns a list of all StorageShelf objects from the database"""
+        return self.__shelf_dao.get_all_shelves()

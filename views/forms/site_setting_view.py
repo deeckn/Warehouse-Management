@@ -8,6 +8,7 @@
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
+from shelve import Shelf
 import sys
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
@@ -28,10 +29,10 @@ class SiteSettingView(QWidget):
     def __init__(self):
         QWidget.__init__(self, None)
         self.resize(1552, 1080)
-        self.setStyleSheet(u"background-color: #E5E5E5;")
+        self.setStyleSheet(u"background-color: #F8F8FF;")
         
         self.current_shelf :ShelfItem = None
-        self.previous_shelf = QWidget()
+        self.previous_shelf = None
 
         # font
         font = QFont()
@@ -144,6 +145,7 @@ class SiteSettingView(QWidget):
         self.search_lineEdit.setGeometry(150, 324, 400, 42)
         self.search_lineEdit.setFont(font)
         self.search_lineEdit.setStyleSheet(u"border-radius: 0;\n"
+        "background-color: #DDDDDD;"
         "padding-left: 14;\n"
         "padding-top: 5;")
 
@@ -158,6 +160,7 @@ class SiteSettingView(QWidget):
         self.shelf_label_informtion_lineEdit.setGeometry(151, 516, 150, 42)
         self.shelf_label_informtion_lineEdit.setFont(font)
         self.shelf_label_informtion_lineEdit.setStyleSheet(u"border-radius: 0;\n"
+        "background-color: #DDDDDD;"
         "padding-left: 14;\n"
         "padding-top: 5;")
 
@@ -165,6 +168,7 @@ class SiteSettingView(QWidget):
         self.max_weight_lineEdit.setGeometry(311, 516, 150, 42)
         self.max_weight_lineEdit.setFont(font)
         self.max_weight_lineEdit.setStyleSheet(u"border-radius: 0; \n"
+        "background-color: #DDDDDD;"
         "padding-left: 14;\n"
         "padding-top: 5;")
 
@@ -172,6 +176,7 @@ class SiteSettingView(QWidget):
         self.length_lineEdit.setGeometry(307, 601, 125, 42)
         self.length_lineEdit.setFont(font)
         self.length_lineEdit.setStyleSheet(u"border-radius: 0;\n"
+        "background-color: #DDDDDD;"
         "padding-left: 14;\n"
         "padding-top: 5;")
 
@@ -179,6 +184,7 @@ class SiteSettingView(QWidget):
         self.weight_lineEdit.setGeometry(307, 650, 125, 42)
         self.weight_lineEdit.setFont(font)
         self.weight_lineEdit.setStyleSheet(u"border-radius: 0;\n"
+        "background-color: #DDDDDD;"
         "padding-left: 14;\n"
         "padding-top: 5;")
 
@@ -186,6 +192,7 @@ class SiteSettingView(QWidget):
         self.height_lineEdit.setGeometry(307, 699, 125, 42)
         self.height_lineEdit.setFont(font)
         self.height_lineEdit.setStyleSheet(u"border-radius: 0; \n"
+        "background-color: #DDDDDD;"
         "padding-left: 14;\n"
         "padding-top: 5;")
 
@@ -193,6 +200,7 @@ class SiteSettingView(QWidget):
         self.row_lineEdit.setGeometry(219, 786, 120, 42)
         self.row_lineEdit.setFont(font)
         self.row_lineEdit.setStyleSheet(u"border-radius: 0; \n"
+        "background-color: #DDDDDD;"
         "padding-left: 14; \n"
         "padding-top: 5;")
 
@@ -200,6 +208,7 @@ class SiteSettingView(QWidget):
         self.column_lineEdit.setGeometry(434, 786, 120, 42)
         self.column_lineEdit.setFont(font)
         self.column_lineEdit.setStyleSheet(u"border-radius: 0; \n"
+        "background-color: #DDDDDD;"
         "padding-left: 14; \n"
         "padding-top: 5;")
 
@@ -231,7 +240,6 @@ class SiteSettingView(QWidget):
         font.setFamilies([u"Poppins"])
         font.setPixelSize(14)
         font.setBold(False)
-
 
         search_label = QLabel("Search",self)
         search_label.setGeometry(325, 264, 50, 22)
@@ -268,23 +276,24 @@ class SiteSettingView(QWidget):
         line_4.setFrameShadow(QFrame.Sunken)
         
         base_widget = QWidget(self)
-        base_widget.setGeometry(704,273,680,686)
+        base_widget.setGeometry(694,273,700,686)
         base_widget.setStyleSheet("background-color: transparent;")
         
         self.scroll_area = QScrollArea(base_widget)
-        self.scroll_area.setGeometry(0,0,680,686)
+        self.scroll_area.setGeometry(0,0,700,686)
         self.scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scroll_area.setStyleSheet("background-color: transparent;")
+        self.scroll_area.setStyleSheet("background-color: transparent; border: none;")
         self.scroll_area.setWidgetResizable(True)
 
         self.scroll_area_widget = QWidget()
-        self.scroll_area_widget.setGeometry(0, 0, 680, 686)
+        self.scroll_area_widget.setGeometry(0, 0, 700, 686)
 
-        self.layout = QVBoxLayout()
-        self.layout.setSpacing(0)
-        self.layout.setAlignment(Qt.AlignTop)
-        self.scroll_area_widget.setLayout(self.layout)
+        self.layout_ = QVBoxLayout(self)
+        self.layout_.setSpacing(15)
+
+        self.layout_.setAlignment(Qt.AlignTop)
+        self.scroll_area_widget.setLayout(self.layout_)
         self.scroll_area.setWidget(self.scroll_area_widget)
 
     # Get data from current selected shelf
@@ -378,6 +387,7 @@ class SiteSettingView(QWidget):
         """Inserts a new ShelfItem object to the list"""
         card = ShelfItem(self, shelf)
         self.scroll_area_widget.layout().addWidget(card)
+        # self.layout_.addWidget(card)
 
     def get_selected_account(self) -> StorageShelf:
         """Returns the selected ShelfItem object on the UI"""
@@ -385,5 +395,5 @@ class SiteSettingView(QWidget):
 
     def clear_shelf_list(self):
         """Clears the list represented in the scrollarea"""
-        for i in reversed(range(self.layout.count())):
-            self.layout.itemAt(i).widget().setParent(None)
+        for i in reversed(range(self.layout_.count())):
+            self.layout_.itemAt(i).widget().setParent(None)

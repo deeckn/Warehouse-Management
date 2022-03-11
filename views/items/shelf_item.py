@@ -16,14 +16,14 @@ from data.data_classes import StorageShelf
 class ShelfItem(QWidget):
     def __init__(self, parent, shelf: StorageShelf):
         QWidget.__init__(self,  None)
+
         self.container = QWidget(self)
-        self.container.resize(680, 120)
-        self.container.setStyleSheet(u"background-color: #FFFFFF;\n"
-        "border-radius: 30;")
+        self.container.setGeometry(0, 0, 680, 120)
+        self.container.setStyleSheet("background-color: #F8F8FF; border-radius: 30;")
 
         self.parent_widget = parent
         self.__shelf = shelf
-        grid_layout = QGridLayout()
+        self.grid_layout = QGridLayout()
 
         self.font = QFont()
         self.font.setFamilies([u"Poppins"])
@@ -31,52 +31,38 @@ class ShelfItem(QWidget):
         self.font.setBold(False)
 
         self.shelf_label = QLabel()
-        self.shelf_label.setGeometry(44, 17, 245, 27)
+        self.shelf_label.resize(245, 27)
         self.shelf_label.setFont(self.font)
-        self.shelf_label.setStyleSheet("background-color: transparent; \n"
-        "color: black;")
 
         self.max_weight_label = QLabel()
-        self.max_weight_label.setGeometry(44, 44, 245, 27)
+        self.max_weight_label.resize(245, 27)
         self.max_weight_label.setFont(self.font)
-        self.max_weight_label.setStyleSheet("background-color: transparent; \n"
-        "color: black;")
-
     
         self.dimensions_label = QLabel()
-        self.dimensions_label.setGeometry(44, 71, 245, 27)
+        self.dimensions_label.resize(245, 27)
         self.dimensions_label.setFont(self.font)
-        self.dimensions_label.setStyleSheet("background-color: transparent; \n"
-        "color: black;")
-
-
+    
         self.total_slot_label = QLabel()
-        self.total_slot_label.setGeometry(371, 17, 245, 27)
+        self.total_slot_label.resize(245, 27)
         self.total_slot_label.setFont(self.font)
-        self.total_slot_label.setStyleSheet("background-color: transparent; \n"
-        "color: black;")
 
         self.row_label = QLabel()
-        self.row_label.setGeometry(371, 44, 245, 27)
+        self.row_label.resize(245, 27)
         self.row_label.setFont(self.font)
-        self.row_label.setStyleSheet("background-color: transparent;\n"
-        "color: black;")
 
         self.column_label = QLabel()
-        self.column_label.setGeometry(371, 71, 245, 27)
+        self.column_label.resize(245, 27)
         self.column_label.setFont(self.font)
-        self.column_label.setStyleSheet("background-color: transparent; \n"
-        "color: black;")
-        self.shelf_label.setText("gee")
-
-        grid_layout.addWidget(self.shelf_label, 0,0,1,1)
-        grid_layout.addWidget(self.max_weight_label, 1,0,1,1)
-        grid_layout.addWidget(self.dimensions_label, 2,0,1,1)
-        grid_layout.addWidget(self.total_slot_label, 0,1,1,1)
-        grid_layout.addWidget(self.row_label, 1,1,1,1)
-        grid_layout.addWidget(self.column_label, 2,1,1,1)
-        grid_layout.setContentsMargins(44,17,40,17)
-        self.container.setLayout(grid_layout)
+       
+        self.grid_layout.addWidget(self.shelf_label, 0,0,1,1)
+        self.grid_layout.addWidget(self.max_weight_label, 1,0,1,1)
+        self.grid_layout.addWidget(self.dimensions_label, 2,0,1,1)
+        self.grid_layout.addWidget(self.total_slot_label, 0,1,1,1)
+        self.grid_layout.addWidget(self.row_label, 1,1,1,1)
+        self.grid_layout.addWidget(self.column_label, 2,1,1,1)
+        self.grid_layout.setContentsMargins(44,17,40,17)
+        
+        self.setLayout(self.grid_layout)
 
         self.set_shelf_label()
         self.set_max_weight_label()
@@ -84,7 +70,6 @@ class ShelfItem(QWidget):
         self.set_total_slot_label()
         self.set_row_label()
         self.set_column_label()
-
 
     def calculate_total_slot(self) -> int:
         return self.__shelf.get_rows() * self.__shelf.get_columns()
@@ -152,23 +137,20 @@ class ShelfItem(QWidget):
         self.column_label.setText("Column: " + str(self.get_column()))
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
-        self.parent_widget.previous_shelf.setStyleSheet("background-color: #FFFFFF;\n"
-        "border-radius: 30;")
-
-        self.parent_widget.current_shelf = self.container
-        self.container.setStyleSheet("background-color: #FFFFFF;\n"
-        "border-radius: 30;"
-        "border: 3px solid #FDCB6E;")
+        if(self.parent_widget.previous_shelf != None):
+            self.parent_widget.previous_shelf.container.setStyleSheet("background-color: #F8F8FF; border-radius: 30;")
+        self.parent_widget.current_shelf = self
+        self.container.setStyleSheet("background-color: #F8F8FF; border-radius: 30; border: 3px solid #FDCB6E;")
         self.shelf_label.setStyleSheet("background-color: transparent;\n"
-        "border: 0px ")
+        "border: 0px")
         self.max_weight_label.setStyleSheet("background-color: transparent;\n"
-        "border: 0px ")
+        "border: 0px")
         self.dimensions_label.setStyleSheet("background-color: transparent;\n"
-        "border: 0px ")
+        "border: 0px")
         self.total_slot_label.setStyleSheet("background-color: transparent;\n"
-        "border: 0px ")
+        "border: 0px")
         self.row_label.setStyleSheet("background-color: transparent;\n"
-        "border: 0px ")
+        "border: 0px")
         self.column_label.setStyleSheet("background-color: transparent;\n"
-        "border: 0px ")
+        "border: 0px")
         self.parent_widget.previous_shelf = self.parent_widget.current_shelf

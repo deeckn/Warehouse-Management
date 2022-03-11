@@ -772,6 +772,28 @@ class ShelfDAO(DAO):
         )
         return shelf
 
+    def get_all_shelves(self) -> list[StorageShelf]:
+        """Returns a list of all StorageShelf objects from the database"""
+        self.cursor.execute(f"SELECT * FROM {ShelfDAO.__table_name}")
+        data = self.cursor.fetchall()
+        if data is None:
+            return None
+
+        shelves = list()
+        for shelf_data in data:
+            shelves.append(
+                StorageShelf(
+                    shelf_data[0],
+                    shelf_data[1],
+                    shelf_data[2],
+                    shelf_data[3],
+                    shelf_data[4],
+                    shelf_data[5],
+                    shelf_data[6],
+                ))
+
+        return shelves
+
     def update_shelf(
         self,
         label: str,
@@ -791,7 +813,7 @@ class ShelfDAO(DAO):
         if width is not None:
             query += f'{ShelfDAO.__COLUMN_WIDTH}="{width}", '
         if height is not None:
-            query += f'{ShelfDAO.__COLUMN_HEIGHT}="{height}", ' 
+            query += f'{ShelfDAO.__COLUMN_HEIGHT}="{height}", '
         if rows is not None:
             query += f'{ShelfDAO.__COLUMN_ROWS}="{rows}", '
         if columns is not None:
@@ -812,3 +834,28 @@ class ShelfDAO(DAO):
         """)
         self.connection.commit()
 
+    def get_shelves_contains_with(self, shelf_search: str) -> list[StorageShelf]:
+        self.cursor.execute(f"""
+            SELECT * FROM {ShelfDAO.__table_name}
+            WHERE {ShelfDAO.__COLUMN_LABEL}
+            LIKE '%{shelf_search}%'
+        """)
+
+        data = self.cursor.fetchall()
+        if data is None:
+            return None
+
+        shelves = list()
+        for value in data:
+            shelf = StorageShelf(
+                value[0],
+                float(value[1]),
+                float(value[2]),
+                float(value[3]),
+                float(value[4]),
+                int(value[5]),
+                int(value[6])
+            )
+            shelves.append(shelf)
+
+        return shelves

@@ -4,6 +4,7 @@ from views.forms.account_view import AccountView
 from views.forms.login_view import LoginView
 from models import *
 from PySide6.QtWidgets import QWidget
+from views.forms.notifications_view import NotificationView
 
 
 class Controller(ABC):
@@ -173,3 +174,32 @@ class AccountPage(Controller):
             self.view.reset_edit_account_inputs()
         else:
             print("Invalid admin password")
+
+
+class NotificationPage(Controller):
+    view: NotificationView
+    model: NotificationModel
+
+    def __init__(self, view: QWidget, model: Model):
+        super().__init__(view, model)
+        self.__load_data()
+
+    def __load_data(self):
+        products = self.model.get_low_stock_products()
+        for product in products:
+            self.view.add_event_card(
+                "low_stock",
+                f"Product ID: {product.get_id()} | Quantity: {product.get_quantity()}",
+                product.get_owner().get_name(),
+                str(product.get_owner().get_id())
+            )
+
+        customers = self.model.get_contract_ending_customers()
+        for customer in customers:
+            ending_days = self.model.date_difference(customer)
+            self.view.add_event_card(
+                "contract_end",
+                f"Contract over in {ending_days} days",
+                customer.get_name(),
+                str(customer.get_id())
+            )

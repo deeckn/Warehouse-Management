@@ -2,6 +2,7 @@ from abc import ABC
 from data.data_classes import *
 from data.filter_options import FilterOption
 from data.app_dao import *
+from datetime import date
 
 
 class Model(ABC):
@@ -234,12 +235,46 @@ class AccountModel(Model):
 
 class NotificationModel(Model):
     __product_dao: ProductDAO
+    __customer_dao: CustomerDAO
+
+    # Customer contract ending warning
+    __deadline = 14
 
     def __init__(self):
         self.__product_dao = AppDAO.get_dao("product")
+        self.__customer_dao = AppDAO.get_dao("customer")
 
     def get_low_stock_products(self) -> list[ProductItem]:
+        """Returns a list of low stock ProductItem objects"""
         return self.__product_dao.get_low_quantity_products()
+
+    def get_contract_ending_customers(self) -> list[Customer]:
+        """Returns a list of contract ending Customer objects"""
+        customers = self.__customer_dao.get_all_customers()
+        customers = list(
+            filter(
+                lambda c: self.__within_deadline(
+                    self.__date_difference(c)
+                ),
+                customers
+            )
+        )
+        return customers
+
+    def __date_difference(self, customer) -> int:
+        """Returns the number of days from Today"""
+        expiry_date = customer.get_expiry_date()
+        day, month, year = tuple(map(int, expiry_date.split("_")))
+        day1 = date(year, month, day)
+        day2 = date.today()
+        delta = day1 - day2
+        return delta.days
+
+    def __within_deadline(self, days):
+        """Returns True if the days are within the deadline range"""
+        if days < 0:
+            return False
+        return days <= NotificationModel.__deadline
 
 
 class SiteSettingsModel(Model):

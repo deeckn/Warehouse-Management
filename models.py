@@ -246,7 +246,9 @@ class NotificationModel(Model):
 
     def get_low_stock_products(self) -> list[ProductItem]:
         """Returns a list of low stock ProductItem objects"""
-        return self.__product_dao.get_low_quantity_products()
+        products = self.__product_dao.get_low_quantity_products()
+        products.sort(key=lambda p: p.get_quantity(), reverse=False)
+        return products
 
     def get_contract_ending_customers(self) -> list[Customer]:
         """Returns a list of contract ending Customer objects"""
@@ -254,14 +256,17 @@ class NotificationModel(Model):
         customers = list(
             filter(
                 lambda c: self.__within_deadline(
-                    self.__date_difference(c)
+                    self.date_difference(c)
                 ),
                 customers
             )
         )
+
+        # Sorting by ugency
+        customers.sort(key=lambda c: self.date_difference(c), reverse=False)
         return customers
 
-    def __date_difference(self, customer) -> int:
+    def date_difference(self, customer) -> int:
         """Returns the number of days from Today"""
         expiry_date = customer.get_expiry_date()
         day, month, year = tuple(map(int, expiry_date.split("_")))

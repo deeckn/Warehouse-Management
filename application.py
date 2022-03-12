@@ -20,7 +20,12 @@ class Application:
             AccountModel(self.current_user)
         )
 
-        self.current_controller = self.account_page
+        self.notification_page = NotificationPage(
+            NotificationView(),
+            NotificationModel()
+        )
+
+        self.current_controller = self.notification_page
 
     def start(self):
         self.current_controller.open_page()

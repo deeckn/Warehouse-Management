@@ -1,7 +1,7 @@
 from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit, QPushButton
 from PySide6.QtGui import Qt, QIntValidator
 from views.theme import Theme
-from data.data_classes import ProductItem
+from data.data_classes import ProductItem, Customer
 
 
 class ProductCardItem(QWidget):
@@ -21,7 +21,7 @@ class ProductCardItem(QWidget):
         self.info.setStyleSheet(
             "padding-top: 21px; padding-bottom: 21px; padding-left: 41px;")
         self.info.setText(
-            f"Customer Name: {item.get_owner()}\nProduct ID: {item.get_id()}\nProduct Name: {item.get_name()}\nQuantity: {item.get_quantity()}""")
+            f"Customer Name: {item.get_owner().get_name()}\nProduct ID: {item.get_id()}\nProduct Name: {item.get_name()}\nQuantity: {item.get_quantity()}""")
         main_layout.addWidget(self.info)
         quantity_box = QWidget()
         quantity_box.setFixedWidth(107)

@@ -1,3 +1,4 @@
+from data.data_classes import Customer, LogEntry, ProductItem
 from views.forms.stack_page import StackPage  # For real test
 from views.theme import Theme
 from views.forms.log_activity_view import LogWindowView

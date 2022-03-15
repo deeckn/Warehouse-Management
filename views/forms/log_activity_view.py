@@ -9,7 +9,6 @@ from views.items.log_item import LogItem
 class LogWindowView(QWidget):
     def __init__(self, parent) -> None:
         QWidget.__init__(self, parent)
-        self.set_styleSheet("page_widget_theme.qss")
         header_activity_log = QLabel("Activity Log", self)
         header_activity_log.setObjectName("h1")
         header_activity_log.setFont(Theme.POPPINS_BOLD_24)
@@ -38,7 +37,7 @@ class LogWindowView(QWidget):
         scroll_area.setWidgetResizable(True)
         scroll_area.setGeometry(60, 147, 390, 620)
         self.scroll_area_widget = QWidget()
-        self.scroll_area_widget.setObjectName("scroll_area")
+        self.scroll_area_widget.setObjectName("sub_widget")
         self.scroll_area_layout = QVBoxLayout(self.scroll_area_widget)
         self.scroll_area_layout.setSpacing(15)
         self.scroll_area_layout.setContentsMargins(10, 5, 10, 0)
@@ -57,11 +56,3 @@ class LogWindowView(QWidget):
             childs = childs[1:]
             for widget in childs:
                 widget.close()
-
-    def set_styleSheet(self, file_name) -> None:
-        file_path = os.path.dirname(os.path.abspath(__file__))
-        real_path = os.path.join(file_path, file_name)
-        with open(real_path, 'r') as f:
-            style = f.read()
-            self.setStyleSheet(style)
-        f.close()

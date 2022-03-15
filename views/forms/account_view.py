@@ -226,7 +226,7 @@ class AccountView(QWidget):
 
     def set_styleSheet(self) -> None:
         file_path = os.path.dirname(os.path.abspath(__file__))
-        real_path = os.path.join(file_path, "account_view_theme.qss")
+        real_path = os.path.join(file_path, "stack_page_theme.qss")
         with open(real_path, 'r') as f:
             style = f.read()
             self.setStyleSheet(style)

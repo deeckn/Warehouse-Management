@@ -1,22 +1,24 @@
 from views.forms.base_view import BaseView
 from views.items.side_menu_item import SideMenuItem
+from views.forms.account_view import AccountView
+from views.forms.site_setting_view import SiteSettingView
+
 
 class AdminAppView(BaseView):
     def __init__(self):
         super().__init__()
-        self.account_bt = SideMenuItem("user","ACCOUNT SETTINGS")
+        self.account_bt = SideMenuItem("user", "ACCOUNT SETTINGS")
         self.site_bt = SideMenuItem("fix", "SITE SETTINGS")
         self.overview_bt = SideMenuItem("files", "INVENTORY OVERVIEW")
         self.report_bt = SideMenuItem("docs", "VIEW REPORT")
         self.main_bt = SideMenuItem("goto", "ENTER MAIN APP")
-        
 
         for bt in (self.account_bt, self.site_bt, self.overview_bt, self.report_bt, self.main_bt):
             self.add_side_menu_bt(bt)
         self.add_spacer_side_menu()
 
         self.current_bt = self.account_bt
-        self.account_bt.click()      
+        self.account_bt.click()
 
         # Set method
         self.account_bt.set_function(self.move_account)
@@ -24,16 +26,21 @@ class AdminAppView(BaseView):
         self.overview_bt.set_function(self.move_overview)
         self.report_bt.set_function(self.move_report)
 
+        self.account_view = AccountView()
+        self.add_page(self.account_view)
+        self.site_setting_view = SiteSettingView()
+        self.add_page(self.site_setting_view)
 
     # Setter
+
     def set_main_button_listener(self, function):
         self.main_bt.set_function(function)
-      
+
     # UI
     def reset(self):
         super().reset()
         self.current_bt = self.account_bt
-        self.account_bt.click()      
+        self.account_bt.click()
 
     # Move
     def move_account(self):
@@ -41,7 +48,7 @@ class AdminAppView(BaseView):
         self.unclick_current_bt()
         self.current_bt = self.account_bt
         self.account_bt.click()
-        
+
     def move_site(self):
         self.stack.setCurrentIndex(1)
         self.unclick_current_bt()

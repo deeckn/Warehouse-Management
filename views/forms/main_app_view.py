@@ -2,10 +2,11 @@ from views.forms.base_view import BaseView
 from views.forms.home_view import HomeView
 from views.items.side_menu_item import SideMenuItem
 
+
 class MainAppView(BaseView):
     def __init__(self):
         super().__init__()
-        self.home_bt = SideMenuItem("home","HOME")
+        self.home_bt = SideMenuItem("home", "HOME")
         self.customer_bt = SideMenuItem("user", "CUSTOMER LIST")
         self.product_bt = SideMenuItem("product", "PRODUCT LIST")
         self.notifications_bt = SideMenuItem("notification", "NOTIFICATIONS")
@@ -27,7 +28,7 @@ class MainAppView(BaseView):
 
         self.home_page = HomeView()
         self.add_page(self.home_page)
-      
+
     # UI
 
     def hide_admin_bt(self):
@@ -35,7 +36,7 @@ class MainAppView(BaseView):
 
     def show_admin_bt(self):
         self.admin_bt.show()
-    
+
     def reset(self):
         super().reset()
         self.current_bt = self.home_bt
@@ -48,7 +49,7 @@ class MainAppView(BaseView):
         self.unclick_current_bt()
         self.current_bt = self.home_bt
         self.home_bt.click()
-        
+
     def move_customer(self):
         self.stack.setCurrentIndex(1)
         self.unclick_current_bt()

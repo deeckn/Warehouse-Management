@@ -1,0 +1,89 @@
+/* Defualt Element Style */
+QWidget { 
+    background-color:#F8F8FF;
+}
+
+QScrollArea {
+    background-color: white;
+    border: none;
+    border-radius: 10px;
+}
+
+QLabel {
+    color: #1A374D;
+    background-color: none;
+}
+
+QLineEdit { 
+    background-color: #DDDDDD;
+    border-radius: 0px;
+    color: black;
+    padding-left: 10px; 
+}
+
+QRadioButton {
+    background-color: white;
+    color:#1A374D;
+}
+
+/* Special Element Style */
+
+/* QWidget */
+QWidget#sub_widget {
+    background-color: white;
+    border-radius: 10px;
+}
+
+QWidget#option {
+    background-color: none;
+}
+
+/* QLabel */
+QLabel#page_name {  /* Page's Name */
+    color: #1A374D;
+    background-color:#F8F8FF;
+}
+
+QLabel#employee_acc_list_label {
+    border-radius: 10px;
+    padding-top: 10px;
+}
+
+QLabel#h1 {
+    color: #406882; 
+    background-color: none;
+}
+
+QLabel#linebreak_top_bottom {
+    border-top: 1px solid black; 
+    border-bottom: 1px solid black; 
+    background-color: none;
+}
+
+QLabel#linebreak_top {
+    border-top: 1px solid black; 
+    background-color: none;
+}
+
+QLabel#legend {
+    background-color: none; 
+    color: black;
+}
+
+QLabel#guide {
+    background-color: white; 
+    color: black;
+}
+
+/* QRadioButton */
+QRadioButton#btn_create_admin {
+    background-color:white;
+    color:#1A374D;
+}
+
+/* QPushButton */
+QPushButton#yellow_btn {
+    color: white;
+    background: #FDCB6E;
+    border-radius: 10px;
+}

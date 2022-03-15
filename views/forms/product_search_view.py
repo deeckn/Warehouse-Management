@@ -10,7 +10,6 @@ import os.path
 class ProductSearchView(QWidget):
     def __init__(self, parent=None) -> None:
         QWidget.__init__(self, parent)
-        self.set_styleSheet("page_widget_theme.qss")
 
         self.current_filter = "id"
 
@@ -77,7 +76,7 @@ class ProductSearchView(QWidget):
         scroll_area.setWidgetResizable(True)
         scroll_area.setGeometry(53, 222, 699, 520)
         self.scroll_area_widget = QWidget()
-        self.scroll_area_widget.setObjectName("scroll_area")
+        self.scroll_area_widget.setObjectName("sub_widget")
         self.scroll_area_layout = QVBoxLayout(self.scroll_area_widget)
         self.scroll_area_layout.setSpacing(10)
         self.scroll_area_layout.setContentsMargins(0, 10, 20, 10)
@@ -120,11 +119,3 @@ class ProductSearchView(QWidget):
 
     def set_search_bt_listener(self, function) -> None:
         self.product_search_button.clicked.connect(function)
-
-    def set_styleSheet(self, file_name) -> None:
-        file_path = os.path.dirname(os.path.abspath(__file__))
-        real_path = os.path.join(file_path, file_name)
-        with open(real_path, 'r') as f:
-            style = f.read()
-            self.setStyleSheet(style)
-        f.close()

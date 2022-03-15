@@ -17,10 +17,10 @@ from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
 from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
                            QFontDatabase, QGradient, QIcon, QImage,
                            QKeySequence, QLinearGradient, QPainter, QPalette,
-                           QPixmap, QRadialGradient, QTransform)
+                           QPixmap, QRadialGradient, QTransform,QIntValidator)
 from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit,
                                QPushButton, QScrollArea, QSizePolicy,
-                               QVBoxLayout, QWidget,QScrollArea )
+                               QVBoxLayout, QWidget,QScrollArea, )
 
 from views.items.shelf_item import ShelfItem
 from data.data_classes import StorageShelf
@@ -141,6 +141,13 @@ class SiteSettingView(QWidget):
         font.setPixelSize(18)
         font.setBold(False)
 
+        self.search_button = QPushButton("Search", self)
+        self.search_button.setGeometry(374, 387, 176, 41)
+        self.search_button.setFont(font)
+        self.search_button.setStyleSheet(u"background-color: #FDCB6E;\n "
+        "border-radius: 10;\n"
+        "color: white")    
+
         self.search_lineEdit = QLineEdit(self)
         self.search_lineEdit.setGeometry(150, 324, 400, 42)
         self.search_lineEdit.setFont(font)
@@ -148,13 +155,6 @@ class SiteSettingView(QWidget):
         "background-color: #DDDDDD;"
         "padding-left: 14;\n"
         "padding-top: 5;")
-
-        self.search_button = QPushButton("Search", self)
-        self.search_button.setGeometry(374, 387, 176, 41)
-        self.search_button.setFont(font)
-        self.search_button.setStyleSheet(u"background-color: #FDCB6E;\n "
-        "border-radius: 10;\n"
-        "color: white")    
 
         self.shelf_label_informtion_lineEdit = QLineEdit(self)
         self.shelf_label_informtion_lineEdit.setGeometry(151, 516, 150, 42)
@@ -166,6 +166,7 @@ class SiteSettingView(QWidget):
 
         self.max_weight_lineEdit = QLineEdit(self)
         self.max_weight_lineEdit.setGeometry(311, 516, 150, 42)
+        self.max_weight_lineEdit.setValidator(QIntValidator(0, 9999999))
         self.max_weight_lineEdit.setFont(font)
         self.max_weight_lineEdit.setStyleSheet(u"border-radius: 0; \n"
         "background-color: #DDDDDD;"
@@ -175,6 +176,7 @@ class SiteSettingView(QWidget):
         self.length_lineEdit = QLineEdit(self)
         self.length_lineEdit.setGeometry(307, 601, 125, 42)
         self.length_lineEdit.setFont(font)
+        self.length_lineEdit.setValidator(QIntValidator(0, 9999999))
         self.length_lineEdit.setStyleSheet(u"border-radius: 0;\n"
         "background-color: #DDDDDD;"
         "padding-left: 14;\n"
@@ -183,6 +185,7 @@ class SiteSettingView(QWidget):
         self.weight_lineEdit = QLineEdit(self)
         self.weight_lineEdit.setGeometry(307, 650, 125, 42)
         self.weight_lineEdit.setFont(font)
+        self.weight_lineEdit.setValidator(QIntValidator(0, 9999999))
         self.weight_lineEdit.setStyleSheet(u"border-radius: 0;\n"
         "background-color: #DDDDDD;"
         "padding-left: 14;\n"
@@ -191,6 +194,7 @@ class SiteSettingView(QWidget):
         self.height_lineEdit = QLineEdit(self)
         self.height_lineEdit.setGeometry(307, 699, 125, 42)
         self.height_lineEdit.setFont(font)
+        self.height_lineEdit.setValidator(QIntValidator(0, 9999999))
         self.height_lineEdit.setStyleSheet(u"border-radius: 0; \n"
         "background-color: #DDDDDD;"
         "padding-left: 14;\n"
@@ -199,6 +203,7 @@ class SiteSettingView(QWidget):
         self.row_lineEdit = QLineEdit(self)
         self.row_lineEdit.setGeometry(219, 786, 120, 42)
         self.row_lineEdit.setFont(font)
+        self.row_lineEdit.setValidator(QIntValidator(0, 9999999))
         self.row_lineEdit.setStyleSheet(u"border-radius: 0; \n"
         "background-color: #DDDDDD;"
         "padding-left: 14; \n"
@@ -207,6 +212,7 @@ class SiteSettingView(QWidget):
         self.column_lineEdit = QLineEdit(self)
         self.column_lineEdit.setGeometry(434, 786, 120, 42)
         self.column_lineEdit.setFont(font)
+        self.column_lineEdit.setValidator(QIntValidator(0, 9999999))
         self.column_lineEdit.setStyleSheet(u"border-radius: 0; \n"
         "background-color: #DDDDDD;"
         "padding-left: 14; \n"

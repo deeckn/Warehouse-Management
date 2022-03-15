@@ -11,7 +11,7 @@ class ProductSearchView(QWidget):
     def __init__(self, parent=None) -> None:
         QWidget.__init__(self, parent)
 
-        self.current_filter = "id"
+        self.current_filter = None
 
         header_product_search = QLabel("Product Search", self)
         header_product_search.setFont(Theme.POPPINS_BOLD_24)
@@ -43,9 +43,10 @@ class ProductSearchView(QWidget):
 
         self.filter_customer_name = QRadioButton("Customer Name")
         self.filter_customer_name.setFont(Theme.POPPINS_BOLD_14)
-        option_layout.addWidget(self.filter_id)
-        option_layout.addWidget(self.filter_product_name)
-        option_layout.addWidget(self.filter_customer_name)
+
+        for bt in (self.filter_id, self.filter_product_name, self.filter_customer_name):
+            bt.clicked.connect(self.filter_select)
+            option_layout.addWidget(bt)
 
         # UI
         ui_linebreak = QLabel(self)
@@ -76,7 +77,7 @@ class ProductSearchView(QWidget):
         scroll_area.setWidgetResizable(True)
         scroll_area.setGeometry(53, 222, 699, 520)
         self.scroll_area_widget = QWidget()
-        self.scroll_area_widget.setObjectName("sub_widget")
+        self.scroll_area_widget.setObjectName("container")
         self.scroll_area_layout = QVBoxLayout(self.scroll_area_widget)
         self.scroll_area_layout.setSpacing(10)
         self.scroll_area_layout.setContentsMargins(0, 10, 20, 10)
@@ -84,7 +85,7 @@ class ProductSearchView(QWidget):
         self.spacer = QSpacerItem(
             0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-    def add_product_card(self, product_item: ProductItem) -> None:
+    def add_product_card(self, product_item: ProductItem):
         """Add product card on Product search window"""
         self.scroll_area_layout.removeItem(self.spacer)
         # card = ProductSearchCardController(product_item).get_view()
@@ -97,7 +98,11 @@ class ProductSearchView(QWidget):
         self.scroll_area_layout.addWidget(item_container)
         self.scroll_area_layout.addItem(self.spacer)
 
-    def clear_product_card(self) -> None:
+    def filter_select(self):
+        new_filter = self.sender().text().replace(" ", "_").lower()
+        self.current_filter = new_filter
+
+    def clear_product_card(self):
         childs = self.scroll_area_widget.children()
         if len(childs) > 1:
             childs = childs[1:]
@@ -105,14 +110,7 @@ class ProductSearchView(QWidget):
                 widget.close()
 
     def get_filter(self) -> str:
-        if self.filter_customer_name.isChecked():
-            return "customer name"
-        elif self.filter_product_name.isChecked():
-            return "product name"
-        elif self.filter_id.isChecked():
-            return "id"
-        else:
-            return "None"
+        return self.current_filter
 
     def get_search_input(self) -> str:
         return self.product_search_input.text()

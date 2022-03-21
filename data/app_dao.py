@@ -600,6 +600,23 @@ class ProductDAO(DAO):
         )
         return product
 
+    def get_customer_products(self, owner_id: int) -> list[ProductItem]:
+        """Returns a ProductItem object list given the owner id"""
+        self.cursor.execute(f"""
+            SELECT *
+            FROM {ProductDAO.__table_name}
+            WHERE {ProductDAO.__COLUMN_OWNER}={owner_id}
+        """)
+
+        products = list()
+        data = self.cursor.fetchall()
+        for product in data:
+            products.append(self.get_product(product[0]))
+
+        if len(products) == 0:
+            return None
+        return products
+
     def get_all_products(self) -> list[ProductItem]:
         """Returns all products as a list of ProductItem objects"""
         self.cursor.execute(f"""

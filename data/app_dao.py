@@ -181,7 +181,10 @@ class LogDAO(DAO):
 
     def get_all_log_entries(self) -> list[LogEntry]:
         """Retreives all log entries"""
-        self.cursor.execute(f"SELECT * FROM {LogDAO.__table_name}")
+        self.cursor.execute(f"""
+            SELECT * FROM {LogDAO.__table_name}
+            ORDER BY {LogDAO.__COLUMN_ID} DESC
+        """)
         users = self.cursor.fetchall()
         self.__query_list = users
         self.__convert_to_object()

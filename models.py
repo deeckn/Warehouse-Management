@@ -41,6 +41,9 @@ class LoginModel(Model):
     def get_current_user(self) -> User:
         return self.__current_user
 
+    def set_current_user(self, username: str):
+        self.__current_user = self.user_dao.get_user_by_username(username)
+
 
 class HomeModel(Model):
 

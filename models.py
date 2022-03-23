@@ -3,6 +3,7 @@ from data.data_classes import *
 from data.filter_options import FilterOption
 from data.app_dao import *
 from datetime import date
+from dateutil import relativedelta
 
 
 class Model(ABC):
@@ -85,36 +86,85 @@ class HomeModel(Model):
 class CustomerListModel(Model):
 
     __current_user: User
-    __current_customer: Customer
-    __customer_query: list[Customer]
+    __customer_dao: CustomerDAO
+    __log_dao: LogDAO
 
-    def __init__(self):
-        self.__current_user = None
-        self.__current_customer = None
-        self.__customer_query = list()
+    def __init__(self, current_user: User):
+        self.__current_user = current_user
+        self.__customer_dao = AppDAO.get_dao("customer")
 
-    def query_customers(self, name: str):
-        """Search Customers from Database"""
-        pass
-
-    def find_customer(self, id: int):
-        """Get Customer by ID from Database"""
-        pass
-
-    def set_current_customer(self, customer: Customer):
-        self.__current_customer = customer
-
-    def get_current_customer(self) -> Customer:
-        return self.__current_customer
+    def get_customer_contains_with(self, search: str) -> list[Customer]:
+        """Returns a list of Customer objects from database with the name that contains the search string"""
+        return self.__customer_dao.get_customer_contains_with(search)
 
     def add_customer(self, customer: Customer):
-        pass
+        """Adds a new customer to the database"""
+        if customer is not None:
+            self.__customer_dao.add_customer(customer)
 
-    def save_customer_data(self):
-        pass
+            # Logging
+            log = LogEntry(
+                f"{self.__current_user.get_username()} added {customer.get_name()} to the system")
+            self.__log_dao.add_log_entry(log)
 
-    def delete_customer(self):
-        pass
+    def save_customer_data(self, previous_info: Customer, new_info: Customer):
+        """Saves changes made to customer information"""
+
+        name = None if previous_info.get_name(
+        ) != new_info.get_name() else new_info.get_name()
+
+        phone = None if previous_info.get_phone(
+        ) != new_info.get_phone() else new_info.get_phone()
+
+        email = None if previous_info.get_email(
+        ) != new_info.get_email() else new_info.get_email()
+
+        packing_service = None if previous_info.get_packing_service(
+        ) != new_info.get_packing_service() else new_info.get_packing_service()
+
+        rental_duration = None if previous_info.get_rental_duration(
+        ) != new_info.get_rental_duration() else new_info.get_rental_duration()
+
+        date_joined = None if previous_info.get_date_joined(
+        ) != new_info.get_date_joined() else new_info.get_date_joined()
+
+        expiry_date = None if previous_info.get_expiry_date(
+        ) != new_info.get_expiry_date() else new_info.get_expiry_date()
+
+        total_payment = None if previous_info.get_total_payment(
+        ) != new_info.get_total_payment() else new_info.get_total_payment()
+
+        self.__customer_dao.update_customer(
+            previous_info.get_id(),
+            name=name,
+            phone=phone,
+            email=email,
+            packing_service=packing_service,
+            rental_duration=rental_duration,
+            date_joined=date_joined,
+            expiry_date=expiry_date,
+            total_payment=total_payment
+        )
+
+        # Logging
+        log = LogEntry(
+            f"{self.__current_user.get_username()} updated Customer ID: {previous_info.get_id()} information")
+        self.__log_dao.add_log_entry(log)
+
+    def delete_customer(self, customer: Customer):
+        """Deletes the given customer from the system"""
+        self.__customer_dao.delete_customer(customer.get_id())
+
+        # Logging
+        log = LogEntry(
+            f"{self.__current_user.get_username()} deleted Customer ID: {customer.get_id()} from the system")
+        self.__log_dao.add_log_entry(log)
+
+    def calculate_expiry_date(self, starting_date: date, duration: int) -> date:
+        """Returns the an ending date string given the starting date and duration"""
+        expiry_date = starting_date + \
+            relativedelta.relativedelta(months=duration)
+        return expiry_date
 
 
 class ProductListModel(Model):
@@ -196,7 +246,7 @@ class AccountModel(Model):
         """Returns the status of password confirmation"""
         return password == confirm
 
-    def update_user_info(self, previous_info, new_user_info: User):
+    def update_user_info(self, previous_info: User, new_user_info: User):
         """Updates an existing user information"""
         if previous_info is None:
             return

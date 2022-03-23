@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from datetime import datetime
 from data.access_level import AccessLevel
 from data.categories import ProductCategory
 
@@ -106,11 +107,21 @@ class StorageShelf:
 
 @dataclass
 class LogEntry:
-
     __id: int
     __date: str
     __time: str
     __description: str
+
+    def __init__(self, description: str, id: int = None, date: str = None, time: str = None):
+        self.__id = id
+        self.__date = date
+        self.__time = time
+        self.__description = description
+
+        if None in [self.__date, self.__time]:
+            today = datetime.now()
+            self.__date = f"{today.day:02d}_{today.month:02d}_{today.year}"
+            self.__time = f"{today.hour:02d}_{today.minute:02d}"
 
     def get_id(self) -> int:
         return self.__id

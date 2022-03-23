@@ -692,6 +692,41 @@ class ProductDAO(DAO):
 
         return low_stock_products
 
+    def get_product_contains_with(self, name: str) -> list[ProductItem]:
+        """Returns a list of ProductItem objects based on a proper substring"""
+
+        self.cursor.execute(f"""
+            SELECT *
+            FROM {ProductDAO.__table_name} 
+            WHERE {ProductDAO.__COLUMN_NAME}
+            LIKE '%{name}%'
+            ORDER BY {ProductDAO.__COLUMN_PRODUCT_ID} ASC
+        """)
+
+        data = self.cursor.fetchall()
+        if data is None:
+            return None
+
+        products: list[ProductItem] = list()
+        for product in data:
+            categories = self.__category_dao.get_product_categories(product[0])
+            locations = self.__location_dao.get_product_location(product[0])
+            owner = self.__customer_dao.get_customer(product[6])
+            product_object = ProductItem(
+                product[0],
+                product[1],
+                product[2],
+                product[3],
+                locations,
+                product[4],
+                product[5],
+                owner,
+                categories
+            )
+            products.append(product_object)
+
+        return products
+
     def update_product(
         self,
         id: int,

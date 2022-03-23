@@ -229,10 +229,12 @@ class ProductListModel(Model):
 class AccountModel(Model):
     __current_admin: User
     __user_dao: UserDAO
+    __log_dao: LogDAO
 
     def __init__(self, user: User = None):
         self.__current_admin = user
         self.__user_dao = AppDAO.get_dao("user")
+        self.__log_dao = AppDAO.get_dao("log")
 
     def get_employee_accounts(self) -> list[User]:
         """Returns all user objects from the database"""
@@ -241,6 +243,11 @@ class AccountModel(Model):
     def create_new_account(self, user: User):
         """Adds a new user object to the database"""
         self.__user_dao.add_user(user)
+
+        # Logging
+        log = LogEntry(
+            f"ADMIN: {self.__current_admin.get_username()} created a new account for {user.get_username()}")
+        self.__log_dao.add_log_entry(log)
 
     def generate_username(self, first_name: str, last_name: str) -> str:
         """Returns a valid username based on the user's name"""
@@ -297,6 +304,11 @@ class AccountModel(Model):
             password=password
         )
 
+        # Logging
+        log = LogEntry(
+            f"ADMIN: {self.__current_admin.get_username()} updated ID:{previous_info.get_id()} account")
+        self.__log_dao.add_log_entry(log)
+
     def admin_confirmation(self, password: str) -> bool:
         """Returns the status of admin password confirmation"""
         return self.__current_admin.get_password() == password
@@ -304,6 +316,11 @@ class AccountModel(Model):
     def delete_user_account(self, user: User):
         """Deletes a user object from the database"""
         self.__user_dao.delete_user_by_id(user.get_id())
+
+        # Logging
+        log = LogEntry(
+            f"ADMIN: {self.__current_admin.get_username()} deleted User: {user.get_username()} from the system")
+        self.__log_dao.add_log_entry(log)
 
 
 class NotificationModel(Model):
@@ -356,10 +373,14 @@ class NotificationModel(Model):
 
 
 class SiteSettingsModel(Model):
+    __current_admin: User
     __shelf_dao: ShelfDAO
+    __log_dao: LogDAO
 
-    def __init__(self):
+    def __init__(self, admin: User):
+        self.__current_admin = admin
         self.__shelf_dao = AppDAO.get_dao("shelf")
+        self.__log_dao = AppDAO.get_dao("log")
 
     def add_shelf(
         self,
@@ -386,6 +407,12 @@ class SiteSettingsModel(Model):
             columns
         )
         self.__shelf_dao.add_shelf(shelf)
+
+        # Logging
+        log = LogEntry(
+            f"ADMIN: {self.__current_admin.get_username()} added a new shelf with the label {label}")
+        self.__log_dao.add_log_entry(log)
+
         return True
 
     def search_shelf(self, label: str) -> StorageShelf:
@@ -422,9 +449,19 @@ class SiteSettingsModel(Model):
             columns=columns
         )
 
+        # Logging
+        log = LogEntry(
+            f"ADMIN: {self.__current_admin.get_username()} updated {previous_info.get_label()} information")
+        self.__log_dao.add_log_entry(log)
+
     def delete_shelf(self, shelf: StorageShelf):
         """Deletes a shelf from the database"""
         self.__shelf_dao.delete_shelf(shelf.get_label())
+
+        # Logging
+        log = LogEntry(
+            f"ADMIN: {self.__current_admin.get_username()} deleted {shelf.get_label()} from the system")
+        self.__log_dao.add_log_entry(log)
 
     def calculate_total_slots(self, rows, columns) -> int:
         """Returns the total number of slots"""

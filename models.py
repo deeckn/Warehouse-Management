@@ -1,6 +1,6 @@
 from abc import ABC
 from data.data_classes import *
-from data.filter_options import FilterOption
+from data.filter_options import CustomerFilter, FilterOption, IdFilter, NameFilter
 from data.app_dao import *
 from datetime import date
 from dateutil import relativedelta
@@ -44,43 +44,63 @@ class LoginModel(Model):
 
 class HomeModel(Model):
 
-    __current_search_filter: FilterOption
-    __search_query: str
-    __current_customer: Customer
-    __current_products: list[ProductItem]
-    __current_activity_logs: list[LogEntry]
+    __current_user: User
+    __product_dao: ProductDAO
+    __customer_dao: CustomerDAO
+    __log_dao: LogDAO
 
-    def __init__(self):
-        self.__current_customer = None
-        self.__current_products = list()
-        self.__current_search_filter = None
-        self.__current_activity_logs = list()
-        self.__search_query = ""
+    def __init__(self, current_user: User):
+        self.__current_user = current_user
+        self.__product_dao = AppDAO.get_dao("product")
+        self.__customer_dao = AppDAO.get_dao("customer")
+        self.__log_dao = AppDAO.get_dao("log")
 
-    def set_home_search_filter(self, filter: FilterOption):
-        self.__current_search_filter = filter
+    def search_product(self, search: str, filter: FilterOption) -> list[ProductItem]:
+        """Returns a list of ProductItem objects based on the search query and filter"""
 
-    def set_home_search_query(self, query: str):
-        self.__search_query = query
+        if isinstance(filter, IdFilter):
+            return [self.__product_dao.get_product(int(search))]
 
-    def find_product(self):
-        "find product depending on search filter"
-        pass
+        if isinstance(filter, NameFilter):
+            return self.__product_dao.get_product_contains_with(search)
 
-    def load_activity_log(self):
-        "get activities from database"
-        pass
+        if isinstance(filter, CustomerFilter):
+            customers = self.__customer_dao.get_customer_contains_with(search)
+            if customers is None:
+                return None
 
-    def get_activity_logs(self):
-        return self.__current_activity_logs
+            customer_ids = list(map(lambda c: c.get_id(), customers))
+            products: list[ProductItem] = list()
+            for id in customer_ids:
+                temp = self.__product_dao.get_customer_products(id)
+                if temp is None:
+                    continue
+                products.extend(temp)
+            return products
 
-    def add_product(self, product: ProductItem, quantity: int):
-        "update quantity of product in database"
-        pass
+        return None
+
+    def get_activity_logs(self) -> list[LogEntry]:
+        """Returns a list of all LogEntry objects in the database"""
+        return self.__log_dao.get_all_log_entries()
+
+    def add_product_quantity(self, product: ProductItem, quantity: int):
+        current_quantity = product.get_quantity()
+        self.__product_dao.update_product(quantity=current_quantity+quantity)
+
+        # Logging
+        log = LogEntry(
+            f"{self.__current_user.get_username()} added {quantity} items for Product ID: {product.get_id()}")
+        self.__log_dao.add_log_entry(log)
 
     def export_product(self, product: ProductItem, quantity: int):
-        "update quantity of product in database"
-        pass
+        current_quantity = product.get_quantity()
+        self.__product_dao.update_product(quantity=current_quantity-quantity)
+
+        # Logging
+        log = LogEntry(
+            f"{self.__current_user.get_username()} exported {quantity} items for Product ID: {product.get_id()}")
+        self.__log_dao.add_log_entry(log)
 
 
 class CustomerListModel(Model):

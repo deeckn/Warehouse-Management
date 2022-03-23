@@ -237,7 +237,7 @@ class CustomerDAO(DAO):
         """Converts raw data to User objects"""
         temp = list()
         for data in self.__query_list:
-            packing_service = True if data[4] == "1" else False
+            packing_service = data[4] == "1"
             customer = Customer(
                 int(data[0]),
                 data[1],
@@ -341,6 +341,19 @@ class CustomerDAO(DAO):
 
         packing_service = data[4] == 1
         return Customer(data[0], data[1], data[2], data[3], packing_service, data[5], data[6], data[7], data[8])
+
+    def get_customer_contains_with(self, name_search: str) -> list[Customer]:
+        self.cursor.execute(f"""
+            SELECT * FROM {CustomerDAO.__table_name}
+            WHERE {CustomerDAO.__COLUMN_NAME} LIKE '%{name_search}%'
+        """)
+
+        self.__query_list = self.cursor.fetchall()
+        if self.__query_list is None:
+            return None
+
+        self.__convert_to_object()
+        return self.__query_list
 
     def delete_customer(self, customer_id: int):
         """Deletes customer data given an id"""

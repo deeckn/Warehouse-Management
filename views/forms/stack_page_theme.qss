@@ -29,7 +29,7 @@ QRadioButton {
 /* Special Element Style */
 
 /* QWidget */
-QWidget#sub_widget {
+QWidget#container {
     background-color: white;
     border-radius: 10px;
 }
@@ -37,11 +37,10 @@ QWidget#sub_widget {
 QWidget#option {
     background-color: none;
 }
-
 /* QLabel */
 QLabel#page_name {  /* Page's Name */
     color: #1A374D;
-    background-color:#F8F8FF;
+    background-color:transparent;
 }
 
 QLabel#employee_acc_list_label {
@@ -54,13 +53,13 @@ QLabel#h1 {
     background-color: none;
 }
 
-QLabel#linebreak_top_bottom {
+QLabel#line_break_top_bottom {
     border-top: 1px solid black; 
     border-bottom: 1px solid black; 
     background-color: none;
 }
 
-QLabel#linebreak_top {
+QLabel#line_break_top {
     border-top: 1px solid black; 
     background-color: none;
 }
@@ -84,6 +83,6 @@ QRadioButton#btn_create_admin {
 /* QPushButton */
 QPushButton#yellow_btn {
     color: white;
-    background: #FDCB6E;
+    background-color: #FDCB6E;
     border-radius: 10px;
 }

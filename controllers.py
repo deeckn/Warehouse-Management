@@ -41,8 +41,12 @@ class LoginPage(Controller):
                 print("Open Admin Page")
             else:
                 print("Open Employee Page")
+            self.model.set_current_user(username)
         else:
             self.view.show_error_label()
+
+    def get_current_user(self) -> User:
+        return self.model.get_current_user()
 
 
 class HomePage(Controller):

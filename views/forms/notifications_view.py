@@ -1,18 +1,18 @@
 from PySide6.QtCore import Qt
+from views.forms.stack_page import StackPage
 from PySide6.QtWidgets import QWidget, QLabel, QScrollArea, QVBoxLayout
 from views.items.notification_item import NotificationItem
 from views.theme import Theme
 
 
-class NotificationView(QWidget):
-    def __init__(self, parent=None) -> None:
-        super().__init__(parent)
-        self.setFixedSize(1520, 1080)
-        self.setStyleSheet(f"background-color: #{Theme.GHOST_WHITE}")
+class NotificationView(StackPage):
+    def __init__(self) -> None:
+        super().__init__()
+        self.setStyleSheet(f"background-color: {Theme.GHOST_WHITE}")
 
         # Page Title
         title = QLabel("Notifications", self)
-        title.setStyleSheet(f"color: #{Theme.DARK_BLUE}")
+        title.setStyleSheet(f"color: {Theme.DARK_BLUE}")
         title.setGeometry(100, 60, 500, 96)
         title.setFont(Theme.POPPINS_BOLD_72)
 
@@ -20,7 +20,7 @@ class NotificationView(QWidget):
         yellow_circle = QLabel(self)
         yellow_circle.setGeometry(100, 165, 25, 25)
         yellow_circle.setStyleSheet(
-            f"background-color: #{Theme.YELLOW}; border-radius: 12;"
+            f"background-color: {Theme.YELLOW}; border-radius: 12;"
         )
 
         low_stock_label = QLabel("Low Stock", self)
@@ -31,7 +31,7 @@ class NotificationView(QWidget):
         red_circle = QLabel(self)
         red_circle.setGeometry(320, 165, 25, 25)
         red_circle.setStyleSheet(
-            f"background-color: #{Theme.RED}; border-radius: 12;"
+            f"background-color: {Theme.RED}; border-radius: 12;"
         )
 
         contract_end_label = QLabel("Contract Ending", self)
@@ -41,22 +41,22 @@ class NotificationView(QWidget):
         # Table Header Labels
         status_column_label = QLabel("Status", self)
         status_column_label.setFont(Theme.POPPINS_BOLD_24)
-        status_column_label.setStyleSheet(f"color: #{Theme.BLUE};")
+        status_column_label.setStyleSheet(f"color: {Theme.BLUE};")
         status_column_label.setGeometry(120, 246, 100, 40)
 
         event_column_label = QLabel("Event", self)
         event_column_label.setFont(Theme.POPPINS_BOLD_24)
-        event_column_label.setStyleSheet(f"color: #{Theme.BLUE};")
+        event_column_label.setStyleSheet(f"color: {Theme.BLUE};")
         event_column_label.setGeometry(285, 246, 100, 40)
 
         customer_column_label = QLabel("Customer", self)
         customer_column_label.setFont(Theme.POPPINS_BOLD_24)
-        customer_column_label.setStyleSheet(f"color: #{Theme.BLUE};")
+        customer_column_label.setStyleSheet(f"color: {Theme.BLUE};")
         customer_column_label.setGeometry(845, 246, 130, 40)
 
         id_column_label = QLabel("ID", self)
         id_column_label.setFont(Theme.POPPINS_BOLD_24)
-        id_column_label.setStyleSheet(f"color: #{Theme.BLUE};")
+        id_column_label.setStyleSheet(f"color: {Theme.BLUE};")
         id_column_label.setGeometry(1150, 246, 30, 40)
 
         # Scroll Area Container

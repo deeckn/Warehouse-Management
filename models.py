@@ -1,8 +1,9 @@
 from abc import ABC
 from data.data_classes import *
-from data.filter_options import FilterOption
+from data.filter_options import CustomerFilter, FilterOption, IdFilter, NameFilter
 from data.app_dao import *
 from datetime import date
+from dateutil import relativedelta
 
 
 class Model(ABC):
@@ -40,81 +41,153 @@ class LoginModel(Model):
     def get_current_user(self) -> User:
         return self.__current_user
 
+    def set_current_user(self, username: str):
+        self.__current_user = self.user_dao.get_user_by_username(username)
+
 
 class HomeModel(Model):
 
-    __current_search_filter: FilterOption
-    __search_query: str
-    __current_customer: Customer
-    __current_products: list[ProductItem]
-    __current_activity_logs: list[LogEntry]
+    __current_user: User
+    __product_dao: ProductDAO
+    __customer_dao: CustomerDAO
+    __log_dao: LogDAO
 
-    def __init__(self):
-        self.__current_customer = None
-        self.__current_products = list()
-        self.__current_search_filter = None
-        self.__current_activity_logs = list()
-        self.__search_query = ""
+    def __init__(self, current_user: User):
+        self.__current_user = current_user
+        self.__product_dao = AppDAO.get_dao("product")
+        self.__customer_dao = AppDAO.get_dao("customer")
+        self.__log_dao = AppDAO.get_dao("log")
 
-    def set_home_search_filter(self, filter: FilterOption):
-        self.__current_search_filter = filter
+    def search_product(self, search: str, filter: FilterOption) -> list[ProductItem]:
+        """Returns a list of ProductItem objects based on the search query and filter"""
 
-    def set_home_search_query(self, query: str):
-        self.__search_query = query
+        if isinstance(filter, IdFilter):
+            return [self.__product_dao.get_product(int(search))]
 
-    def find_product(self):
-        "find product depending on search filter"
-        pass
+        if isinstance(filter, NameFilter):
+            return self.__product_dao.get_product_contains_with(search)
 
-    def load_activity_log(self):
-        "get activities from database"
-        pass
+        if isinstance(filter, CustomerFilter):
+            customers = self.__customer_dao.get_customer_contains_with(search)
+            if customers is None:
+                return None
 
-    def get_activity_logs(self):
-        return self.__current_activity_logs
+            customer_ids = list(map(lambda c: c.get_id(), customers))
+            products: list[ProductItem] = list()
+            for id in customer_ids:
+                temp = self.__product_dao.get_customer_products(id)
+                if temp is None:
+                    continue
+                products.extend(temp)
+            return products
 
-    def add_product(self, product: ProductItem, quantity: int):
-        "update quantity of product in database"
-        pass
+        return None
+
+    def get_activity_logs(self) -> list[LogEntry]:
+        """Returns a list of all LogEntry objects in the database"""
+        return self.__log_dao.get_all_log_entries()
+
+    def add_product_quantity(self, product: ProductItem, quantity: int):
+        current_quantity = product.get_quantity()
+        self.__product_dao.update_product(quantity=current_quantity+quantity)
+
+        # Logging
+        log = LogEntry(
+            f"{self.__current_user.get_username()} added {quantity} items for Product ID: {product.get_id()}")
+        self.__log_dao.add_log_entry(log)
 
     def export_product(self, product: ProductItem, quantity: int):
-        "update quantity of product in database"
-        pass
+        current_quantity = product.get_quantity()
+        self.__product_dao.update_product(quantity=current_quantity-quantity)
+
+        # Logging
+        log = LogEntry(
+            f"{self.__current_user.get_username()} exported {quantity} items for Product ID: {product.get_id()}")
+        self.__log_dao.add_log_entry(log)
 
 
 class CustomerListModel(Model):
 
     __current_user: User
-    __current_customer: Customer
-    __customer_query: list[Customer]
+    __customer_dao: CustomerDAO
+    __log_dao: LogDAO
 
-    def __init__(self):
-        self.__current_user = None
-        self.__current_customer = None
-        self.__customer_query = list()
+    def __init__(self, current_user: User):
+        self.__current_user = current_user
+        self.__customer_dao = AppDAO.get_dao("customer")
 
-    def query_customers(self, name: str):
-        """Search Customers from Database"""
-        pass
-
-    def find_customer(self, id: int):
-        """Get Customer by ID from Database"""
-        pass
-
-    def set_current_customer(self, customer: Customer):
-        self.__current_customer = customer
-
-    def get_current_customer(self) -> Customer:
-        return self.__current_customer
+    def get_customer_contains_with(self, search: str) -> list[Customer]:
+        """Returns a list of Customer objects from database with the name that contains the search string"""
+        return self.__customer_dao.get_customer_contains_with(search)
 
     def add_customer(self, customer: Customer):
-        pass
+        """Adds a new customer to the database"""
+        if customer is not None:
+            self.__customer_dao.add_customer(customer)
 
-    def save_customer_data(self):
-        pass
+            # Logging
+            log = LogEntry(
+                f"{self.__current_user.get_username()} added {customer.get_name()} to the system")
+            self.__log_dao.add_log_entry(log)
 
-    def delete_customer(self):
-        pass
+    def save_customer_data(self, previous_info: Customer, new_info: Customer):
+        """Saves changes made to customer information"""
+
+        name = None if previous_info.get_name(
+        ) != new_info.get_name() else new_info.get_name()
+
+        phone = None if previous_info.get_phone(
+        ) != new_info.get_phone() else new_info.get_phone()
+
+        email = None if previous_info.get_email(
+        ) != new_info.get_email() else new_info.get_email()
+
+        packing_service = None if previous_info.get_packing_service(
+        ) != new_info.get_packing_service() else new_info.get_packing_service()
+
+        rental_duration = None if previous_info.get_rental_duration(
+        ) != new_info.get_rental_duration() else new_info.get_rental_duration()
+
+        date_joined = None if previous_info.get_date_joined(
+        ) != new_info.get_date_joined() else new_info.get_date_joined()
+
+        expiry_date = None if previous_info.get_expiry_date(
+        ) != new_info.get_expiry_date() else new_info.get_expiry_date()
+
+        total_payment = None if previous_info.get_total_payment(
+        ) != new_info.get_total_payment() else new_info.get_total_payment()
+
+        self.__customer_dao.update_customer(
+            previous_info.get_id(),
+            name=name,
+            phone=phone,
+            email=email,
+            packing_service=packing_service,
+            rental_duration=rental_duration,
+            date_joined=date_joined,
+            expiry_date=expiry_date,
+            total_payment=total_payment
+        )
+
+        # Logging
+        log = LogEntry(
+            f"{self.__current_user.get_username()} updated Customer ID: {previous_info.get_id()} information")
+        self.__log_dao.add_log_entry(log)
+
+    def delete_customer(self, customer: Customer):
+        """Deletes the given customer from the system"""
+        self.__customer_dao.delete_customer(customer.get_id())
+
+        # Logging
+        log = LogEntry(
+            f"{self.__current_user.get_username()} deleted Customer ID: {customer.get_id()} from the system")
+        self.__log_dao.add_log_entry(log)
+
+    def calculate_expiry_date(self, starting_date: date, duration: int) -> date:
+        """Returns the an ending date string given the starting date and duration"""
+        expiry_date = starting_date + \
+            relativedelta.relativedelta(months=duration)
+        return expiry_date
 
 
 class ProductListModel(Model):
@@ -156,10 +229,12 @@ class ProductListModel(Model):
 class AccountModel(Model):
     __current_admin: User
     __user_dao: UserDAO
+    __log_dao: LogDAO
 
     def __init__(self, user: User = None):
         self.__current_admin = user
         self.__user_dao = AppDAO.get_dao("user")
+        self.__log_dao = AppDAO.get_dao("log")
 
     def get_employee_accounts(self) -> list[User]:
         """Returns all user objects from the database"""
@@ -168,6 +243,11 @@ class AccountModel(Model):
     def create_new_account(self, user: User):
         """Adds a new user object to the database"""
         self.__user_dao.add_user(user)
+
+        # Logging
+        log = LogEntry(
+            f"ADMIN: {self.__current_admin.get_username()} created a new account for {user.get_username()}")
+        self.__log_dao.add_log_entry(log)
 
     def generate_username(self, first_name: str, last_name: str) -> str:
         """Returns a valid username based on the user's name"""
@@ -196,7 +276,7 @@ class AccountModel(Model):
         """Returns the status of password confirmation"""
         return password == confirm
 
-    def update_user_info(self, previous_info, new_user_info: User):
+    def update_user_info(self, previous_info: User, new_user_info: User):
         """Updates an existing user information"""
         if previous_info is None:
             return
@@ -224,6 +304,11 @@ class AccountModel(Model):
             password=password
         )
 
+        # Logging
+        log = LogEntry(
+            f"ADMIN: {self.__current_admin.get_username()} updated ID:{previous_info.get_id()} account")
+        self.__log_dao.add_log_entry(log)
+
     def admin_confirmation(self, password: str) -> bool:
         """Returns the status of admin password confirmation"""
         return self.__current_admin.get_password() == password
@@ -231,6 +316,11 @@ class AccountModel(Model):
     def delete_user_account(self, user: User):
         """Deletes a user object from the database"""
         self.__user_dao.delete_user_by_id(user.get_id())
+
+        # Logging
+        log = LogEntry(
+            f"ADMIN: {self.__current_admin.get_username()} deleted User: {user.get_username()} from the system")
+        self.__log_dao.add_log_entry(log)
 
 
 class NotificationModel(Model):
@@ -283,10 +373,14 @@ class NotificationModel(Model):
 
 
 class SiteSettingsModel(Model):
+    __current_admin: User
     __shelf_dao: ShelfDAO
+    __log_dao: LogDAO
 
-    def __init__(self):
+    def __init__(self, admin: User):
+        self.__current_admin = admin
         self.__shelf_dao = AppDAO.get_dao("shelf")
+        self.__log_dao = AppDAO.get_dao("log")
 
     def add_shelf(
         self,
@@ -313,6 +407,12 @@ class SiteSettingsModel(Model):
             columns
         )
         self.__shelf_dao.add_shelf(shelf)
+
+        # Logging
+        log = LogEntry(
+            f"ADMIN: {self.__current_admin.get_username()} added a new shelf with the label {label}")
+        self.__log_dao.add_log_entry(log)
+
         return True
 
     def search_shelf(self, label: str) -> StorageShelf:
@@ -349,9 +449,19 @@ class SiteSettingsModel(Model):
             columns=columns
         )
 
+        # Logging
+        log = LogEntry(
+            f"ADMIN: {self.__current_admin.get_username()} updated {previous_info.get_label()} information")
+        self.__log_dao.add_log_entry(log)
+
     def delete_shelf(self, shelf: StorageShelf):
         """Deletes a shelf from the database"""
         self.__shelf_dao.delete_shelf(shelf.get_label())
+
+        # Logging
+        log = LogEntry(
+            f"ADMIN: {self.__current_admin.get_username()} deleted {shelf.get_label()} from the system")
+        self.__log_dao.add_log_entry(log)
 
     def calculate_total_slots(self, rows, columns) -> int:
         """Returns the total number of slots"""

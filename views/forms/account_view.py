@@ -2,18 +2,15 @@ import os.path
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QRadioButton, QScrollArea, QVBoxLayout
+from views.forms.stack_page import StackPage  # For real test
 from data.data_classes import User
 from views.items.employee_card_item import EmployeeCardItem
 
 
-class AccountView(QWidget):
+class AccountView(StackPage):
 
     def __init__(self):
-        QWidget.__init__(self, None)
-        self.set_styleSheet()
-
-        self.setFixedSize(1520, 1080)
-
+        super().__init__()
         self.current_card: EmployeeCardItem = None
         self.previous_card = QWidget()
 
@@ -26,7 +23,7 @@ class AccountView(QWidget):
         account_setting_label.setFont(font)
 
         employee_acc_list_widget = QWidget(self)
-        employee_acc_list_widget.setObjectName("sub_widget")
+        employee_acc_list_widget.setObjectName("container")
         employee_acc_list_widget.setGeometry(100, 222, 380, 765)
 
         font.setPixelSize(24)
@@ -45,7 +42,7 @@ class AccountView(QWidget):
         self.scrollArea.setWidgetResizable(True)
 
         self.scrollArea_widget = QWidget()
-        self.scrollArea_widget.setObjectName("sub_widget")
+        self.scrollArea_widget.setObjectName("container")
         self.scrollArea_widget.setGeometry(0, 0, 380, 685)
 
         self.layout = QVBoxLayout()
@@ -56,7 +53,7 @@ class AccountView(QWidget):
 
         # Create new account
         create_new_acc_widget = QWidget(self)
-        create_new_acc_widget.setObjectName("sub_widget")
+        create_new_acc_widget.setObjectName("container")
         create_new_acc_widget.setGeometry(560, 220, 850, 350)
 
         create_new_acc_label = QLabel(
@@ -103,10 +100,12 @@ class AccountView(QWidget):
         self.usin_create_password = QLineEdit(create_new_acc_widget)
         self.usin_create_password.setGeometry(170, 240, 280, 30)
         self.usin_create_password.setFont(font)
+        self.usin_create_password.setEchoMode(QLineEdit.Password)
 
         self.usin_create_confirm = QLineEdit(create_new_acc_widget)
         self.usin_create_confirm.setGeometry(580, 240, 210, 30)
         self.usin_create_confirm.setFont(font)
+        self.usin_create_confirm.setEchoMode(QLineEdit.Password)
 
         font.setPixelSize(14)
         font.setBold(True)
@@ -132,7 +131,7 @@ class AccountView(QWidget):
 
         # Edit employee account
         edit_employee_acc_widget = QWidget(self)
-        edit_employee_acc_widget.setObjectName("sub_widget")
+        edit_employee_acc_widget.setObjectName("container")
         edit_employee_acc_widget.setGeometry(560, 638, 850, 350)
 
         font.setPixelSize(24)
@@ -191,6 +190,7 @@ class AccountView(QWidget):
         self.usin_edit_change_password = QLineEdit(edit_employee_acc_widget)
         self.usin_edit_change_password.setGeometry(525, 200, 265, 30)
         self.usin_edit_change_password.setFont(font)
+        self.usin_edit_change_password.setEchoMode(QLineEdit.Password)
 
         font.setPixelSize(14)
         edit_admin_confirm_label = QLabel(
@@ -208,6 +208,7 @@ class AccountView(QWidget):
         self.usin_edit_password = QLineEdit(edit_employee_acc_widget)
         self.usin_edit_password.setGeometry(170, 280, 265, 30)
         self.usin_edit_password.setFont(font)
+        self.usin_edit_password.setEchoMode(QLineEdit.Password)
 
         self.btn_delete = QPushButton("Delete", edit_employee_acc_widget)
         self.btn_delete.setObjectName("yellow_btn")
@@ -223,14 +224,6 @@ class AccountView(QWidget):
         self.btn_save_changes.setFont(font)
 
         self.card_selected_function = None
-
-    def set_styleSheet(self) -> None:
-        file_path = os.path.dirname(os.path.abspath(__file__))
-        real_path = os.path.join(file_path, "stack_page_theme.qss")
-        with open(real_path, 'r') as f:
-            style = f.read()
-            self.setStyleSheet(style)
-        f.close()
 
     """Create new account section"""
 

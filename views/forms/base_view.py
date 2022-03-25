@@ -10,12 +10,12 @@ from views.items.side_menu_item import SideMenuItem
 class BaseView(QWidget):
     def __init__(self) -> None:
         QWidget.__init__(self, None)
-        self.setStyleSheet("background-color: #F8F8FF")
         font = QFont("Poppins")
         font.setPixelSize(24)
         font.setBold(True)
         self.current_bt = None
-        self.spacer = QSpacerItem(0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.spacer = QSpacerItem(
+            0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
         self.main_layout = QHBoxLayout(self)
         self.main_layout.setSpacing(0)
@@ -46,7 +46,7 @@ class BaseView(QWidget):
         # Side bt bar layout
         self.side_menu_bt_bar_layout = QVBoxLayout(self.side_menu_bt_bar)
 
-        self.logout_bt =SideMenuItem("out", "Log out")
+        self.logout_bt = SideMenuItem("out", "Log out")
         self.logout_bt.add_function(self.logout_bt.unclick)
         self.side_menu_layout.addWidget(self.logout_bt)
 
@@ -55,7 +55,7 @@ class BaseView(QWidget):
         self.main_layout.addWidget(self.stack)
 
     # Setter
-    def set_current_bt(self, bt:SideMenuItem):
+    def set_current_bt(self, bt: SideMenuItem):
         self.current_bt = bt
 
     def set_user_label(self, username: str):
@@ -70,9 +70,8 @@ class BaseView(QWidget):
             bt.set_function(function)
 
     # Add
-    def add_side_menu_bt(self, new_bt:SideMenuItem) -> None:
+    def add_side_menu_bt(self, new_bt: SideMenuItem) -> None:
         self.side_menu_bt_bar_layout.addWidget(new_bt)
-       
 
     def add_function_all_bt(self, function, add_type: str = "append"):
         for i in range(self.count_bt):

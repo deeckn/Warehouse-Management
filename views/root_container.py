@@ -10,25 +10,24 @@ class RootContainer(QStackedWidget):
     def __init__(self):
         QStackedWidget.__init__(self, None)
         self.setFixedSize(1920, 1080)
-        self.setStyleSheet("background-color: #1A374D")
         self.setWindowTitle("GEB-ARAI-DEE")
         self.login_Page = LoginView()
-        self.main_app_view = MainAppView() 
+        self.main_app_view = MainAppView()
         self.admin_app_view = AdminAppView()
-        
-        self.login_Page.set_login_button_listener(self.move_login_to_admin)  # Tester
+
+        self.login_Page.set_login_button_listener(
+            self.move_login_to_admin)  # Tester
         self.main_app_view.set_logout_bt_listener(self.move_to_login)
         self.main_app_view.set_admin_bt_listener(self.move_main_to_admin)
         self.admin_app_view.set_logout_bt_listener(self.move_to_login)
         self.admin_app_view.set_main_button_listener(self.move_admin_to_main)
-        
 
         self.addWidget(self.login_Page)
         self.addWidget(self.main_app_view)
         self.addWidget(self.admin_app_view)
 
-
     # Move
+
     def reset_admin_and_main(self):
         self.main_app_view.reset()
         self.admin_app_view.reset()

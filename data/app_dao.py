@@ -181,7 +181,10 @@ class LogDAO(DAO):
 
     def get_all_log_entries(self) -> list[LogEntry]:
         """Retreives all log entries"""
-        self.cursor.execute(f"SELECT * FROM {LogDAO.__table_name}")
+        self.cursor.execute(f"""
+            SELECT * FROM {LogDAO.__table_name}
+            ORDER BY {LogDAO.__COLUMN_ID} DESC
+        """)
         users = self.cursor.fetchall()
         self.__query_list = users
         self.__convert_to_object()
@@ -237,7 +240,7 @@ class CustomerDAO(DAO):
         """Converts raw data to User objects"""
         temp = list()
         for data in self.__query_list:
-            packing_service = True if data[4] == "1" else False
+            packing_service = data[4] == "1"
             customer = Customer(
                 int(data[0]),
                 data[1],
@@ -341,6 +344,19 @@ class CustomerDAO(DAO):
 
         packing_service = data[4] == 1
         return Customer(data[0], data[1], data[2], data[3], packing_service, data[5], data[6], data[7], data[8])
+
+    def get_customer_contains_with(self, name_search: str) -> list[Customer]:
+        self.cursor.execute(f"""
+            SELECT * FROM {CustomerDAO.__table_name}
+            WHERE {CustomerDAO.__COLUMN_NAME} LIKE '%{name_search}%'
+        """)
+
+        self.__query_list = self.cursor.fetchall()
+        if self.__query_list is None:
+            return None
+
+        self.__convert_to_object()
+        return self.__query_list
 
     def delete_customer(self, customer_id: int):
         """Deletes customer data given an id"""
@@ -600,6 +616,23 @@ class ProductDAO(DAO):
         )
         return product
 
+    def get_customer_products(self, owner_id: int) -> list[ProductItem]:
+        """Returns a ProductItem object list given the owner id"""
+        self.cursor.execute(f"""
+            SELECT *
+            FROM {ProductDAO.__table_name}
+            WHERE {ProductDAO.__COLUMN_OWNER}={owner_id}
+        """)
+
+        products = list()
+        data = self.cursor.fetchall()
+        for product in data:
+            products.append(self.get_product(product[0]))
+
+        if len(products) == 0:
+            return None
+        return products
+
     def get_all_products(self) -> list[ProductItem]:
         """Returns all products as a list of ProductItem objects"""
         self.cursor.execute(f"""
@@ -661,6 +694,41 @@ class ProductDAO(DAO):
             low_stock_products.append(product_object)
 
         return low_stock_products
+
+    def get_product_contains_with(self, name: str) -> list[ProductItem]:
+        """Returns a list of ProductItem objects based on a proper substring"""
+
+        self.cursor.execute(f"""
+            SELECT *
+            FROM {ProductDAO.__table_name} 
+            WHERE {ProductDAO.__COLUMN_NAME}
+            LIKE '%{name}%'
+            ORDER BY {ProductDAO.__COLUMN_PRODUCT_ID} ASC
+        """)
+
+        data = self.cursor.fetchall()
+        if data is None:
+            return None
+
+        products: list[ProductItem] = list()
+        for product in data:
+            categories = self.__category_dao.get_product_categories(product[0])
+            locations = self.__location_dao.get_product_location(product[0])
+            owner = self.__customer_dao.get_customer(product[6])
+            product_object = ProductItem(
+                product[0],
+                product[1],
+                product[2],
+                product[3],
+                locations,
+                product[4],
+                product[5],
+                owner,
+                categories
+            )
+            products.append(product_object)
+
+        return products
 
     def update_product(
         self,

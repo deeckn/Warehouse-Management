@@ -1,13 +1,13 @@
 from PySide6.QtCore import Qt
+from views.forms.stack_page import StackPage
 from PySide6.QtWidgets import QWidget, QLabel, QScrollArea, QVBoxLayout
 from views.items.notification_item import NotificationItem
 from views.theme import Theme
 
 
-class NotificationView(QWidget):
-    def __init__(self, parent=None) -> None:
-        super().__init__(parent)
-        self.setFixedSize(1520, 1080)
+class NotificationView(StackPage):
+    def __init__(self) -> None:
+        super().__init__()
         self.setStyleSheet(f"background-color: {Theme.GHOST_WHITE}")
 
         # Page Title

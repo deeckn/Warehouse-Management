@@ -7,6 +7,7 @@ import os.path
 class StackPage(QWidget):
     def __init__(self) -> None:
         QWidget.__init__(self, None)
+        self.set_styleSheet("stack_page_theme.qss")
         self.setFixedSize(1520, 1080)
         bg = QLabel(self)
         bg.setGeometry(0, 0, 1520, 1080)

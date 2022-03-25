@@ -12,7 +12,7 @@ class NotificationItem(QWidget):
         container = QWidget(self)
         container.setFixedSize(1310, 120)
         container.setStyleSheet(f"""
-            background-color: #{Theme.WHITE}; 
+            background-color: white; 
             border-radius: 15; 
             padding: 0
         """)
@@ -26,17 +26,17 @@ class NotificationItem(QWidget):
 
         if notification_type == "low_stock":
             status_circle.setStyleSheet(f"""
-                background-color: #{Theme.YELLOW}; 
+                background-color: {Theme.YELLOW}; 
                 border-radius: 12;
             """)
         elif notification_type == "contract_end":
             status_circle.setStyleSheet(f"""
-                background-color: #{Theme.RED}; 
+                background-color: {Theme.RED}; 
                 border-radius: 12;
             """)
         else:
             status_circle.setStyleSheet(f"""
-                background-color: #{Theme.BLACK}; 
+                background-color: black; 
                 border-radius: 12;
             """)
 

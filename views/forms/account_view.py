@@ -10,11 +10,7 @@ from views.items.employee_card_item import EmployeeCardItem
 class AccountView(StackPage):
 
     def __init__(self):
-        # QWidget.__init__(self, None)
         super().__init__()
-        self.set_styleSheet("stack_page_theme.qss")
-
-        # self.setFixedSize(1520, 1080)
         self.current_card: EmployeeCardItem = None
         self.previous_card = QWidget()
 

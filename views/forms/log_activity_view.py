@@ -7,7 +7,7 @@ from views.items.log_item import LogItem
 
 
 class LogWindowView(QWidget):
-    def __init__(self, parent) -> None:
+    def __init__(self, parent=None) -> None:
         QWidget.__init__(self, parent)
         header_activity_log = QLabel("Activity Log", self)
         header_activity_log.setObjectName("h1")
@@ -16,7 +16,7 @@ class LogWindowView(QWidget):
 
         # UI
         ui_linebreak = QLabel(self)
-        ui_linebreak.setObjectName("linebreak_top_bottom")
+        ui_linebreak.setObjectName("line_break_top_bottom")
         ui_linebreak.setGeometry(60, 85, 381, 47)
 
         ui_legend_Date = QLabel("Date", self)
@@ -37,7 +37,7 @@ class LogWindowView(QWidget):
         scroll_area.setWidgetResizable(True)
         scroll_area.setGeometry(60, 147, 390, 620)
         self.scroll_area_widget = QWidget()
-        self.scroll_area_widget.setObjectName("sub_widget")
+        self.scroll_area_widget.setObjectName("container")
         self.scroll_area_layout = QVBoxLayout(self.scroll_area_widget)
         self.scroll_area_layout.setSpacing(15)
         self.scroll_area_layout.setContentsMargins(10, 5, 10, 0)

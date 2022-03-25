@@ -1,5 +1,5 @@
 from views.forms.base_view import BaseView
-from views.forms.home_view import HomeView
+from views.forms.home_view import HomePageView
 from views.items.side_menu_item import SideMenuItem
 
 
@@ -26,7 +26,7 @@ class MainAppView(BaseView):
         self.product_bt.set_function(self.move_product)
         self.notifications_bt.set_function(self.move_notifications)
 
-        self.home_page = HomeView()
+        self.home_page = HomePageView()
         self.add_page(self.home_page)
 
     # UI

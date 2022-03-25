@@ -4,7 +4,6 @@ from PySide6.QtWidgets import *
 from data.data_classes import ProductItem
 from views.theme import Theme
 from views.items.product_card_item import ProductCardItem
-import os.path
 
 
 class ProductSearchView(QWidget):
@@ -30,7 +29,6 @@ class ProductSearchView(QWidget):
         option = QWidget(self)
         option.setObjectName("option")
         option.setGeometry(53, 146, 368, 21)
-        option.setStyleSheet("")
         option_layout = QHBoxLayout(option)
         option_layout.setContentsMargins(0, 0, 0, 0)
         self.filter_id = QRadioButton("ID")
@@ -49,9 +47,9 @@ class ProductSearchView(QWidget):
             option_layout.addWidget(bt)
 
         # UI
-        ui_linebreak = QLabel(self)
-        ui_linebreak.setObjectName("linebreak_top")
-        ui_linebreak.setGeometry(53, 198, 680, 1)
+        ui_line_break = QLabel(self)
+        ui_line_break.setObjectName("line_break_top")
+        ui_line_break.setGeometry(53, 198, 680, 1)
 
         ui_guide = QLabel(
             "Enter quantity to add or export products", self)

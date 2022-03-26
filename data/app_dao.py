@@ -32,24 +32,28 @@ class AppDAO:
         'shelf' returns ShelfDAO |
         'log' returns LogDAO |
         'category' returns CategoryDAO |
-        'location" returns LocationDAO
+        'location' returns LocationDAO |
+        'report' returns ReportDAO
         """
-        if type == "user":
-            return UserDAO(AppDAO.__connection)
-        elif type == "customer":
-            return CustomerDAO(AppDAO.__connection)
-        elif type == "product":
-            return ProductDAO(AppDAO.__connection)
-        elif type == "shelf":
-            return ShelfDAO(AppDAO.__connection)
-        elif type == "log":
-            return LogDAO(AppDAO.__connection)
-        elif type == "category":
-            return CategoryDAO(AppDAO.__connection)
-        elif type == "location":
-            return LocationDAO(AppDAO.__connection)
-        else:
-            return None
+        match type:
+            case "user":
+                return UserDAO(AppDAO.__connection)
+            case "customer":
+                return CustomerDAO(AppDAO.__connection)
+            case "product":
+                return ProductDAO(AppDAO.__connection)
+            case "shelf":
+                return ShelfDAO(AppDAO.__connection)
+            case "log":
+                return LogDAO(AppDAO.__connection)
+            case "category":
+                return CategoryDAO(AppDAO.__connection)
+            case "location":
+                return LocationDAO(AppDAO.__connection)
+            case "report":
+                return ReportDAO(AppDAO.__connection)
+            case _:
+                return None
 
 
 class UserDAO(DAO):
@@ -184,6 +188,7 @@ class LogDAO(DAO):
         self.cursor.execute(f"""
             SELECT * FROM {LogDAO.__table_name}
             ORDER BY {LogDAO.__COLUMN_ID} DESC
+            LIMIT 100
         """)
         users = self.cursor.fetchall()
         self.__query_list = users
@@ -927,3 +932,75 @@ class ShelfDAO(DAO):
             shelves.append(shelf)
 
         return shelves
+
+
+class ReportDAO(DAO):
+    __table_name = "QUARTERLY_REPORT"
+    __COLUMN_YEAR = "year"
+    __COLUMN_QUARTER = "quarter"
+    __COLUMN_UTILIZED_SPACE = "utilized_space"
+    __COLUMN_TOTAL_REVENUE = "total_revenue"
+
+    def __init__(self, connection: sqlite3.Connection):
+        super().__init__(connection)
+
+    def add_report(self, report: QuarterlyReport):
+        """Add QuarterlyReport object to the QUARTERLY_REPORT table"""
+        try:
+            self.cursor.execute(f"""
+                INSERT INTO {ReportDAO.__table_name}
+                ({ReportDAO.__COLUMN_YEAR}, 
+                {ReportDAO.__COLUMN_QUARTER}, 
+                {ReportDAO.__COLUMN_UTILIZED_SPACE},  
+                {ReportDAO.__COLUMN_TOTAL_REVENUE})
+                VALUES
+                ({report.get_year()}, 
+                {report.get_quarter()},  
+                {report.get_utilized_space()}, 
+                {report.get_total_revenue()})
+            """)
+            self.connection.commit()
+
+        except sqlite3.IntegrityError:
+            print(
+                "Unable to insert quarterly report, \
+                the there might already be a report of the same time period"
+            )
+            return
+
+    def get_all_reports(self) -> list[QuarterlyReport]:
+        """Returns a list of all QuarterlyReport objects in the database"""
+        self.cursor.execute(f"SELECT * FROM {ReportDAO.__table_name}")
+        data = self.cursor.fetchall()
+        if data is None:
+            return None
+
+        reports = list()
+        for report in data:
+            report_object = QuarterlyReport(
+                report[0],
+                report[1],
+                report[2],
+                report[3],
+            )
+            reports.append(report_object)
+
+        return reports
+
+    def update_report(self, year: int, quarter: int, utilization: float = None, revenue: float = None):
+        if utilization is None and revenue is None:
+            return
+
+        query = f"UPDATE {ReportDAO.__table_name} SET "
+        if utilization is not None:
+            query += f"{ReportDAO.__COLUMN_UTILIZED_SPACE} = {utilization}, "
+
+        if revenue is not None:
+            query += f"{ReportDAO.__COLUMN_TOTAL_REVENUE} = {revenue}, "
+
+        if query[-2] == ",":
+            query = query[:-2]
+
+        query += f" WHERE {ReportDAO.__COLUMN_YEAR}={year} AND {ReportDAO.__COLUMN_QUARTER}={quarter}"
+        self.cursor.execute(query)
+        self.connection.commit()

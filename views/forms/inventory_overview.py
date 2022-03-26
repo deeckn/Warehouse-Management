@@ -8,6 +8,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
 from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit,
                                QPushButton, QScrollArea, QSizePolicy,
                                QVBoxLayout, QWidget,QScrollArea, )
+from data.data_classes import ProductItem
+from views.items.customer_stock_item import CustomerStockItem
+from views.items.product_list_item import ProductListItem
 
 from views.theme import Theme
 
@@ -16,6 +19,9 @@ class InventoryOverviewView(QWidget):
         QWidget.__init__(self, None)
         self.resize(1520, 1080)
         self.setStyleSheet(u"background-color: " + Theme.GHOST_WHITE + ";")
+
+        self.current_customer = None
+        self.previous_customer = None
 
         container1 = QWidget(self)
         container1.setGeometry(100,219,464,762)
@@ -56,18 +62,18 @@ class InventoryOverviewView(QWidget):
         product_stocked_label.setAlignment(Qt.AlignCenter)
 
         base_widget_customer = QWidget(self)
-        base_widget_customer.setGeometry(134,383,422,235)
+        base_widget_customer.setGeometry(134,383,416,235)
         base_widget_customer.setStyleSheet("background-color: transparent;")
         
         self.scroll_area_customer = QScrollArea(base_widget_customer)
-        self.scroll_area_customer.setGeometry(0,0,422,235)
+        self.scroll_area_customer.setGeometry(0,0,416,235)
         self.scroll_area_customer.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll_area_customer.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll_area_customer.setStyleSheet("background-color: transparent; border: none;")
         self.scroll_area_customer.setWidgetResizable(True)
 
         self.scroll_area_widget_customer = QWidget()
-        self.scroll_area_widget_customer.setGeometry(0, 0, 422, 235)
+        self.scroll_area_widget_customer.setGeometry(0, 0, 416, 235)
 
         self.layout_customer = QVBoxLayout(self)
         self.layout_customer.setSpacing(24)
@@ -81,7 +87,7 @@ class InventoryOverviewView(QWidget):
         base_widget_product.setStyleSheet("background-color: transparent;")
         
         self.scroll_area_product = QScrollArea(base_widget_product)
-        self.scroll_area_product.setGeometry(0,0,422,235)
+        self.scroll_area_product.setGeometry(0,0,782,566)
         self.scroll_area_product.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll_area_product.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         self.scroll_area_product.setStyleSheet("background-color: transparent; border: none;")
@@ -98,18 +104,22 @@ class InventoryOverviewView(QWidget):
         self.scroll_area_product.setWidget(self.scroll_area_widget_product)
 
     # Add Product Item to the product list
-    def add_product_item(self):
-        pass
+    def add_product_item(self, product:ProductItem):
+        card = ProductListItem(product)
+        self.scroll_area_widget_product.layout().addWidget(card)
 
     def clear_product_item(self):
-        pass
+        for i in reversed(range(self.layout_product.count())):
+            self.layout_product.itemAt(i).widget().setParent(None)
 
     # Add Customer Item to the customer list
-    def add_customer_item(self):
-        pass
+    def add_customer_item(self, name, percent):
+        card = CustomerStockItem(self, name, percent)
+        self.scroll_area_widget_customer.layout().addWidget(card)
 
     def get_selected_customer_item(self):
-        pass
+        return self.current_customer
 
     def clear_customer_item(self):
-        pass
+        for i in reversed(range(self.layout_customer.count())):
+            self.layout_customer.itemAt(i).widget().setParent(None)

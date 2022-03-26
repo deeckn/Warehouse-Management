@@ -1,6 +1,6 @@
 from abc import ABC
 from data.data_classes import *
-from data.filter_options import CustomerFilter, FilterOption, IdFilter, NameFilter
+from data.filter_options import *
 from data.app_dao import *
 from datetime import date
 from dateutil import relativedelta
@@ -58,17 +58,17 @@ class HomeModel(Model):
         self.__customer_dao = AppDAO.get_dao("customer")
         self.__log_dao = AppDAO.get_dao("log")
 
-    def search_product(self, search: str, filter: FilterOption) -> list[ProductItem]:
+    def search_product(self, search_input: str, filter: FilterOption) -> list[ProductItem]:
         """Returns a list of ProductItem objects based on the search query and filter"""
 
         if isinstance(filter, IdFilter):
-            return [self.__product_dao.get_product(int(search))]
+            return [self.__product_dao.get_product(int(search_input))]
 
         if isinstance(filter, NameFilter):
-            return self.__product_dao.get_product_contains_with(search)
+            return self.__product_dao.get_product_contains_with(search_input)
 
         if isinstance(filter, CustomerFilter):
-            customers = self.__customer_dao.get_customer_contains_with(search)
+            customers = self.__customer_dao.get_customer_contains_with(search_input)
             if customers is None:
                 return None
 
@@ -474,3 +474,50 @@ class SiteSettingsModel(Model):
     def get_all_shelves(self) -> list[StorageShelf]:
         """Returns a list of all StorageShelf objects from the database"""
         return self.__shelf_dao.get_all_shelves()
+
+
+class ReportModel(Model):
+
+    __report_dao: ReportDAO
+    __customer_dao: CustomerDAO
+
+    def __init__(self):
+        self.__report_dao = AppDAO.get_dao("report")
+        self.__customer_dao = AppDAO.get_dao("customer")
+
+    def get_all_reports(self) -> list[QuarterlyReport]:
+        return self.__report_dao.get_all_reports()
+
+    def get_deadline_customers(self) -> list[Customer]:
+        """Returns a list of contract ending Customer objects"""
+        customers = self.__customer_dao.get_all_customers()
+        customers = list(
+            filter(
+                lambda c: self.__within_deadline(
+                    self.date_difference(c)
+                ),
+                customers
+            )
+        )
+
+        # Sorting by ugency
+        customers.sort(key=lambda c: self.date_difference(c), reverse=False)
+        return customers
+
+    def date_difference(self, customer) -> int:
+        """Returns the number of days from Today"""
+        expiry_date = customer.get_expiry_date()
+        day, month, year = tuple(map(int, expiry_date.split("_")))
+        day1 = date(year, month, day)
+        day2 = date.today()
+        delta = day1 - day2
+        return delta.days
+
+    def __within_deadline(self, days):
+        """Returns True if the days are within the deadline range"""
+        if days < 0:
+            return False
+        return days <= NotificationModel.__deadline
+
+    def generate_csv_report(self):
+        pass

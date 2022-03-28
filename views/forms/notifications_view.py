@@ -8,13 +8,13 @@ from views.theme import Theme
 class NotificationView(StackPage):
     def __init__(self) -> None:
         super().__init__()
-        self.setStyleSheet(f"background-color: {Theme.GHOST_WHITE}")
+        self.set_styleSheet("stack_page_theme.qss")
 
         # Page Title
-        title = QLabel("Notifications", self)
-        title.setStyleSheet(f"color: {Theme.DARK_BLUE}")
-        title.setGeometry(100, 60, 500, 96)
-        title.setFont(Theme.POPPINS_BOLD_72)
+        title = QLabel("Notification", self)
+        title.setObjectName("page_name")
+        title.setFont(Theme.POPPINS_BOLD_64)
+        title.setGeometry(100, 60, 423, 96)
 
         # Low Stock Indicator
         yellow_circle = QLabel(self)

@@ -26,8 +26,7 @@ class HomePageView(StackPage):
         product_search_container.setObjectName("container")
         product_search_container.setGeometry(107, 186, 800, 794)
 
-        self.product_search_view = ProductSearchView(
-            self, product_search_container)
+        self.product_search_view = ProductSearchView(product_search_container)
 
         # title page name
         title = QLabel("Home", self)

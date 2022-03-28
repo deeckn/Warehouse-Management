@@ -178,6 +178,7 @@ class LogDAO(DAO):
     __COLUMN_DATE = "date"
     __COLUMN_TIME = "time"
     __COLUMN_DESCRIPTION = "description"
+    LOG_LIMIT = 100
 
     def __init__(self, connection: sqlite3.Connection):
         super().__init__(connection)
@@ -188,7 +189,7 @@ class LogDAO(DAO):
         self.cursor.execute(f"""
             SELECT * FROM {LogDAO.__table_name}
             ORDER BY {LogDAO.__COLUMN_ID} DESC
-            LIMIT 100
+            LIMIT {LogDAO.LOG_LIMIT}
         """)
         users = self.cursor.fetchall()
         self.__query_list = users
@@ -199,7 +200,12 @@ class LogDAO(DAO):
         """Converts raw data to User objects"""
         temp = list()
         for data in self.__query_list:
-            log_entry = LogEntry(data[0], data[1], data[2], data[3])
+            log_entry = LogEntry(
+                id=data[0],
+                date=data[1],
+                time=data[2],
+                description=data[3]
+            )
             temp.append(log_entry)
         self.__query_list = temp
 

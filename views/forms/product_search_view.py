@@ -3,13 +3,12 @@ from PySide6.QtGui import *
 from PySide6.QtWidgets import *
 from data.data_classes import ProductItem
 from views.theme import Theme
-from views.items.product_card_item import ProductCardItem
+from views.items.product_card_home_item import ProductCardHomeItem
 
 
 class ProductSearchView(QWidget):
     def __init__(self, parent=None) -> None:
         QWidget.__init__(self, parent)
-
         self.current_filter = None
 
         header_product_search = QLabel("Product Search", self)
@@ -73,28 +72,21 @@ class ProductSearchView(QWidget):
         scroll_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll_area.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
         scroll_area.setWidgetResizable(True)
+        scroll_area.setStyleSheet("background-color: white; border:none;")
         scroll_area.setGeometry(53, 222, 699, 520)
+
         self.scroll_area_widget = QWidget()
-        self.scroll_area_widget.setObjectName("container")
+
         self.scroll_area_layout = QVBoxLayout(self.scroll_area_widget)
         self.scroll_area_layout.setSpacing(10)
         self.scroll_area_layout.setContentsMargins(0, 10, 20, 10)
+        self.scroll_area_layout.setAlignment(Qt.AlignTop)
         scroll_area.setWidget(self.scroll_area_widget)
-        self.spacer = QSpacerItem(
-            0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
     def add_product_card(self, product_item: ProductItem):
         """Add product card on Product search window"""
-        self.scroll_area_layout.removeItem(self.spacer)
-        # card = ProductSearchCardController(product_item).get_view()
-        # self.scroll_area_layout.addWidget(card)
-        item_container = QWidget(self)
-        item_container.setFixedSize(680, 150)
-        item_container.setStyleSheet(
-            "background-color: #F8F8FF; border-radius: 25px")
-        item = ProductCardItem(item_container, product_item)
-        self.scroll_area_layout.addWidget(item_container)
-        self.scroll_area_layout.addItem(self.spacer)
+        card = ProductCardHomeItem(product_item)
+        self.scroll_area_layout.addWidget(card)
 
     def filter_select(self):
         new_filter = self.sender().text().replace(" ", "_").lower()
@@ -106,6 +98,10 @@ class ProductSearchView(QWidget):
             childs = childs[1:]
             for widget in childs:
                 widget.close()
+
+    def get_card_list(self):
+        childs = self.scroll_area_widget.children()
+        return childs[1:]
 
     def get_filter(self) -> str:
         return self.current_filter

@@ -69,3 +69,4 @@ class Theme:
     YELLOW = "#F3CF48"
     RED = "#FF7474"
     GREEN = "#2ACAB0"
+    LIGHT_GREEN = "#99E997"

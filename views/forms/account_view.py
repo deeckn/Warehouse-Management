@@ -1,4 +1,3 @@
-import os.path
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QRadioButton, QScrollArea, QVBoxLayout
@@ -11,6 +10,7 @@ class AccountView(StackPage):
 
     def __init__(self):
         super().__init__()
+        self.set_styleSheet("stack_page_theme.qss")
         self.current_card: EmployeeCardItem = None
         self.previous_card = QWidget()
 

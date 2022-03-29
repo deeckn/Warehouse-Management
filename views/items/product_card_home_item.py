@@ -1,7 +1,7 @@
-from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout, QVBoxLayout, QLineEdit, QPushButton
+from PySide6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton
 from PySide6.QtGui import Qt, QIntValidator
 from views.theme import Theme
-from data.data_classes import ProductItem, Customer
+from data.data_classes import ProductItem
 
 
 class ProductCardHomeItem(QWidget):

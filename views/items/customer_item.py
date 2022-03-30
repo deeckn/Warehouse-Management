@@ -20,7 +20,7 @@ class CustomerCard(QWidget):
         self.customer_info_1 = QLabel(self)
         self.customer_info_1.setGeometry(44, 20, 316, 108)
         self.customer_info_1.setFont(Theme.POPPINS_REGULAR_18)
-        self.customer_info_1.setStyleSheet("background-color: none;")
+        self.customer_info_1.setStyleSheet("background-color: none; color: black;")
 
         text = f"Name: {customer.get_name()}\n" + \
                 f"Phone: {customer.get_phone()}\n" + \
@@ -32,7 +32,7 @@ class CustomerCard(QWidget):
         self.customer_info_2 = QLabel(self)
         self.customer_info_2.setGeometry(371, 20, 292, 108)
         self.customer_info_2.setFont(Theme.POPPINS_REGULAR_18)
-        self.customer_info_2.setStyleSheet("background-color: none;")
+        self.customer_info_2.setStyleSheet("background-color: none; color: black;")
         text = f"Rental Duration: {customer.get_rental_duration()}\n" + \
             f"Date Joined: {customer.get_date_joined().replace('_','-')}\n" + \
             f"Expiry Date: {customer.get_expiry_date().replace('_','-')}\n" + \

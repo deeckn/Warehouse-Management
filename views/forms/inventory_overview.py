@@ -7,11 +7,12 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
                            QPixmap, QRadialGradient, QTransform,QIntValidator)
 from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit,
                                QPushButton, QScrollArea, QSizePolicy,
-                               QVBoxLayout, QWidget,QScrollArea, )
+                               QVBoxLayout, QWidget,QScrollArea, QGridLayout)
+from PySide6.QtCharts import (QChart, QChartView, QPieSeries, QPieSlice)
+
 from data.data_classes import ProductItem
 from views.items.customer_stock_item import CustomerStockItem
 from views.items.product_card_inventory import ProductCardInventory
-
 from views.theme import Theme
 
 class InventoryOverviewView(QWidget):
@@ -103,6 +104,17 @@ class InventoryOverviewView(QWidget):
         self.scroll_area_widget_product.setLayout(self.layout_product)
         self.scroll_area_product.setWidget(self.scroll_area_widget_product)
 
+        self.pie_chart_widget = QWidget(self)
+        self.pie_chart_widget.setGeometry(150,602,400,400)
+        self.pie_chart_widget.setStyleSheet("background-color: transparent;")
+        self.series = QPieSeries()
+        self.chart = QChart()
+        self.chart.legend().hide()
+        self.chartview = QChartView(self.chart)
+        self.gridlayout = QGridLayout()
+        self.pie_chart_widget.setLayout(self.gridlayout)
+    
+
     # Add Product Item to the product list
     def add_product_item(self, product:ProductItem) -> None:
         card = ProductCardInventory(product)
@@ -113,7 +125,7 @@ class InventoryOverviewView(QWidget):
             self.layout_product.itemAt(i).widget().setParent(None)
 
     # Add Customer Item to the customer list
-    def add_customer_item(self, name, percent) -> None:
+    def add_customer_item(self, name: str, percent: float) -> None:
         card = CustomerStockItem(self, name, percent)
         self.scroll_area_widget_customer.layout().addWidget(card)
 
@@ -124,5 +136,20 @@ class InventoryOverviewView(QWidget):
         for i in reversed(range(self.layout_customer.count())):
             self.layout_customer.itemAt(i).widget().setParent(None)
 
-    def draw_pie_chart_of_selected_customer(self)->None:
-        pass
+    def draw_pie_chart_of_selected_customer(self, name:str, percent: float)->None:
+        if(not self.gridlayout.isEmpty()):
+            self.series.clear()
+            self.chart.removeAllSeries()
+        self.series = QPieSeries()
+        slice = QPieSlice(name, percent)
+        slice.setBrush(QColor("#2ACAB0"))
+        slice.setBorderColor("black")
+        slice.setBorderWidth(5)
+        self.series.append(slice)
+        slice2 = QPieSlice("Blank", 100-percent)
+        slice2.setBrush(QColor("#C4C4C4"))
+        slice2.setBorderColor("black")
+        slice2.setBorderWidth(5)
+        self.series.append(slice2)
+        self.chart.addSeries(self.series)
+        self.gridlayout.addWidget(self.chartview)

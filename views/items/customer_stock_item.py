@@ -21,6 +21,9 @@ class CustomerStockItem(QWidget):
         self.container.resize(380,60)
         self.container.setStyleSheet("background-color: " + Theme.GHOST_WHITE + "; border-radius: 15")
 
+        self.name = name
+        self.percent = percent
+
         self.parent_widget = parent
         self.grid_layout = QGridLayout()
 
@@ -34,7 +37,7 @@ class CustomerStockItem(QWidget):
         self.product_stocked_label.setFont(Theme.POPPINS_BOLD_14)
         self.product_stocked_label.setStyleSheet("color: " + Theme.DARK_BLUE)
         self.product_stocked_label.resize(143, 29)
-        self.product_stocked_label.setText(percent + "%")
+        self.product_stocked_label.setText(str(percent) + "%")
 
         self.grid_layout.addWidget(self.customer_label, 0,0,1,1)
         self.grid_layout.addWidget(self.product_stocked_label, 0,1,1,1)
@@ -44,7 +47,7 @@ class CustomerStockItem(QWidget):
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         # Draw Pie Chart
-        self.parent_widget.draw_pie_chart_of_selected_customer()
+        self.parent_widget.draw_pie_chart_of_selected_customer(self.name, self.percent)
         if(self.parent_widget.previous_customer != None):
             self.parent_widget.previous_customer.container.setStyleSheet("background-color: " + Theme.GHOST_WHITE + "; border-radius: 15;")
         self.parent_widget.current_customer = self

@@ -234,7 +234,7 @@ class SiteSettingView(QWidget):
                                        "border-radius: 0;")
 
         self.delete_button = QPushButton("DELETE", self)
-        self.delete_button.setGeometry(100, 948, 167, 64)
+        self.delete_button.setGeometry(100, 948, 167, 65)
         self.delete_button.setFont(font)
         self.delete_button.setStyleSheet(u"background-color: #FF7474;\n "
                                          "color: white; \n"

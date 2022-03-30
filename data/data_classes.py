@@ -200,3 +200,29 @@ class ProductItem:
 
     def get_category_list(self) -> list[ProductCategory]:
         return self.__categories
+
+
+@dataclass
+class QuarterlyReport:
+    __year: int
+    __quarter: int
+    __utilized_space: float
+    __total_revenue: float
+
+    def get_year(self) -> int:
+        return self.__year
+
+    def get_quarter(self) -> int:
+        return self.__quarter
+
+    def get_utilized_space(self) -> float:
+        return self.__utilized_space
+
+    def get_unutilized_space(self) -> float:
+        return 1 - self.__utilized_space
+
+    def get_total_revenue(self) -> float:
+        return self.__total_revenue
+
+    def get_monthly_revenue(self) -> float:
+        return self.__total_revenue / 12

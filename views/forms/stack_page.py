@@ -1,4 +1,3 @@
-from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QWidget, QLabel
 from views.theme import Theme
 import os.path
@@ -7,11 +6,10 @@ import os.path
 class StackPage(QWidget):
     def __init__(self) -> None:
         QWidget.__init__(self, None)
-        self.set_styleSheet("stack_page_theme.qss")
         self.setFixedSize(1520, 1080)
         bg = QLabel(self)
         bg.setGeometry(0, 0, 1520, 1080)
-        bg.setStyleSheet("background-color: #F8F8FF;")
+        bg.setStyleSheet(f"background-color: {Theme.GHOST_WHITE};")
 
     def set_styleSheet(self, file_name):
         file_path = os.path.dirname(os.path.abspath(__file__))

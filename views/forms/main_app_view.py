@@ -1,5 +1,8 @@
 from views.forms.base_view import BaseView
 from views.forms.home_view import HomePageView
+from views.forms.customer_list_page_view import CustomerListPageView
+from views.forms.product_list_page_view import ProductListPageView
+from views.forms.notifications_view import NotificationView
 from views.items.side_menu_item import SideMenuItem
 
 
@@ -20,14 +23,23 @@ class MainAppView(BaseView):
         self.home_bt.click()
         self.hide_admin_bt()
 
-        # Set method
+        self.home_page = HomePageView()
+        self.add_page(self.home_page)
+
+        self.customer_list_page = CustomerListPageView()
+        self.add_page(self.customer_list_page)
+
+        self.product_list_page = ProductListPageView()
+        self.add_page(self.product_list_page)
+
+        self.noti_page = NotificationView()
+        self.add_page(self.noti_page)
+
+        # Controller
         self.home_bt.set_function(self.move_home)
         self.customer_bt.set_function(self.move_customer)
         self.product_bt.set_function(self.move_product)
         self.notifications_bt.set_function(self.move_notifications)
-
-        self.home_page = HomePageView()
-        self.add_page(self.home_page)
 
     # UI
 

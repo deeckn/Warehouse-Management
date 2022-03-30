@@ -32,24 +32,28 @@ class AppDAO:
         'shelf' returns ShelfDAO |
         'log' returns LogDAO |
         'category' returns CategoryDAO |
-        'location" returns LocationDAO
+        'location' returns LocationDAO |
+        'report' returns ReportDAO
         """
-        if type == "user":
-            return UserDAO(AppDAO.__connection)
-        elif type == "customer":
-            return CustomerDAO(AppDAO.__connection)
-        elif type == "product":
-            return ProductDAO(AppDAO.__connection)
-        elif type == "shelf":
-            return ShelfDAO(AppDAO.__connection)
-        elif type == "log":
-            return LogDAO(AppDAO.__connection)
-        elif type == "category":
-            return CategoryDAO(AppDAO.__connection)
-        elif type == "location":
-            return LocationDAO(AppDAO.__connection)
-        else:
-            return None
+        match type:
+            case "user":
+                return UserDAO(AppDAO.__connection)
+            case "customer":
+                return CustomerDAO(AppDAO.__connection)
+            case "product":
+                return ProductDAO(AppDAO.__connection)
+            case "shelf":
+                return ShelfDAO(AppDAO.__connection)
+            case "log":
+                return LogDAO(AppDAO.__connection)
+            case "category":
+                return CategoryDAO(AppDAO.__connection)
+            case "location":
+                return LocationDAO(AppDAO.__connection)
+            case "report":
+                return ReportDAO(AppDAO.__connection)
+            case _:
+                return None
 
 
 class UserDAO(DAO):
@@ -107,6 +111,9 @@ class UserDAO(DAO):
 
     def add_user(self, user: User) -> None:
         """Adds a User object to the database"""
+        if self.exist(user):
+            return
+
         access = "admin" if isinstance(
             user.get_access_level(), AdminAccess) else "employee"
         self.cursor.execute(f"""
@@ -124,6 +131,24 @@ class UserDAO(DAO):
             '{access}')
         """)
         self.connection.commit()
+
+    def exist(self, user: User) -> bool:
+        """Returns True if the User exist in the database"""
+        access = "admin" if isinstance(
+            user.get_access_level(), AdminAccess) else "employee"
+
+        self.cursor.execute(f"""
+            SELECT * FROM {UserDAO.__table_name}
+            WHERE {UserDAO.__COLUMN_FIRST_NAME}='{user.get_first_name()}'
+            AND {UserDAO.__COLUMN_LAST_NAME}='{user.get_last_name()}'
+            AND {UserDAO.__COLUMN_USERNAME}='{user.get_username()}'
+            AND {UserDAO.__COLUMN_PASSWORD}='{user.get_password()}'
+            AND {UserDAO.__COLUMN_ACCESS}='{access}'
+        """)
+
+        if self.cursor.fetchone() is None:
+            return False
+        return True
 
     def update_user(
         self,
@@ -174,6 +199,7 @@ class LogDAO(DAO):
     __COLUMN_DATE = "date"
     __COLUMN_TIME = "time"
     __COLUMN_DESCRIPTION = "description"
+    LOG_LIMIT = 100
 
     def __init__(self, connection: sqlite3.Connection):
         super().__init__(connection)
@@ -184,6 +210,7 @@ class LogDAO(DAO):
         self.cursor.execute(f"""
             SELECT * FROM {LogDAO.__table_name}
             ORDER BY {LogDAO.__COLUMN_ID} DESC
+            LIMIT {LogDAO.LOG_LIMIT}
         """)
         users = self.cursor.fetchall()
         self.__query_list = users
@@ -194,7 +221,12 @@ class LogDAO(DAO):
         """Converts raw data to User objects"""
         temp = list()
         for data in self.__query_list:
-            log_entry = LogEntry(data[0], data[1], data[2], data[3])
+            log_entry = LogEntry(
+                id=data[0],
+                date=data[1],
+                time=data[2],
+                description=data[3]
+            )
             temp.append(log_entry)
         self.__query_list = temp
 
@@ -257,6 +289,9 @@ class CustomerDAO(DAO):
 
     def add_customer(self, customer: Customer):
         """Adds a Customer object to the database"""
+        if self.exist(customer):
+            return
+
         packing_service = 1 if customer.get_packing_service() else 0
 
         self.cursor.execute(f"""
@@ -357,6 +392,26 @@ class CustomerDAO(DAO):
 
         self.__convert_to_object()
         return self.__query_list
+
+    def exist(self, customer: Customer) -> bool:
+        """Returns True if a customer exist in the database"""
+        packing_service = 1 if customer.get_packing_service() else 0
+
+        self.cursor.execute(f"""
+            SELECT * FROM {CustomerDAO.__table_name}
+            WHERE {CustomerDAO.__COLUMN_NAME}='{customer.get_name()}'
+            AND {CustomerDAO.__COLUMN_PHONE}='{customer.get_phone()}'
+            AND {CustomerDAO.__COLUMN_EMAIL}='{customer.get_email()}'
+            AND {CustomerDAO.__COLUMN_PACKING_SERVICE}={packing_service}
+            AND {CustomerDAO.__COLUMN_RENTAL_DURATION}='{customer.get_rental_duration()}'
+            AND {CustomerDAO.__COLUMN_DATE_JOINED}='{customer.get_date_joined()}'
+            AND {CustomerDAO.__COLUMN_EXPIRY_DATE}='{customer.get_expiry_date()}'
+            AND {CustomerDAO.__COLUMN_TOTAL_PAYMENT}={customer.get_total_payment()}
+        """)
+
+        if self.cursor.fetchone() is None:
+            return False
+        return True
 
     def delete_customer(self, customer_id: int):
         """Deletes customer data given an id"""
@@ -515,6 +570,8 @@ class ProductDAO(DAO):
 
     def add_product(self, product: ProductItem):
         """Adds a Product object to the PRODUCTS table"""
+        if self.exist(product):
+            return
 
         try:
             self.cursor.execute(f"""
@@ -558,6 +615,22 @@ class ProductDAO(DAO):
                 the there might be a product with same id"
             )
             return
+
+    def exist(self, product: ProductItem) -> bool:
+        """Returns True if a Product exist in the database"""
+        self.cursor.execute(f"""
+            SELECT * FROM {ProductDAO.__table_name}
+            WHERE {ProductDAO.__COLUMN_NAME}='{product.get_name()}'
+            AND {ProductDAO.__COLUMN_QUANTITY}={product.get_quantity()}
+            AND {ProductDAO.__COLUMN_LOW_STOCK}={product.get_low_stock_quantity()}
+            AND {ProductDAO.__COLUMN_WEIGHT}={product.get_weight()}
+            AND {ProductDAO.__COLUMN_LAST_STORED}='{product.get_last_stored()}'
+            AND {ProductDAO.__COLUMN_OWNER}={product.get_owner().get_id()}
+        """)
+
+        if self.cursor.fetchone() is None:
+            return False
+        return True
 
     def get_product(self, product_id: int) -> ProductItem:
         """Returns a ProductItem object given an id"""
@@ -789,6 +862,9 @@ class ShelfDAO(DAO):
 
     def add_shelf(self, shelf: StorageShelf):
         """Add shelf object to the STORAGE_SHELF table"""
+        if self.exist(shelf):
+            return
+
         try:
             self.cursor.execute(f"""
                 INSERT INTO {ShelfDAO.__table_name}
@@ -816,6 +892,23 @@ class ShelfDAO(DAO):
                 the there might be a shelf with same label"
             )
             return
+
+    def exist(self, shelf: StorageShelf) -> bool:
+        """Returns True if a Shelf exist in the database"""
+        self.cursor.execute(f"""
+            SELECT * FROM {ShelfDAO.__table_name}
+            WHERE {ShelfDAO.__COLUMN_LABEL}='{shelf.get_label()}'
+            AND {ShelfDAO.__COLUMN_MAX_WEIGHT}={shelf.get_max_weight()}
+            AND {ShelfDAO.__COLUMN_LENGTH}={shelf.get_length()}
+            AND {ShelfDAO.__COLUMN_WIDTH}={shelf.get_width()}
+            AND {ShelfDAO.__COLUMN_HEIGHT}={shelf.get_height()}
+            AND {ShelfDAO.__COLUMN_ROWS}={shelf.get_rows()}
+            AND {ShelfDAO.__COLUMN_COLUMNS}={shelf.get_columns()}
+        """)
+
+        if self.cursor.fetchone() is None:
+            return False
+        return True
 
     def get_shelf_by_label(self, shelf_label: str) -> StorageShelf:
         """Returns a StorageShelf object given a label"""
@@ -927,3 +1020,75 @@ class ShelfDAO(DAO):
             shelves.append(shelf)
 
         return shelves
+
+
+class ReportDAO(DAO):
+    __table_name = "QUARTERLY_REPORT"
+    __COLUMN_YEAR = "year"
+    __COLUMN_QUARTER = "quarter"
+    __COLUMN_UTILIZED_SPACE = "utilized_space"
+    __COLUMN_TOTAL_REVENUE = "total_revenue"
+
+    def __init__(self, connection: sqlite3.Connection):
+        super().__init__(connection)
+
+    def add_report(self, report: QuarterlyReport):
+        """Add QuarterlyReport object to the QUARTERLY_REPORT table"""
+        try:
+            self.cursor.execute(f"""
+                INSERT INTO {ReportDAO.__table_name}
+                ({ReportDAO.__COLUMN_YEAR}, 
+                {ReportDAO.__COLUMN_QUARTER}, 
+                {ReportDAO.__COLUMN_UTILIZED_SPACE},  
+                {ReportDAO.__COLUMN_TOTAL_REVENUE})
+                VALUES
+                ({report.get_year()}, 
+                {report.get_quarter()},  
+                {report.get_utilized_space()}, 
+                {report.get_total_revenue()})
+            """)
+            self.connection.commit()
+
+        except sqlite3.IntegrityError:
+            print(
+                "Unable to insert quarterly report, \
+                the there might already be a report of the same time period"
+            )
+            return
+
+    def get_all_reports(self) -> list[QuarterlyReport]:
+        """Returns a list of all QuarterlyReport objects in the database"""
+        self.cursor.execute(f"SELECT * FROM {ReportDAO.__table_name}")
+        data = self.cursor.fetchall()
+        if data is None:
+            return None
+
+        reports = list()
+        for report in data:
+            report_object = QuarterlyReport(
+                report[0],
+                report[1],
+                report[2],
+                report[3],
+            )
+            reports.append(report_object)
+
+        return reports
+
+    def update_report(self, year: int, quarter: int, utilization: float = None, revenue: float = None):
+        if utilization is None and revenue is None:
+            return
+
+        query = f"UPDATE {ReportDAO.__table_name} SET "
+        if utilization is not None:
+            query += f"{ReportDAO.__COLUMN_UTILIZED_SPACE} = {utilization}, "
+
+        if revenue is not None:
+            query += f"{ReportDAO.__COLUMN_TOTAL_REVENUE} = {revenue}, "
+
+        if query[-2] == ",":
+            query = query[:-2]
+
+        query += f" WHERE {ReportDAO.__COLUMN_YEAR}={year} AND {ReportDAO.__COLUMN_QUARTER}={quarter}"
+        self.cursor.execute(query)
+        self.connection.commit()

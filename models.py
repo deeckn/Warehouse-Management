@@ -1,6 +1,6 @@
 from abc import ABC
 from data.data_classes import *
-from data.filter_options import CustomerFilter, FilterOption, IdFilter, NameFilter
+from data.filter_options import *
 from data.app_dao import *
 from datetime import date
 from dateutil import relativedelta
@@ -58,17 +58,18 @@ class HomeModel(Model):
         self.__customer_dao = AppDAO.get_dao("customer")
         self.__log_dao = AppDAO.get_dao("log")
 
-    def search_product(self, search: str, filter: FilterOption) -> list[ProductItem]:
+    def search_product(self, search_input: str, filter: FilterOption) -> list[ProductItem]:
         """Returns a list of ProductItem objects based on the search query and filter"""
 
         if isinstance(filter, IdFilter):
-            return [self.__product_dao.get_product(int(search))]
+            return [self.__product_dao.get_product(int(search_input))]
 
         if isinstance(filter, NameFilter):
-            return self.__product_dao.get_product_contains_with(search)
+            return self.__product_dao.get_product_contains_with(search_input)
 
         if isinstance(filter, CustomerFilter):
-            customers = self.__customer_dao.get_customer_contains_with(search)
+            customers = self.__customer_dao.get_customer_contains_with(
+                search_input)
             if customers is None:
                 return None
 
@@ -343,6 +344,8 @@ class NotificationModel(Model):
     def get_contract_ending_customers(self) -> list[Customer]:
         """Returns a list of contract ending Customer objects"""
         customers = self.__customer_dao.get_all_customers()
+        if customers is None:
+            return None
         customers = list(
             filter(
                 lambda c: self.__within_deadline(
@@ -354,6 +357,9 @@ class NotificationModel(Model):
 
         # Sorting by ugency
         customers.sort(key=lambda c: self.date_difference(c), reverse=False)
+
+        if len(customers) == 0:
+            return None
         return customers
 
     def date_difference(self, customer) -> int:
@@ -474,3 +480,106 @@ class SiteSettingsModel(Model):
     def get_all_shelves(self) -> list[StorageShelf]:
         """Returns a list of all StorageShelf objects from the database"""
         return self.__shelf_dao.get_all_shelves()
+
+
+class ReportModel(Model):
+
+    __report_dao: ReportDAO
+    __customer_dao: CustomerDAO
+    __product_dao: ProductDAO
+    __log_dao: LogDAO
+    __notification_model: NotificationModel
+
+    def __init__(self, current_user: User):
+        self.__current_user = current_user
+        self.__report_dao = AppDAO.get_dao("report")
+        self.__customer_dao = AppDAO.get_dao("customer")
+        self.__product_dao = AppDAO.get_dao("product")
+        self.__log_dao = AppDAO.get_dao("log")
+        self.__notification_model = NotificationModel()
+
+    def get_all_reports(self) -> list[QuarterlyReport]:
+        return self.__report_dao.get_all_reports()
+
+    def get_contract_ending_customers(self) -> list[Customer]:
+        return self.__notification_model.get_contract_ending_customers()
+
+    def generate_csv_report(self):
+        with open("test.csv", "w") as file:
+            # Quarterly Report
+            reports = self.__report_dao.get_all_reports()
+
+            if reports is not None:
+                file.write(
+                    "Quarterly Report,\nYEAR,QUARTER,REVENUE,UTILIZED SPACE,\n")
+
+                for report in reports:
+                    file.write(
+                        f"{report.get_year()},{report.get_quarter()},{report.get_total_revenue()},{report.get_utilized_space()*100}%,\n"
+                    )
+
+            # Customer List
+            customers = self.__customer_dao.get_all_customers()
+
+            if customers is not None:
+                file.write(
+                    "\nCustomer List,\nID,NAME,PHONE,EMAIL,PACKING SERVICE,RENTAL DURATION,DATE JOINED,EXPIRY DATE,TOTAL PAYMENT,\n")
+
+                for customer in customers:
+                    file.write(
+                        f"{customer.get_id()},{customer.get_name()},{customer.get_phone()},{customer.get_email()},{customer.get_packing_service()},{customer.get_rental_duration()},{customer.get_date_joined()},{customer.get_expiry_date()},{customer.get_total_payment()},\n"
+                    )
+
+            # Product List
+            if customers is not None:
+                file.write(
+                    "\nProduct List of Customer Products,\nID,NAME,QUANTITY,WEIGHT,LAST STORED,OWNER\n")
+
+                for customer in customers:
+                    products = self.__product_dao.get_customer_products(
+                        customer.get_id())
+                    if products is None:
+                        continue
+
+                    for product in products:
+                        file.write(
+                            f"{product.get_id()},{product.get_name()},{product.get_quantity()},{product.get_weight()},{product.get_last_stored()},{customer.get_name()},\n")
+
+            # Low Stock Products
+            low_stock_products = self.__notification_model.get_low_stock_products()
+
+            if low_stock_products is not None:
+                file.write(
+                    "\nList of Low Quantity Products,\nID,NAME,QUANTITY,WEIGHT,LAST STORED,OWNER\n")
+
+                for product in low_stock_products:
+                    file.write(
+                        f"{product.get_id()},{product.get_name()},{product.get_quantity()},{product.get_weight()},{product.get_last_stored()},{product.get_owner().get_name()},\n")
+
+            # Contract Ending Customers
+            ending_customers = self.__notification_model.get_contract_ending_customers()
+
+            if ending_customers is not None:
+                file.write(
+                    "\nList of Contract Ending Customers,\nID,NAME,DAYS LEFT\n")
+
+                for customer in ending_customers:
+                    file.write(
+                        f"{customer.get_id()},{customer.get_name()},{self.__notification_model.date_difference(customer)},\n")
+
+            # Logs
+            logs = self.__log_dao.get_all_log_entries()
+
+            if logs is not None:
+                file.write(
+                    f"\nLog of System Activities ({LogDAO.LOG_LIMIT} recent),\nID,DATE,TIME,DESCRIPTION\n")
+
+                for log in logs:
+                    file.write(
+                        f"{log.get_id()},{log.get_date()},{log.get_time()},{log.get_description()},\n")
+
+            file.close()
+
+        log = LogEntry(
+            f"{self.__current_user.get_username()} exported report CSV file")
+        self.__log_dao.add_log_entry(log)

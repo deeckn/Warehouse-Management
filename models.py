@@ -482,6 +482,48 @@ class SiteSettingsModel(Model):
         return self.__shelf_dao.get_all_shelves()
 
 
+class InventoryOverview(Model):
+    __product_dao: ProductDAO
+    __customer_dao: CustomerDAO
+
+    def __init__(self):
+        self.__product_dao = AppDAO.get_dao("product")
+        self.__customer_dao = AppDAO.get_dao("customer")
+
+    def get_customer_selection(self) -> list[Customer]:
+        """Returns a list of Customers"""
+        customers = self.__customer_dao.get_all_customers()
+        return customers
+
+    def get_all_product_list(self) -> list[ProductItem]:
+        """Returns a list of Products"""
+        products = self.__product_dao.get_all_products()
+        return products
+
+    def get_product_list_by_owner_id(self, owner_id: int) -> list[ProductItem]:
+        """Returns a list of Owner's Products"""
+        products = self.__product_dao.get_customer_products(owner_id)
+        return products
+
+    def get_product_stock(self, owner_id: int) -> float:
+        """Returns percent of each Customers"""
+        total = len(self.get_all_product_list())
+        if (self.get_product_list_by_owner_id(owner_id) == None):
+            percent = 0
+        else:
+            item = len(self.get_product_list_by_owner_id(owner_id))
+            percent = (item/total)*100
+        return percent
+
+    def get_all_product_stock(self, owners: list[Customer]) -> list[float]:
+        """Returns percent of all Customers"""
+        owner_percent = list()
+        for owner in owners:
+            print(owner.get_name())
+            owner_percent.append(self.get_product_stock(owner.get_id()))
+        return owner_percent
+
+
 class ReportModel(Model):
 
     __report_dao: ReportDAO

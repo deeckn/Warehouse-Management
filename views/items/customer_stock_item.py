@@ -10,6 +10,8 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
 from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit,
                                QPushButton, QSizePolicy, QWidget, QGridLayout)
 
+
+
 from views.theme import Theme
 
 class CustomerStockItem(QWidget):
@@ -32,7 +34,7 @@ class CustomerStockItem(QWidget):
         self.product_stocked_label.setFont(Theme.POPPINS_BOLD_14)
         self.product_stocked_label.setStyleSheet("color: " + Theme.DARK_BLUE)
         self.product_stocked_label.resize(143, 29)
-        self.product_stocked_label.setText(percent)
+        self.product_stocked_label.setText(percent + "%")
 
         self.grid_layout.addWidget(self.customer_label, 0,0,1,1)
         self.grid_layout.addWidget(self.product_stocked_label, 0,1,1,1)
@@ -41,8 +43,11 @@ class CustomerStockItem(QWidget):
         self.setLayout(self.grid_layout)
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
+        # Draw Pie Chart
+        self.parent_widget.draw_pie_chart_of_selected_customer()
         if(self.parent_widget.previous_customer != None):
             self.parent_widget.previous_customer.container.setStyleSheet("background-color: " + Theme.GHOST_WHITE + "; border-radius: 15;")
         self.parent_widget.current_customer = self
         self.container.setStyleSheet("background-color: #EAEAEA; border-radius: 15;")
         self.parent_widget.previous_customer = self.parent_widget.current_customer
+        

@@ -12,7 +12,7 @@ from data.data_classes import ProductItem
 
 from views.theme import Theme
 
-class ProductListItem(QWidget):
+class ProductCardInventory(QWidget):
     def __init__(self, product:ProductItem):
         QWidget.__init__(self, None)
         self.resize(782,160)

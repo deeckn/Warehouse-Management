@@ -4,6 +4,6 @@ from PySide6.QtWidgets import *
 from data.data_classes import ProductItem
 
 
-class ProductCard(QWidget):
-    def __init__(self, parent=None):
-        QWidget.__init__(self, parent)
+class ProductListCard(QWidget):
+    def __init__(self, product : ProductItem):
+        QWidget.__init__(self, None)

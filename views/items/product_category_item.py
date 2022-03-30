@@ -11,7 +11,7 @@ class ProductCategoryItem(QLabel):
         self.setAlignment(Qt.AlignCenter)
         color = self.get_color(str(catergory))
         border_color = self.get_border_color(str(catergory))
-        self.setStyleSheet(f"background-color: {color}; border-radius: 17; border: 4px solid {border_color}; ")
+        self.setStyleSheet(f"background-color: {color}; border-radius: 17; border: 4px solid {border_color}; color: white;")
 
     @staticmethod
     def get_color(category: str):

@@ -22,6 +22,7 @@ class InputForm(QWidget):
         self.add_button.setGeometry(333, 732, 167, 65)
         self.add_button.setObjectName("add_btn")
 
+        # Disable all bt by default
         self.set_delete_button_Enabled(False)
         self.set_save_button_Enabled(False)
         self.set_add_button_Enabled(False)

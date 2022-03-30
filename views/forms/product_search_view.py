@@ -30,6 +30,7 @@ class ProductSearchView(QWidget):
         option.setGeometry(53, 146, 368, 21)
         option_layout = QHBoxLayout(option)
         option_layout.setContentsMargins(0, 0, 0, 0)
+        
         self.filter_id = QRadioButton("ID")
         self.filter_id.setFixedWidth(45)
         self.filter_id.setFont(Theme.POPPINS_BOLD_14)

@@ -59,6 +59,10 @@ class CustomerListPageView(StackPage):
         self.customer_form.rental_duration_le.setText("")
         self.customer_form.date_joined_picker.setDateTime(
             QDateTime.currentDateTime())
+    
+    def update_current_card(self, new_customer: Customer):
+        self.current_customer.set_customer(new_customer)
+        self.current_customer.update()
 
     def reset_list(self):
         self.current_customer.unclick()

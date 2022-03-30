@@ -10,7 +10,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit,
                                QVBoxLayout, QWidget,QScrollArea, )
 from data.data_classes import ProductItem
 from views.items.customer_stock_item import CustomerStockItem
-from views.items.product_list_item import ProductListItem
+from views.items.product_card_inventory import ProductCardInventory
 
 from views.theme import Theme
 
@@ -97,29 +97,32 @@ class InventoryOverviewView(QWidget):
         self.scroll_area_widget_product.setGeometry(0, 0, 782, 566)
 
         self.layout_product = QVBoxLayout(self)
-        self.layout_product.setSpacing(43)
+        self.layout_product.setSpacing(30)
 
         self.layout_product.setAlignment(Qt.AlignTop)
         self.scroll_area_widget_product.setLayout(self.layout_product)
         self.scroll_area_product.setWidget(self.scroll_area_widget_product)
 
     # Add Product Item to the product list
-    def add_product_item(self, product:ProductItem):
-        card = ProductListItem(product)
+    def add_product_item(self, product:ProductItem) -> None:
+        card = ProductCardInventory(product)
         self.scroll_area_widget_product.layout().addWidget(card)
 
-    def clear_product_item(self):
+    def clear_product_item(self) -> None:
         for i in reversed(range(self.layout_product.count())):
             self.layout_product.itemAt(i).widget().setParent(None)
 
     # Add Customer Item to the customer list
-    def add_customer_item(self, name, percent):
+    def add_customer_item(self, name, percent) -> None:
         card = CustomerStockItem(self, name, percent)
         self.scroll_area_widget_customer.layout().addWidget(card)
 
-    def get_selected_customer_item(self):
+    def get_selected_customer_item(self) -> None:
         return self.current_customer
 
-    def clear_customer_item(self):
+    def clear_customer_item(self) -> None:
         for i in reversed(range(self.layout_customer.count())):
             self.layout_customer.itemAt(i).widget().setParent(None)
+
+    def draw_pie_chart_of_selected_customer(self)->None:
+        pass

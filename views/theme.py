@@ -77,7 +77,7 @@ class Theme:
     DARK_GREEN = "#146356"
     VIOLET = "#CF6FFD"
     DARK_VIOLET = "#B75DE1"
-    CREAM = "#F8D3B"
+    CREAM = "#F8D3B0"
     DARK_CREAM = "#D6B291"
     LIGHT_BLUE = "#89CBED"
     BROWN = "#987044"

@@ -8,6 +8,9 @@ class ProductCategory(ABC):
     def get_category(self) -> str:
         return self.category_name
 
+    def __str__(self) -> str:
+        return self.category_name.capitalize()
+
 
 class Electronics(ProductCategory):
     def __init__(self):
@@ -37,6 +40,9 @@ class Collectibles(ProductCategory):
 class DryFood(ProductCategory):
     def __init__(self):
         super().__init__("dry_food")
+
+    def __str__(self) -> str:
+        return "Dry Food"
 
 
 class Chemicals(ProductCategory):

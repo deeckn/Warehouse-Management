@@ -15,7 +15,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit,
 from views.theme import Theme
 
 class CustomerStockItem(QWidget):
-    def __init__(self, parent, name:str, percent:float):
+    def __init__(self, parent, name:str, percent:float, id: int):
         QWidget.__init__(self, None)
         self.container = QWidget(self)
         self.container.resize(380,60)
@@ -23,6 +23,7 @@ class CustomerStockItem(QWidget):
 
         self.name = name
         self.percent = percent
+        self.id = id
 
         self.parent_widget = parent
         self.grid_layout = QGridLayout()
@@ -54,3 +55,12 @@ class CustomerStockItem(QWidget):
         self.container.setStyleSheet("background-color: #EAEAEA; border-radius: 15;")
         self.parent_widget.previous_customer = self.parent_widget.current_customer
         
+
+    def get_customer_name(self) -> str:
+        return self.name
+    
+    def get_customer_stock_percent(self):
+        return self.percent
+        
+    def get_customer_id(self):
+        return self.id

@@ -107,13 +107,14 @@ class InventoryOverviewView(QWidget):
         self.pie_chart_widget = QWidget(self)
         self.pie_chart_widget.setGeometry(150,602,400,400)
         self.pie_chart_widget.setStyleSheet("background-color: transparent;")
-        self.series = QPieSeries()
+        self.series = None
         self.chart = QChart()
         self.chart.legend().hide()
         self.chartview = QChartView(self.chart)
         self.gridlayout = QGridLayout()
         self.pie_chart_widget.setLayout(self.gridlayout)
     
+        self.customer_selected_function = None
 
     # Add Product Item to the product list
     def add_product_item(self, product:ProductItem) -> None:
@@ -122,7 +123,7 @@ class InventoryOverviewView(QWidget):
 
     def clear_product_item(self) -> None:
         for i in reversed(range(self.layout_product.count())):
-            self.layout_product.itemAt(i).widget().setParent(None)
+            self.layout_product.itemAt(i).widget().deleteLater()
 
     # Add Customer Item to the customer list
     def add_customer_item(self, name: str, percent: float) -> None:
@@ -134,7 +135,10 @@ class InventoryOverviewView(QWidget):
 
     def clear_customer_item(self) -> None:
         for i in reversed(range(self.layout_customer.count())):
-            self.layout_customer.itemAt(i).widget().setParent(None)
+            self.layout_customer.itemAt(i).widget().deleteLater()
+    
+    def set_customer_selected_function(self, function) -> None:
+        self.customer_selected_function = function
 
     def draw_pie_chart_of_selected_customer(self, name:str, percent: float)->None:
         if(not self.gridlayout.isEmpty()):

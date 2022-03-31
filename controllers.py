@@ -1,6 +1,7 @@
 from abc import ABC
 from data.access_level import AdminAccess, EmployeeAccess
 from views.forms.account_view import AccountView
+from views.forms.inventory_overview import InventoryOverviewView
 from views.forms.login_view import LoginView
 from models import *
 from PySide6.QtWidgets import QWidget
@@ -207,3 +208,19 @@ class NotificationPage(Controller):
                 customer.get_name(),
                 str(customer.get_id())
             )
+
+class InventoryOverviewPage(Controller):
+    view: InventoryOverviewView
+    model: InventoryOverviewModel
+
+    def __init__(self, view: QWidget, model: Model):
+        super().__init__(view, model)
+        self.__fill_customer_list()
+        
+
+    def __fill_customer_list(self):
+        self.customer = self.model.get_customer_selection()
+        for i in self.customer:
+            self.view.add_customer_item(i.get_name(), self.model.get_product_stock(i.get_id()))
+    
+    def 

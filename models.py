@@ -482,7 +482,7 @@ class SiteSettingsModel(Model):
         return self.__shelf_dao.get_all_shelves()
 
 
-class InventoryOverview(Model):
+class InventoryOverviewModel(Model):
     __product_dao: ProductDAO
     __customer_dao: CustomerDAO
 

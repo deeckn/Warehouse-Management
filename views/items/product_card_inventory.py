@@ -1,4 +1,5 @@
 from math import prod
+from unicodedata import category
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
                             QMetaObject, QObject, QPoint, QRect, QSize, Qt,
                             QTime, QUrl)
@@ -11,6 +12,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit,
 from data.data_classes import ProductItem
 
 from views.theme import Theme
+from views.items.product_category_item import ProductCategoryItem
 
 class ProductCardInventory(QWidget):
     def __init__(self, product:ProductItem):
@@ -45,6 +47,12 @@ class ProductCardInventory(QWidget):
         self.data_last_stored_label = QLabel(self)
         self.data_last_stored_label.setFont(Theme.POPPINS_REGULAR_18)
         self.data_last_stored_label.setText("Date Last Stored: " + str(product.get_last_stored()))
+        self.categories = product.get_category_list()
+        for i in range(len(self.categories)):
+            catergory = self.categories[i]
+            catergory_item = ProductCategoryItem(catergory)
+            catergory_item.change_size(131,35)
+            self.grid_layout.addWidget(catergory_item,i,2,1,1 )
 
         self.grid_layout.addWidget(self.product_id_label, 0,0,1,1)
         self.grid_layout.addWidget(self.product_name_label, 1,0,1,1)
@@ -53,5 +61,6 @@ class ProductCardInventory(QWidget):
         self.grid_layout.addWidget(self.low_stock_level_label, 1,1,1,1)
         self.grid_layout.addWidget(self.data_last_stored_label, 2,1,1,1)
         
-        self.grid_layout.setContentsMargins(39,39,39,39)
+        
+        self.grid_layout.setContentsMargins(40,20,40,20)
         self.setLayout(self.grid_layout)

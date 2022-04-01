@@ -50,3 +50,6 @@ class ProductCategoryItem(QLabel):
             return Theme.DARK_GREEN
         if(category == "Others"):
             return Theme.DARK_GREY
+    
+    def change_size(self, weight: int, height: int):
+        self.setFixedSize(weight, height)

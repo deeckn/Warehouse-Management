@@ -126,8 +126,8 @@ class InventoryOverviewView(QWidget):
             self.layout_product.itemAt(i).widget().deleteLater()
 
     # Add Customer Item to the customer list
-    def add_customer_item(self, name: str, percent: float) -> None:
-        card = CustomerStockItem(self, name, percent)
+    def add_customer_item(self, name: str, percent: float, id: int) -> None:
+        card = CustomerStockItem(self, name, percent, id)
         self.scroll_area_widget_customer.layout().addWidget(card)
 
     def get_selected_customer_item(self) -> None:

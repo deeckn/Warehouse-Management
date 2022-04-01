@@ -216,12 +216,12 @@ class InventoryOverviewPage(Controller):
     def __init__(self, view: QWidget, model: Model):
         super().__init__(view, model)
         self.__fill_customer_list()
-        self.view.set_customer_selected_function(self.fill_selected_customer_products())
+        self.view.set_customer_selected_function(self.fill_selected_customer_products)
         
     def __fill_customer_list(self):
         self.customer = self.model.get_customer_selection()
         for i in self.customer:
-            self.view.add_customer_item(i.get_name(), self.get_customer_percent_stocked(i.get_id()))
+            self.view.add_customer_item(i.get_name(), self.get_customer_percent_stocked(i.get_id()), i.get_id())
     
     def get_customer_percent_stocked(self, id: int)->float:
         return self.model.get_product_stock(id)
@@ -231,7 +231,9 @@ class InventoryOverviewPage(Controller):
 
     def fill_selected_customer_products(self):
         self.view.clear_product_item()
-        id = self.view.current_customer.getid()
-        products = self.get_products_of_customer(id)
-        for product in products:
-            self.view.add_product_item(product)
+        if(self.view.current_customer != None):
+            id = self.view.current_customer.get_customer_id()
+            products = self.get_products_of_customer(id)
+            if(products is not None):
+                for product in products:
+                    self.view.add_product_item(product)

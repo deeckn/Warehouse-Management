@@ -52,8 +52,8 @@ class ProductCardInventory(QWidget):
             catergory = self.categories[i]
             catergory_item = ProductCategoryItem(catergory)
             catergory_item.change_size(131,35)
-            self.grid_layout.addWidget(catergory_item,i,2,1,1 )
-
+            self.grid_layout.addWidget(catergory_item,i,2,1,1)
+            
         self.grid_layout.addWidget(self.product_id_label, 0,0,1,1)
         self.grid_layout.addWidget(self.product_name_label, 1,0,1,1)
         self.grid_layout.addWidget(self.quality_label, 2,0,1,1)
@@ -61,6 +61,5 @@ class ProductCardInventory(QWidget):
         self.grid_layout.addWidget(self.low_stock_level_label, 1,1,1,1)
         self.grid_layout.addWidget(self.data_last_stored_label, 2,1,1,1)
         
-        
-        self.grid_layout.setContentsMargins(40,20,40,20)
+        self.grid_layout.setContentsMargins(40,20,40,40)
         self.setLayout(self.grid_layout)

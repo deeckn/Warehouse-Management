@@ -38,11 +38,12 @@ class CustomerStockItem(QWidget):
         self.product_stocked_label.setFont(Theme.POPPINS_BOLD_14)
         self.product_stocked_label.setStyleSheet("color: " + Theme.DARK_BLUE)
         self.product_stocked_label.resize(143, 29)
-        self.product_stocked_label.setText(str(percent) + "%")
+        self.product_stocked_label.setText(f"{percent:.2f}%")
 
         self.grid_layout.addWidget(self.customer_label, 0,0,1,1)
         self.grid_layout.addWidget(self.product_stocked_label, 0,1,1,1)
         self.grid_layout.setContentsMargins(23,21,0,19)
+        self.grid_layout.setHorizontalSpacing(50)
 
         self.setLayout(self.grid_layout)
 
@@ -54,6 +55,7 @@ class CustomerStockItem(QWidget):
         self.parent_widget.current_customer = self
         self.container.setStyleSheet("background-color: #EAEAEA; border-radius: 15;")
         self.parent_widget.previous_customer = self.parent_widget.current_customer
+        self.parent_widget.customer_selected_function()
         
 
     def get_customer_name(self) -> str:

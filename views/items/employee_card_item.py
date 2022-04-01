@@ -13,8 +13,8 @@ class EmployeeCardItem(QWidget):
 
         self.setFixedSize(340, 170)
         self.setStyleSheet(f"""
-            color: #{Theme.BLACK};
-            background-color: #{Theme.GHOST_WHITE};
+            color: black;
+            background-color: {Theme.GHOST_WHITE};
             padding-left: 20px;
             margin: 0px 20px 15px 35px;
             border-radius: 10px;
@@ -47,8 +47,8 @@ class EmployeeCardItem(QWidget):
 
     def mousePressEvent(self, event: QMouseEvent) -> None:
         self.parent_widget.previous_card.setStyleSheet(f"""
-            color: #{Theme.BLACK}; 
-            background-color: #{Theme.GHOST_WHITE}; 
+            color: black; 
+            background-color: {Theme.GHOST_WHITE}; 
             padding-left: 20px; 
             margin: 0px 20px 15px 35px; 
             border-radius: 10px;
@@ -56,8 +56,8 @@ class EmployeeCardItem(QWidget):
 
         self.parent_widget.current_card = self
         self.setStyleSheet(f"""
-            color: #{Theme.BLACK}; 
-            background-color: #{Theme.GHOST_WHITE}; 
+            color: black; 
+            background-color: {Theme.GHOST_WHITE}; 
             padding-left: 20px; 
             margin: 0px 20px 15px 35px; 
             border-radius: 10px; 

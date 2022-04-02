@@ -492,23 +492,20 @@ class InventoryOverviewModel(Model):
 
     def get_customer_selection(self) -> list[Customer]:
         """Returns a list of Customers"""
-        customers = self.__customer_dao.get_all_customers()
-        return customers
+        return self.__customer_dao.get_all_customers()
 
     def get_all_product_list(self) -> list[ProductItem]:
         """Returns a list of Products"""
-        products = self.__product_dao.get_all_products()
-        return products
+        return self.__product_dao.get_all_products()
 
     def get_product_list_by_owner_id(self, owner_id: int) -> list[ProductItem]:
         """Returns a list of Owner's Products"""
-        products = self.__product_dao.get_customer_products(owner_id)
-        return products
+        return self.__product_dao.get_customer_products(owner_id)
 
     def get_product_stock(self, owner_id: int) -> float:
         """Returns percent of each Customers"""
         total = len(self.get_all_product_list())
-        if (self.get_product_list_by_owner_id(owner_id) == None):
+        if self.get_product_list_by_owner_id(owner_id) is None:
             percent = 0
         else:
             item = len(self.get_product_list_by_owner_id(owner_id))
@@ -519,7 +516,6 @@ class InventoryOverviewModel(Model):
         """Returns percent of all Customers"""
         owner_percent = list()
         for owner in owners:
-            print(owner.get_name())
             owner_percent.append(self.get_product_stock(owner.get_id()))
         return owner_percent
 

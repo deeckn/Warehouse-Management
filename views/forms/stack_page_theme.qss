@@ -86,3 +86,9 @@ QPushButton#yellow_btn {
     background-color: #FDCB6E;
     border-radius: 10px;
 }
+
+QPushButton#disable_yellow_btn {
+    color: #EBEBEB;
+    background-color: #E7B861;
+    border-radius: 10px;
+}

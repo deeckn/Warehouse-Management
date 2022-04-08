@@ -39,7 +39,7 @@ class CustomerListPageView(StackPage):
         self.customer_form.not_applied_option.setChecked(
             not customer.get_packing_service())
         self.customer_form.rental_duration_le.setText(
-            customer.get_rental_duration())
+            str(customer.get_rental_duration()))
 
         self.customer_form.date_joined_picker.setDateTime(
             QDateTime.fromString(
@@ -92,6 +92,32 @@ class CustomerListPageView(StackPage):
                  self.customer_form.not_applied_option.isChecked())
              )
 
+    def is_current_edited(self):
+        """Check if the current selected customer is edited"""
+        name = self.customer_form.customer_name_le.text()
+        phone = self.customer_form.customer_phone_le.text()
+        email = self.customer_form.customer_email_le.text()
+        duration = self.customer_form.rental_duration_le.text()
+        applied = self.customer_form.applied_option.isChecked()
+
+        current_customer = self.current_customer.get_customer()
+        if name != current_customer.get_name():
+            return True
+
+        if phone != current_customer.get_phone():
+            return True
+
+        if email != current_customer.get_email():
+            return True
+
+        if duration != str(current_customer.get_rental_duration()):
+            return True
+
+        if applied != current_customer.get_packing_service():
+            return True
+
+        return False
+
     def reset_card_list(self):
         """Clears the customer cards in the list view"""
         self.customer_list.clear_all_card()
@@ -118,7 +144,7 @@ class CustomerListPageView(StackPage):
         return self.customer_form.rental_duration_le.text()
 
     def get_packing_service(self) -> bool:
-        return self.customer_form.applied_option.isCheckable()
+        return self.customer_form.applied_option.isChecked()
 
     def get_joined_date(self) -> str:
         return self.customer_form.date_joined_picker.dateTime().toString("dd_MM_yyyy")
@@ -127,10 +153,16 @@ class CustomerListPageView(StackPage):
         return self.customer_form.get_search_input()
 
     def get_current_customer(self) -> Customer:
-        return self.current_customer.get_current_customer()
+        return self.current_customer.get_customer()
 
     def set_add_button_listenter(self, function):
         self.customer_form.set_add_button_listener(function)
 
     def set_input_on_change_listener(self, function):
         self.customer_form.set_input_on_change_listener(function)
+
+    def set_save_button_listener(self, function):
+        self.customer_form.set_save_button_listener(function)
+
+    def set_delete_button_listener(self, function):
+        self.customer_form.set_delete_button_listener(function)

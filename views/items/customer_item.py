@@ -20,19 +20,21 @@ class CustomerCard(QWidget):
         self.customer_info_1 = QLabel(self)
         self.customer_info_1.setGeometry(44, 20, 316, 108)
         self.customer_info_1.setFont(Theme.POPPINS_REGULAR_18)
-        self.customer_info_1.setStyleSheet("background-color: none; color: black;")
+        self.customer_info_1.setStyleSheet(
+            "background-color: none; color: black;")
 
         text = f"Name: {customer.get_name()}\n" + \
-                f"Phone: {customer.get_phone()}\n" + \
-                f"Email: {customer.get_email()}\n" + \
-                f"Packing Service: {'Applied' if customer.get_packing_service() else 'Not Applied'}"
+            f"Phone: {customer.get_phone()}\n" + \
+            f"Email: {customer.get_email()}\n" + \
+            f"Packing Service: {'Applied' if customer.get_packing_service() else 'Not Applied'}"
 
         self.customer_info_1.setText(text)
 
         self.customer_info_2 = QLabel(self)
         self.customer_info_2.setGeometry(371, 20, 292, 108)
         self.customer_info_2.setFont(Theme.POPPINS_REGULAR_18)
-        self.customer_info_2.setStyleSheet("background-color: none; color: black;")
+        self.customer_info_2.setStyleSheet(
+            "background-color: none; color: black;")
         text = f"Rental Duration: {customer.get_rental_duration()}\n" + \
             f"Date Joined: {customer.get_date_joined().replace('_','-')}\n" + \
             f"Expiry Date: {customer.get_expiry_date().replace('_','-')}\n" + \
@@ -62,9 +64,9 @@ class CustomerCard(QWidget):
 
     def update(self):
         text = f"Name: {self.customer.get_name()}\n" + \
-                f"Phone: {self.customer.get_phone()}\n" + \
-                f"Email: {self.customer.get_email()}\n" + \
-                f"Packing Service: {'Applied' if self.customer.get_packing_service() else 'Not Applied'}"
+            f"Phone: {self.customer.get_phone()}\n" + \
+            f"Email: {self.customer.get_email()}\n" + \
+            f"Packing Service: {'Applied' if self.customer.get_packing_service() else 'Not Applied'}"
 
         self.customer_info_1.setText(text)
 
@@ -77,3 +79,6 @@ class CustomerCard(QWidget):
 
     def set_customer(self, new_customer: Customer):
         self.customer = new_customer
+
+    def get_customer(self) -> Customer:
+        return self.customer

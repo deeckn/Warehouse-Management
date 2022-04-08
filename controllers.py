@@ -68,6 +68,7 @@ class HomePage(Controller):
         if None not in products:
             for product in products:
                 card = self.view.add_product_card(product)
+
                 def quantity_check():
                     new_quantity = card.get_new_quantity()
                     add_state = True
@@ -79,7 +80,7 @@ class HomePage(Controller):
                         export_state = False
                     card.set_enable_add_bt(add_state)
                     card.set_enable_export_bt(export_state)
-                
+
                 card.set_quantity_changed_listener(quantity_check)
 
                 def add():
@@ -88,6 +89,7 @@ class HomePage(Controller):
                     card.add_quantity(new_quantity)
                     card.update_card()
                     self.update_activity_logs()
+
                 def export():
                     new_quantity = card.get_new_quantity()
                     if new_quantity == 0:
@@ -98,7 +100,7 @@ class HomePage(Controller):
                     self.update_activity_logs()
                 card.set_add_bt_listener(add)
                 card.set_export_bt_listener(export)
-        
+
     def update_activity_logs(self):
         self.view.clear_logs()
         for log in self.model.get_activity_logs():
@@ -109,7 +111,6 @@ class HomePage(Controller):
         self.view.setEnabled_search_bt(input != "")
 
 
-
 class CustomerPage(Controller):
     view: CustomerListPageView
     model: CustomerListModel
@@ -117,20 +118,27 @@ class CustomerPage(Controller):
     def __init__(self, view: QWidget, model: Model):
         super().__init__(view, model)
 
+        # Initial List Data
+        self.__fill_customer_cards(self.model.get_all_customers())
+
+        # Card select/unselect events
         self.view.set_unselect_event(lambda: self.view.reset_form())
 
         self.view.set_select_event(lambda: self.view.set_form(
             self.view.current_customer.get_customer())
         )
 
-        self.__fill_customer_cards(self.model.get_all_customers())
-
+        # Search Button Event
         self.view.customer_form.set_search_button_listener(
             self.search_users
         )
 
+        # Form Buttons Event
         self.view.set_add_button_listenter(self.add_customer)
+        self.view.set_save_button_listener(self.edit_customer)
+        self.view.set_delete_button_listener(self.delete_customer)
 
+        # Form OnChange Event
         self.view.set_input_on_change_listener(self.validate_buttons)
 
     def __fill_customer_cards(self, customers: list[Customer]):
@@ -163,14 +171,13 @@ class CustomerPage(Controller):
         email = self.view.get_email()
         packing_service = self.view.get_packing_service()
         date_joined = self.view.get_joined_date()
-        duration = self.view.get_rental_duration()
+        duration = int(self.view.get_rental_duration())
 
         # Calculate Expiry Date
         day, month, year = list(map(int, date_joined.split("_")))
         date_start = date(year, month, day)
-        duration_int = int(duration.split(" ")[0])
         expiry_date = self.model.calculate_expiry_date(
-            date_start, duration_int)
+            date_start, duration)
         expiring_day = f"{expiry_date.day:02d}_{expiry_date.month:02d}_{expiry_date.year:02d}"
 
         # Initialize new customer
@@ -200,9 +207,62 @@ class CustomerPage(Controller):
         else:
             self.view.customer_form.set_add_button_enabled(True)
 
+        # Save Button
+        if self.view.is_card_selected() and self.view.is_current_edited():
+            self.view.customer_form.set_save_button_enabled(True)
+        else:
+            self.view.customer_form.set_save_button_enabled(False)
+
+        # Delete Button
+        if self.view.is_card_selected() and not self.view.is_current_edited():
+            self.view.customer_form.set_delete_button_enabled(True)
+        else:
+            self.view.customer_form.set_delete_button_enabled(False)
+
     def edit_customer(self):
-        if not self.view.is_card_selected():
+        if not (self.view.is_card_selected() and self.view.is_current_edited()):
             return
+
+        prev_info = self.view.get_current_customer()
+
+        date_joined = self.view.get_joined_date()
+        duration = int(self.view.get_rental_duration())
+
+        day, month, year = list(
+            map(int, date_joined.split("_")))
+        date_start = date(year, month, day)
+        expiry_date = self.model.calculate_expiry_date(
+            date_start, duration)
+        expiring_day = f"{expiry_date.day:02d}_{expiry_date.month:02d}_{expiry_date.year:02d}"
+
+        new_info = Customer(
+            prev_info.get_id(),
+            self.view.get_name(),
+            self.view.get_phone(),
+            self.view.get_email(),
+            self.view.get_packing_service(),
+            duration,
+            date_joined,
+            expiring_day,
+            prev_info.get_total_payment()
+        )
+
+        self.model.save_customer_data(prev_info, new_info)
+        self.__update_list()
+
+    def delete_customer(self):
+        if not self.view.is_card_selected() or self.view.is_current_edited():
+            return
+
+        current_customer = self.view.get_current_customer()
+        self.model.delete_customer(current_customer)
+
+        self.__update_list()
+
+    def __update_list(self):
+        # Update List
+        self.view.reset_card_list()
+        self.__fill_customer_cards(self.model.get_all_customers())
 
 
 class AccountPage(Controller):

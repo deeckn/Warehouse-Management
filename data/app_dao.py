@@ -279,7 +279,7 @@ class CustomerDAO(DAO):
                 data[2],
                 data[3],
                 packing_service,
-                data[5],
+                int(data[5]),
                 data[6],
                 data[7],
                 float(data[8])
@@ -308,7 +308,7 @@ class CustomerDAO(DAO):
             '{customer.get_phone()}',
             '{customer.get_email()}',
             {packing_service},
-            '{customer.get_rental_duration()}',
+            {customer.get_rental_duration()},
             '{customer.get_date_joined()}',
             '{customer.get_expiry_date()}',
             {customer.get_total_payment()})
@@ -322,7 +322,7 @@ class CustomerDAO(DAO):
         phone: str = None,
         email: str = None,
         packing_service: bool = None,
-        rental_duration: str = None,
+        rental_duration: int = None,
         date_joined: str = None,
         expiry_date: str = None,
         total_payment: float = None
@@ -343,7 +343,7 @@ class CustomerDAO(DAO):
             status = 1 if packing_service else 0
             query += f'{CustomerDAO.__COLUMN_PACKING_SERVICE}={status}, '
         if rental_duration is not None:
-            query += f'{CustomerDAO.__COLUMN_RENTAL_DURATION}="{rental_duration}", '
+            query += f'{CustomerDAO.__COLUMN_RENTAL_DURATION}={rental_duration}, '
         if date_joined is not None:
             query += f'{CustomerDAO.__COLUMN_DATE_JOINED}="{date_joined}", '
         if expiry_date is not None:
@@ -367,7 +367,7 @@ class CustomerDAO(DAO):
             return None
 
         packing_service = data[4] == 1
-        return Customer(data[0], data[1], data[2], data[3], packing_service, data[5], data[6], data[7], data[8])
+        return Customer(data[0], data[1], data[2], data[3], packing_service, int(data[5]), data[6], data[7], data[8])
 
     def get_customer_by_name(self, name: str) -> Customer:
         """Retreives a Customer object given a name"""
@@ -378,7 +378,7 @@ class CustomerDAO(DAO):
             return None
 
         packing_service = data[4] == 1
-        return Customer(data[0], data[1], data[2], data[3], packing_service, data[5], data[6], data[7], data[8])
+        return Customer(data[0], data[1], data[2], data[3], packing_service, int(data[5]), data[6], data[7], data[8])
 
     def get_customer_contains_with(self, name_search: str) -> list[Customer]:
         self.cursor.execute(f"""
@@ -403,7 +403,7 @@ class CustomerDAO(DAO):
             AND {CustomerDAO.__COLUMN_PHONE}='{customer.get_phone()}'
             AND {CustomerDAO.__COLUMN_EMAIL}='{customer.get_email()}'
             AND {CustomerDAO.__COLUMN_PACKING_SERVICE}={packing_service}
-            AND {CustomerDAO.__COLUMN_RENTAL_DURATION}='{customer.get_rental_duration()}'
+            AND {CustomerDAO.__COLUMN_RENTAL_DURATION}={customer.get_rental_duration()}
             AND {CustomerDAO.__COLUMN_DATE_JOINED}='{customer.get_date_joined()}'
             AND {CustomerDAO.__COLUMN_EXPIRY_DATE}='{customer.get_expiry_date()}'
             AND {CustomerDAO.__COLUMN_TOTAL_PAYMENT}={customer.get_total_payment()}

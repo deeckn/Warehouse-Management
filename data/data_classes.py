@@ -40,7 +40,7 @@ class Customer:
     __phone: str
     __email: str
     __packing_service: bool
-    __rental_duration: str
+    __rental_duration: int
     __date_joined: str
     __expiry_date: str
     __total_payment: float
@@ -60,7 +60,7 @@ class Customer:
     def get_packing_service(self) -> bool:
         return self.__packing_service
 
-    def get_rental_duration(self) -> str:
+    def get_rental_duration(self) -> int:
         return self.__rental_duration
 
     def get_date_joined(self) -> str:
@@ -201,11 +201,12 @@ class ProductItem:
     def get_category_list(self) -> list[ProductCategory]:
         return self.__categories
 
-    def add_quantity(self, new_quantity : int):
+    def add_quantity(self, new_quantity: int):
         self.__quantity += new_quantity
 
-    def export_quantity(self, exported_quantity : int):
+    def export_quantity(self, exported_quantity: int):
         self.__quantity -= exported_quantity
+
 
 @dataclass
 class QuarterlyReport:

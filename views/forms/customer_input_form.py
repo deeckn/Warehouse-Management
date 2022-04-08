@@ -15,24 +15,34 @@ class CustomerInputForm(InputForm):
         line_break_top = "border-top: 1px solid black; background-color: none;"
         guide = "background-color: white; color: black;"
 
-        # Input
+        # Customer Search Input
         self.customer_search_le = QLineEdit(self)
         self.customer_search_le.setGeometry(50, 101, 400, 40)
         self.customer_search_le.setFont(Theme.POPPINS_REGULAR_18)
         self.customer_search_le.setStyleSheet(default_le)
 
+        # Search Button
+        self.search_bt = QPushButton("SEARCH", self)
+        self.search_bt.setGeometry(274, 161, 176, 40)
+        self.search_bt.setFont(Theme.POPPINS_BOLD_18)
+        self.search_bt.setStyleSheet(
+            f"color: white;background-color: {Theme.YELLOW};border-radius: 10px;")
+
+        # Customer Name Input
         self.customer_name_le = QLineEdit(self)
         self.customer_name_le.setGeometry(50, 285, 400, 40)
         self.customer_name_le.setFont(Theme.POPPINS_REGULAR_18)
         self.customer_name_le.setStyleSheet(
             default_le)
 
+        # Customer Phone Input
         self.customer_phone_le = QLineEdit(self)
         self.customer_phone_le.setGeometry(50, 363, 400, 40)
         self.customer_phone_le.setFont(Theme.POPPINS_REGULAR_18)
         self.customer_phone_le.setStyleSheet(
             default_le)
 
+        # Customer Email Input
         self.customer_email_le = QLineEdit(self)
         self.customer_email_le.setGeometry(50, 440, 400, 40)
         self.customer_email_le.setFont(Theme.POPPINS_REGULAR_18)
@@ -45,6 +55,7 @@ class CustomerInputForm(InputForm):
         self.rental_duration_le.setStyleSheet(
             default_le)
 
+        # Packaging Service Radio Buttons
         option = QWidget(self)
         option.setObjectName("option")
         option.setGeometry(65, 523, 235, 22)
@@ -62,12 +73,6 @@ class CustomerInputForm(InputForm):
             radio_bt.setObjectName("packing_option")
             option_layout.addWidget(radio_bt)
 
-        self.search_bt = QPushButton("SEARCH", self)
-        self.search_bt.setGeometry(274, 161, 176, 40)
-        self.search_bt.setFont(Theme.POPPINS_BOLD_18)
-        self.search_bt.setStyleSheet(
-            f"color: white;background-color: {Theme.YELLOW};border-radius: 10px;")
-
         self.date_joined_picker = QDateEdit(self)
         self.date_joined_picker.setGeometry(51, 581, 187, 40)
         self.date_joined_picker.setDisplayFormat("dd-MM-yyyy")
@@ -76,7 +81,7 @@ class CustomerInputForm(InputForm):
         self.date_joined_picker.setDateTime(QDateTime.currentDateTime())
         self.date_joined_picker.setCalendarPopup(True)
 
-        # UI
+        # Labels
         ui_line_break = QLabel(self)
         ui_line_break.setStyleSheet(line_break_top)
         ui_line_break.setGeometry(50, 54, 400, 1)
@@ -136,3 +141,29 @@ class CustomerInputForm(InputForm):
         ui_guide_label.setFont(Theme.POPPINS_REGULAR_14)
         ui_guide_label.setStyleSheet(guide)
         ui_guide_label.setGeometry(196, 231, 110, 21)
+
+    # Clear
+
+    def clear_search_le(self):
+        self.customer_search_le.setText("")
+
+    # Search Functionality
+
+    def set_search_button_listener(self, function):
+        self.search_bt.clicked.connect(function)
+
+    def get_search_input(self) -> str:
+        return self.customer_search_le.text()
+
+    # Add new customer
+
+    def set_add_button_listener(self, function):
+        self.add_button.clicked.connect(function)
+
+    def set_input_on_change_listener(self, function):
+        self.customer_name_le.textChanged.connect(function)
+        self.customer_phone_le.textChanged.connect(function)
+        self.customer_email_le.textChanged.connect(function)
+        self.rental_duration_le.textChanged.connect(function)
+        self.applied_option.clicked.connect(function)
+        self.not_applied_option.clicked.connect(function)

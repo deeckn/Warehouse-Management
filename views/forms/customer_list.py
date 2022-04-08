@@ -8,14 +8,6 @@ class CustomerList(ItemList):
         super().__init__(parent)
         self.qparent = parent
 
-        # Testing purpose
-        test_customer = Customer(
-            1, "Dee Co Ltd", "0875548888", " DeeDee@GAD.com", True, "3 years", "01_01_2022", "16_01_2022", 300)
-        self.add_card(test_customer)
-        test_customer = Customer(
-            1, "Kris Co Ltd", "012354235", " KKK@GAD.com", False, "5 years", "17_01_2022", "18_01_2022", 400)
-        self.add_card(test_customer)
-
     def add_card(self, customer: Customer):
         """Add new customer card to the list"""
         card = CustomerCard(self.qparent, customer)

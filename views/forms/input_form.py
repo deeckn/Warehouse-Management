@@ -23,24 +23,24 @@ class InputForm(QWidget):
         self.add_button.setObjectName("add_btn")
 
         # Disable all bt by default
-        self.set_delete_button_Enabled(False)
-        self.set_save_button_Enabled(False)
-        self.set_add_button_Enabled(False)
+        self.set_delete_button_enabled(False)
+        self.set_save_button_enabled(False)
+        self.set_add_button_enabled(False)
 
         for bt in (self.save_button, self.delete_button, self.add_button):
             bt.setFont(Theme.POPPINS_BOLD_24)
 
-    def set_add_button_Enabled(self, boolean):
+    def set_add_button_enabled(self, boolean):
         style = f"background-color:  {Theme.GREEN}; color: white; border-bottom-right-radius: 23px;" if boolean else f"background-color:  {Theme.LIGHTER_DARK_GREEN}; color: {Theme.DARK_WHITE}; border-bottom-right-radius: 23px;"
         self.add_button.setStyleSheet(style)
         self.add_button.setEnabled(boolean)
 
-    def set_delete_button_Enabled(self, boolean):
+    def set_delete_button_enabled(self, boolean):
         style = f"background-color: {Theme.RED}; color: white;border-bottom-left-radius: 23px;" if boolean else f"background-color: {Theme.DARK_RED}; color: {Theme.DARK_WHITE}; border-bottom-left-radius: 23px;"
         self.delete_button.setStyleSheet(style)
         self.delete_button.setEnabled(boolean)
 
-    def set_save_button_Enabled(self, boolean):
+    def set_save_button_enabled(self, boolean):
         style = f"background-color:  {Theme.YELLOW}; color: white; border-radius: none;" if boolean else f"background-color: {Theme.DARK_YELLOW}; color: {Theme.DARK_WHITE}; border: none;"
         self.save_button.setStyleSheet(style)
         self.save_button.setEnabled(boolean)

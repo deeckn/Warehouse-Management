@@ -1,11 +1,13 @@
 from abc import ABC
 from data.access_level import AdminAccess, EmployeeAccess
 from views.forms.account_view import AccountView
+from views.forms.customer_list_page_view import CustomerListPageView
 from views.forms.inventory_overview import InventoryOverviewView
 from views.forms.login_view import LoginView
 from models import *
 from PySide6.QtWidgets import QWidget
 from views.forms.notifications_view import NotificationView
+from datetime import date
 
 
 class Controller(ABC):
@@ -53,6 +55,101 @@ class LoginPage(Controller):
 class HomePage(Controller):
     def __init__(self, view: QWidget, model: Model):
         super().__init__(view, model)
+
+
+class CustomerPage(Controller):
+    view: CustomerListPageView
+    model: CustomerListModel
+
+    def __init__(self, view: QWidget, model: Model):
+        super().__init__(view, model)
+
+        self.view.set_unselect_event(lambda: self.view.reset_form())
+
+        self.view.set_select_event(lambda: self.view.set_form(
+            self.view.current_customer.get_customer())
+        )
+
+        self.__fill_customer_cards(self.model.get_all_customers())
+
+        self.view.customer_form.set_search_button_listener(
+            self.search_users
+        )
+
+        self.view.set_add_button_listenter(self.add_customer)
+
+        self.view.set_input_on_change_listener(self.validate_buttons)
+
+    def __fill_customer_cards(self, customers: list[Customer]):
+        if customers is None:
+            return
+
+        for customer in customers:
+            self.view.customer_list.add_card(customer)
+
+    def search_users(self):
+        search_string = self.view.get_search_input()
+        if len(search_string) == 0:
+            self.__fill_customer_cards(self.model.get_all_customers())
+            return
+
+        customers = self.model.get_customer_contains_with(search_string)
+        if customers is None:
+            return
+
+        self.view.reset_card_list()
+        self.__fill_customer_cards(customers)
+
+    def add_customer(self):
+        if self.view.is_card_selected() or not self.view.is_form_valid():
+            return
+
+        # Retreive user inputs
+        name = self.view.get_name()
+        phone = self.view.get_phone()
+        email = self.view.get_email()
+        packing_service = self.view.get_packing_service()
+        date_joined = self.view.get_joined_date()
+        duration = self.view.get_rental_duration()
+
+        # Calculate Expiry Date
+        day, month, year = list(map(int, date_joined.split("_")))
+        date_start = date(year, month, day)
+        duration_int = int(duration.split(" ")[0])
+        expiry_date = self.model.calculate_expiry_date(
+            date_start, duration_int)
+        expiring_day = f"{expiry_date.day:02d}_{expiry_date.month:02d}_{expiry_date.year:02d}"
+
+        # Initialize new customer
+        new_customer = Customer(
+            None,
+            name,
+            phone,
+            email,
+            packing_service,
+            duration,
+            date_joined,
+            expiring_day,
+            0
+        )
+
+        # Update page
+        self.model.add_customer(new_customer)
+        self.view.reset_card_list()
+        self.view.reset_form()
+        self.view.reset_search_input()
+        self.__fill_customer_cards(self.model.get_all_customers())
+
+    def validate_buttons(self):
+        # Add Button
+        if self.view.is_card_selected() or not self.view.is_form_valid():
+            self.view.customer_form.set_add_button_enabled(False)
+        else:
+            self.view.customer_form.set_add_button_enabled(True)
+
+    def edit_customer(self):
+        if not self.view.is_card_selected():
+            return
 
 
 class AccountPage(Controller):
@@ -205,7 +302,7 @@ class NotificationPage(Controller):
 
         customers = self.model.get_contract_ending_customers()
 
-        if customer is None:
+        if customers is None:
             return
 
         for customer in customers:

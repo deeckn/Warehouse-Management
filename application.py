@@ -1,8 +1,10 @@
 import sys
 from PySide6.QtWidgets import QApplication
 from controllers import *
+from views.forms.home_view import HomePageView
 from views.forms.login_view import LoginView
 from models import LoginModel
+
 
 
 class Application:
@@ -23,6 +25,11 @@ class Application:
         self.account_page = AccountPage(
             AccountView(),
             AccountModel(self.current_user)
+        )
+
+        self.home_page = HomePage(
+            HomePageView(),
+            HomeModel(self.current_user)
         )
 
         self.notification_page = NotificationPage(

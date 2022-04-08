@@ -101,6 +101,45 @@ class HomePage(Controller):
                 card.set_add_bt_listener(add)
                 card.set_export_bt_listener(export)
 
+                def generate(temp):
+                    def quantity_check():
+                        new_quantity = temp.get_new_quantity()
+                        add_state = True
+                        export_state = True
+                        if new_quantity == 0:
+                            add_state = False
+                            export_state = False
+                        elif new_quantity > temp.get_product().get_quantity():
+                            export_state = False
+                        temp.set_enable_add_bt(add_state)
+                        temp.set_enable_export_bt(export_state)
+
+                    def add():
+                        new_quantity = temp.get_new_quantity()
+                        self.model.add_product_quantity(
+                            temp.get_product(), new_quantity)
+                        temp.add_quantity(new_quantity)
+                        temp.update_card()
+                        temp.clear_quantity_input()
+                        self.update_activity_logs()
+
+                    def export():
+                        new_quantity = temp.get_new_quantity()
+                        if new_quantity == 0:
+                            return
+                        self.model.export_product(
+                            temp.get_product(), new_quantity)
+                        temp.export_quantity(new_quantity)
+                        temp.update_card()
+                        temp.clear_quantity_input()
+                        self.update_activity_logs()
+                    return (quantity_check, add, export)
+
+                events = generate(card)
+                card.set_quantity_changed_listener(events[0])
+                card.set_add_bt_listener(events[1])
+                card.set_export_bt_listener(events[2])
+
     def update_activity_logs(self):
         self.view.clear_logs()
         for log in self.model.get_activity_logs():

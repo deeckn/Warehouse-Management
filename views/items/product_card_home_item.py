@@ -73,6 +73,9 @@ class ProductCardHomeItem(QWidget):
         except Exception:
             return 0
 
+    def clear_quantity_input(self):
+        self.quantity_LE.setText("")
+
     def get_product(self):
         return self.product
 

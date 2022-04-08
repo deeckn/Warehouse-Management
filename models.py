@@ -116,10 +116,15 @@ class CustomerListModel(Model):
     def __init__(self, current_user: User):
         self.__current_user = current_user
         self.__customer_dao = AppDAO.get_dao("customer")
+        self.__log_dao = AppDAO.get_dao("log")
 
     def get_customer_contains_with(self, search: str) -> list[Customer]:
         """Returns a list of Customer objects from database with the name that contains the search string"""
         return self.__customer_dao.get_customer_contains_with(search)
+
+    def get_all_customers(self) -> list[Customer]:
+        """Returns a list of all Customers object in the database"""
+        return self.__customer_dao.get_all_customers()
 
     def add_customer(self, customer: Customer):
         """Adds a new customer to the database"""

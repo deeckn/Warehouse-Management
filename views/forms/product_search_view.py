@@ -4,12 +4,12 @@ from PySide6.QtWidgets import *
 from data.data_classes import ProductItem
 from views.theme import Theme
 from views.items.product_card_home_item import ProductCardHomeItem
-
+from data.filter_options import *
 
 class ProductSearchView(QWidget):
     def __init__(self, parent=None) -> None:
         QWidget.__init__(self, parent)
-        self.current_filter = None
+        self.current_filter = "id"
 
         header_product_search = QLabel("Product Search", self)
         header_product_search.setFont(Theme.POPPINS_BOLD_24)
@@ -22,8 +22,9 @@ class ProductSearchView(QWidget):
 
         self.product_search_button = QPushButton("SEARCH", self)
         self.product_search_button.setFont(Theme.POPPINS_BOLD_18)
-        self.product_search_button.setObjectName("yellow_btn")
         self.product_search_button.setGeometry(613, 127, 120, 40)
+        # By default
+        self.setEnabled_search_bt(False)
 
         option = QWidget(self)
         option.setObjectName("option")
@@ -34,6 +35,8 @@ class ProductSearchView(QWidget):
         self.filter_id = QRadioButton("ID")
         self.filter_id.setFixedWidth(45)
         self.filter_id.setFont(Theme.POPPINS_BOLD_14)
+        # By defualt
+        self.filter_id.setChecked(True)
 
         self.filter_product_name = QRadioButton("Product Name")
         self.filter_product_name.setFixedWidth(130)
@@ -88,12 +91,13 @@ class ProductSearchView(QWidget):
         """Add product card on Product search window"""
         card = ProductCardHomeItem(product_item)
         self.scroll_area_layout.addWidget(card)
+        return card
 
     def filter_select(self):
         new_filter = self.sender().text().replace(" ", "_").lower()
         self.current_filter = new_filter
 
-    def clear_product_card(self):
+    def clear_product_cards(self):
         childs = self.scroll_area_widget.children()
         if len(childs) > 1:
             childs = childs[1:]
@@ -112,3 +116,12 @@ class ProductSearchView(QWidget):
 
     def set_search_bt_listener(self, function) -> None:
         self.product_search_button.clicked.connect(function)
+
+    def setEnabled_search_bt(self, status: bool):
+        self.product_search_button.setEnabled(status)
+        self.product_search_button.setObjectName("yellow_btn" if status else "disable_yellow_btn")
+        self.product_search_button.style().unpolish(self.product_search_button)
+        self.product_search_button.style().polish(self.product_search_button)
+        
+    def set_input_changed_listener(self, function):
+        self.product_search_input.textChanged.connect(function)

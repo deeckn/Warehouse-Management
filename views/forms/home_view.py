@@ -2,12 +2,11 @@ from views.forms.stack_page import StackPage
 from views.theme import Theme
 from views.forms.log_activity_view import LogWindowView
 from views.forms.product_search_view import ProductSearchView
-from views.items.product_card_home_item import ProductCardHomeItem
-from data.data_classes import Customer, ProductItem
+from data.data_classes import LogEntry, ProductItem
+from data.filter_options import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-import copy
 
 
 class HomePageView(StackPage):
@@ -33,6 +32,43 @@ class HomePageView(StackPage):
         title.setObjectName("page_name")
         title.setFont(Theme.POPPINS_BOLD_64)
         title.setGeometry(100, 60, 195, 96)
+
+    def add_log(self, log: LogEntry):
+        self.log_window_view.add_log(log)
+
+    def clear_logs(self):
+        self.log_window_view.clear_logs()
+
+    def set_search_bt_listener(self, event):
+        self.product_search_view.set_search_bt_listener(event)
+
+    def get_search_input(self) -> str:
+        return self.product_search_view.get_search_input()
+    
+    def get_filter(self) -> FilterOption:
+        filter = self.product_search_view.get_filter()
+        match filter:
+            case "id":
+                return IdFilter()
+            case "product_name":
+                return ProductFilter()
+            case "customer_name":
+                return CustomerFilter()
+
+    def set_input_changed_listener(self, function):
+        self.product_search_view.set_input_changed_listener(function)
+
+    def setEnabled_search_bt(self, status: bool):
+        self.product_search_view.setEnabled_search_bt(status)
+
+    def add_product_card(self, product : ProductItem):
+        return self.product_search_view.add_product_card(product)
+
+    def clear_product_cards(self):
+        self.product_search_view.clear_product_cards()
+
+    def get_card_list(self):
+        return self.product_search_view.get_card_list()
 
     # Example for controller
     # def set_add_event(self):

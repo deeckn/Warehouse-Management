@@ -40,7 +40,7 @@ class LogWindowView(QWidget):
         self.scroll_area_widget.setObjectName("container")
         self.scroll_area_layout = QVBoxLayout(self.scroll_area_widget)
         self.scroll_area_layout.setSpacing(15)
-        self.scroll_area_layout.setContentsMargins(10, 5, 10, 0)
+        self.scroll_area_layout.setContentsMargins(5, 5, 5, 0)
         scroll_area.setWidget(self.scroll_area_widget)
         self.spacer = QSpacerItem(
             0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -50,7 +50,7 @@ class LogWindowView(QWidget):
         self.scroll_area_layout.addWidget(LogItem(log_entry))
         self.scroll_area_layout.addItem(self.spacer)
 
-    def clear_log(self):
+    def clear_logs(self):
         childs = self.scroll_area_widget.children()
         if len(childs) > 1:
             childs = childs[1:]

@@ -167,3 +167,13 @@ class CustomerInputForm(InputForm):
         self.rental_duration_le.textChanged.connect(function)
         self.applied_option.clicked.connect(function)
         self.not_applied_option.clicked.connect(function)
+
+    # Save edited data
+
+    def set_save_button_listener(self, function):
+        self.save_button.clicked.connect(function)
+
+    # Delete customer
+
+    def set_delete_button_listener(self, function):
+        self.delete_button.clicked.connect(function)

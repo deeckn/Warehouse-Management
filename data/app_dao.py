@@ -272,7 +272,7 @@ class CustomerDAO(DAO):
         """Converts raw data to User objects"""
         temp = list()
         for data in self.__query_list:
-            packing_service = data[4] == "1"
+            packing_service = data[4] == 1
             customer = Customer(
                 int(data[0]),
                 data[1],

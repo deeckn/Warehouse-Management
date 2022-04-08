@@ -51,7 +51,7 @@ class HomePageView(StackPage):
             case "id":
                 return IdFilter()
             case "product_name":
-                return ProductFilter()
+                return NameFilter()
             case "customer_name":
                 return CustomerFilter()
 
@@ -69,13 +69,3 @@ class HomePageView(StackPage):
 
     def get_card_list(self):
         return self.product_search_view.get_card_list()
-
-    # Example for controller
-    # def set_add_event(self):
-    #     cards = self.product_search_view.get_card_list()
-    #     for card in cards:
-    #         def generate(temp):
-    #             def test():
-    #                 print(temp.item.get_id())
-    #             return test
-    #         card.add_bt.clicked.connect(generate(card))

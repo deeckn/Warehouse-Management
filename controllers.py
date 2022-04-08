@@ -8,6 +8,7 @@ from models import *
 from PySide6.QtWidgets import QWidget
 from views.forms.notifications_view import NotificationView
 from datetime import date
+import views.rc_icons
 
 
 class Controller(ABC):
@@ -55,6 +56,58 @@ class LoginPage(Controller):
 class HomePage(Controller):
     def __init__(self, view: QWidget, model: Model):
         super().__init__(view, model)
+        self.update_activity_logs()
+        self.view.set_search_bt_listener(self.search)
+        self.view.set_input_changed_listener(self.input_check)
+
+    def search(self):
+        input = self.view.get_search_input()
+        filter_option = self.view.get_filter()
+        self.view.clear_product_cards()
+        products = self.model.search_product(input, filter_option)
+        if None not in products:
+            for product in products:
+                card = self.view.add_product_card(product)
+                def quantity_check():
+                    new_quantity = card.get_new_quantity()
+                    add_state = True
+                    export_state = True
+                    if new_quantity == 0:
+                        add_state = False
+                        export_state = False
+                    elif new_quantity > card.get_product().get_quantity():
+                        export_state = False
+                    card.set_enable_add_bt(add_state)
+                    card.set_enable_export_bt(export_state)
+                
+                card.set_quantity_changed_listener(quantity_check)
+
+                def add():
+                    new_quantity = card.get_new_quantity()
+                    self.model.add_product_quantity(product, new_quantity)
+                    card.add_quantity(new_quantity)
+                    card.update_card()
+                    self.update_activity_logs()
+                def export():
+                    new_quantity = card.get_new_quantity()
+                    if new_quantity == 0:
+                        return
+                    self.model.export_product(product, new_quantity)
+                    card.export_quantity(new_quantity)
+                    card.update_card()
+                    self.update_activity_logs()
+                card.set_add_bt_listener(add)
+                card.set_export_bt_listener(export)
+        
+    def update_activity_logs(self):
+        self.view.clear_logs()
+        for log in self.model.get_activity_logs():
+            self.view.add_log(log)
+
+    def input_check(self):
+        input = self.view.get_search_input()
+        self.view.setEnabled_search_bt(input != "")
+
 
 
 class CustomerPage(Controller):

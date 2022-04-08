@@ -90,7 +90,8 @@ class HomeModel(Model):
 
     def add_product_quantity(self, product: ProductItem, quantity: int):
         current_quantity = product.get_quantity()
-        self.__product_dao.update_product(id=product.get_id(),quantity=current_quantity+quantity)
+        self.__product_dao.update_product(
+            id=product.get_id(), quantity=current_quantity+quantity)
 
         # Logging
         log = LogEntry(
@@ -99,7 +100,8 @@ class HomeModel(Model):
 
     def export_product(self, product: ProductItem, quantity: int):
         current_quantity = product.get_quantity()
-        self.__product_dao.update_product(id=product.get_id(),quantity=current_quantity-quantity)
+        self.__product_dao.update_product(
+            id=product.get_id(), quantity=current_quantity-quantity)
 
         # Logging
         log = LogEntry(
@@ -140,28 +142,31 @@ class CustomerListModel(Model):
         """Saves changes made to customer information"""
 
         name = None if previous_info.get_name(
-        ) != new_info.get_name() else new_info.get_name()
+        ) == new_info.get_name() else new_info.get_name()
 
         phone = None if previous_info.get_phone(
-        ) != new_info.get_phone() else new_info.get_phone()
+        ) == new_info.get_phone() else new_info.get_phone()
 
         email = None if previous_info.get_email(
-        ) != new_info.get_email() else new_info.get_email()
+        ) == new_info.get_email() else new_info.get_email()
 
         packing_service = None if previous_info.get_packing_service(
-        ) != new_info.get_packing_service() else new_info.get_packing_service()
+        ) == new_info.get_packing_service() else new_info.get_packing_service()
+
+        if packing_service is not None:
+            packing_service = 1 if packing_service else 0
 
         rental_duration = None if previous_info.get_rental_duration(
-        ) != new_info.get_rental_duration() else new_info.get_rental_duration()
+        ) == new_info.get_rental_duration() else new_info.get_rental_duration()
 
         date_joined = None if previous_info.get_date_joined(
-        ) != new_info.get_date_joined() else new_info.get_date_joined()
+        ) == new_info.get_date_joined() else new_info.get_date_joined()
 
         expiry_date = None if previous_info.get_expiry_date(
-        ) != new_info.get_expiry_date() else new_info.get_expiry_date()
+        ) == new_info.get_expiry_date() else new_info.get_expiry_date()
 
         total_payment = None if previous_info.get_total_payment(
-        ) != new_info.get_total_payment() else new_info.get_total_payment()
+        ) == new_info.get_total_payment() else new_info.get_total_payment()
 
         self.__customer_dao.update_customer(
             previous_info.get_id(),

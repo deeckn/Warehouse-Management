@@ -90,7 +90,7 @@ class HomeModel(Model):
 
     def add_product_quantity(self, product: ProductItem, quantity: int):
         current_quantity = product.get_quantity()
-        self.__product_dao.update_product(quantity=current_quantity+quantity)
+        self.__product_dao.update_product(id=product.get_id(),quantity=current_quantity+quantity)
 
         # Logging
         log = LogEntry(
@@ -99,7 +99,7 @@ class HomeModel(Model):
 
     def export_product(self, product: ProductItem, quantity: int):
         current_quantity = product.get_quantity()
-        self.__product_dao.update_product(quantity=current_quantity-quantity)
+        self.__product_dao.update_product(id=product.get_id(),quantity=current_quantity-quantity)
 
         # Logging
         log = LogEntry(

@@ -14,7 +14,7 @@ class ProductCardHomeItem(QWidget):
         bg.setStyleSheet(
             f"background-color: {Theme.GHOST_WHITE}; border-radius:25px")
 
-        self.item = item
+        self.product = item
 
         self.info = QLabel(self)
         self.info.setGeometry(40, 20, 361, 108)
@@ -52,3 +52,19 @@ class ProductCardHomeItem(QWidget):
         self.export_bt.setStyleSheet(
             f"background-color: {Theme.RED}; border: none; border-radius:10px; color:{Theme.GHOST_WHITE};")
         self.export_bt.setFont(Theme.POPPINS_BOLD_18)
+
+    def set_add_bt_listener(self, event):
+        self.add_bt.clicked.connect(event)
+
+    def get_quantity(self):
+        return int(self.quantity_LE.text())
+
+    def get_product(self):
+        return self.product
+
+    def add_quatity(self, new_quantity):
+        self.product.add_quantity(new_quantity)
+
+    def update_card(self):
+         self.info.setText(
+            f"Customer Name: {self.product.get_owner().get_name()}\nProduct ID: {self.product.get_id()}\nProduct Name: {self.product.get_name()}\nQuantity: {self.product.get_quantity()}""")

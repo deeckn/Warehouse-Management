@@ -1,5 +1,3 @@
-from tkinter import LEFT, RIGHT
-from turtle import left
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
                             QMetaObject, QObject, QPoint, QRect, QSize, Qt,
                             QTime, QUrl)

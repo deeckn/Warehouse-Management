@@ -8,6 +8,10 @@ class CustomerList(ItemList):
         super().__init__(parent)
         self.qparent = parent
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> af4b30c5a822b5b2af497c59580cdf61931d86ba
     def add_card(self, customer: Customer):
         """Add new customer card to the list"""
         card = CustomerCard(self.qparent, customer)

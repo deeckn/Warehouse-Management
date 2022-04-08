@@ -201,6 +201,11 @@ class ProductItem:
     def get_category_list(self) -> list[ProductCategory]:
         return self.__categories
 
+    def add_quantity(self, new_quantity : int):
+        self.__quantity += new_quantity
+
+    def export_quantity(self, exported_quantity : int):
+        self.__quantity -= exported_quantity
 
 @dataclass
 class QuarterlyReport:

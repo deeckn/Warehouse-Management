@@ -19,10 +19,6 @@ class IdFilter(FilterOption):
     def __init__(self) -> None:
         self.option = "id"
 
-class ProductFilter(FilterOption):
-    def __init__(self) -> None:
-        self.option = "product"
-
 
 class CustomerFilter(FilterOption):
     def __init__(self) -> None:

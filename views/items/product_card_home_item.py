@@ -14,6 +14,12 @@ class ProductCardHomeItem(QWidget):
         bg.setStyleSheet(
             f"background-color: {Theme.GHOST_WHITE}; border-radius:25px")
 
+        self.enable_add_style = f"background-color: {Theme.GREEN}; border: none; border-radius:10px; color:{Theme.GHOST_WHITE};"
+        self.enable_export_style =  f"background-color: {Theme.RED}; border: none; border-radius:10px; color:{Theme.GHOST_WHITE};"
+       
+        self.disable_add_style = f"background-color: {Theme.DARK_GREEN}; border: none; border-radius:10px; color:{Theme.DARK_WHITE};"
+        self.disable_export_style =  f"background-color: {Theme.DARK_RED}; border: none; border-radius:10px; color:{Theme.DARK_WHITE};"
+
         self.product = item
 
         self.info = QLabel(self)
@@ -43,27 +49,46 @@ class ProductCardHomeItem(QWidget):
 
         self.add_bt = QPushButton("ADD", self)
         self.add_bt.setGeometry(540, 22, 100, 40)
-        self.add_bt.setStyleSheet(
-            f"background-color: {Theme.LIGHT_GREEN}; border: none; border-radius:10px; color:{Theme.GHOST_WHITE};")
         self.add_bt.setFont(Theme.POPPINS_BOLD_18)
 
         self.export_bt = QPushButton("EXPORT", self)
         self.export_bt.setGeometry(540, 74, 100, 40)
-        self.export_bt.setStyleSheet(
-            f"background-color: {Theme.RED}; border: none; border-radius:10px; color:{Theme.GHOST_WHITE};")
         self.export_bt.setFont(Theme.POPPINS_BOLD_18)
+
+        self.set_enable_add_bt(False)
+        self.set_enable_export_bt(False)
 
     def set_add_bt_listener(self, event):
         self.add_bt.clicked.connect(event)
 
-    def get_quantity(self):
-        return int(self.quantity_LE.text())
+    def set_export_bt_listener(self, event):
+        self.export_bt.clicked.connect(event)
+
+    def set_quantity_changed_listener(self, event):
+        self.quantity_LE.textChanged.connect(event)
+
+    def get_new_quantity(self):
+        try:
+            return int(self.quantity_LE.text())
+        except Exception:
+            return 0
 
     def get_product(self):
         return self.product
 
-    def add_quatity(self, new_quantity):
+    def add_quantity(self, new_quantity:int):
         self.product.add_quantity(new_quantity)
+
+    def export_quantity(self, new_quantity:int):
+        self.product.export_quantity(new_quantity)
+
+    def set_enable_add_bt(self, state:bool):
+        self.add_bt.setEnabled(state)
+        self.add_bt.setStyleSheet(self.enable_add_style if state else self.disable_add_style)
+
+    def set_enable_export_bt(self, state:bool):
+        self.export_bt.setEnabled(state)
+        self.export_bt.setStyleSheet(self.enable_export_style if state else self.disable_export_style)
 
     def update_card(self):
          self.info.setText(

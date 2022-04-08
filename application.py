@@ -15,22 +15,27 @@ class Application:
             LoginModel()
         )
 
+        self.customer_page = CustomerPage(
+            CustomerListPageView(),
+            CustomerListModel(self.current_user)
+        )
+
         self.account_page = AccountPage(
             AccountView(),
             AccountModel(self.current_user)
         )
 
-        # self.notification_page = NotificationPage(
-        #     NotificationView(),
-        #     NotificationModel()
-        # )
+        self.notification_page = NotificationPage(
+            NotificationView(),
+            NotificationModel()
+        )
 
         self.inventory_page = InventoryOverviewPage(
             InventoryOverviewView(),
             InventoryOverviewModel()
         )
 
-        self.current_controller = self.inventory_page
+        self.current_controller = self.customer_page
 
     def start(self):
         self.current_controller.open_page()

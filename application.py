@@ -1,10 +1,9 @@
 import sys
 from PySide6.QtWidgets import QApplication
 from controllers import *
+from models import *
 from views.forms.home_view import HomePageView
 from views.forms.login_view import LoginView
-from models import LoginModel
-
 
 
 class Application:

@@ -476,29 +476,28 @@ class CategoryDAO(DAO):
 class LocationDAO(DAO):
     __table_name = "PRODUCT_LOCATIONS"
     __COLUMN_PRODUCT_ID = "product_id"
+    __COLUMN_BATCH_NUMBER = "batch_number"
+    __COLUMN_QUANTITY = "quantity"
     __COLUMN_SHELF_LABEL = "shelf_label"
-    __COLUMN_STARTING_NUMBER = "starting_number"
-    __COLUMN_ENDING_NUMBER = "ending_number"
 
     def __init__(self, connection: sqlite3.Connection):
         super().__init__(connection)
 
     def add_product_location(self, product_id: int, location: Location):
         """Adds a product and location entry to the PRODUCT_LOCATIONS table"""
-        start, end = location.get_range()
 
         try:
             self.cursor.execute(f"""
                 INSERT INTO {LocationDAO.__table_name}
                 ({LocationDAO.__COLUMN_PRODUCT_ID},
-                {LocationDAO.__COLUMN_SHELF_LABEL},
-                {LocationDAO.__COLUMN_STARTING_NUMBER},
-                {LocationDAO.__COLUMN_ENDING_NUMBER})
+                {LocationDAO.__COLUMN_BATCH_NUMBER},
+                {LocationDAO.__COLUMN_QUANTITY},
+                {LocationDAO.__COLUMN_SHELF_LABEL})
                 VALUES
                 ({product_id},
-                '{location.get_shelf_label()}',
-                {start},
-                {end})
+                {location.get_batch_number()},
+                {location.get_batch_quantity()},
+                '{location.get_shelf_label()}')
             """)
             self.connection.commit()
         except sqlite3.IntegrityError:
@@ -512,9 +511,9 @@ class LocationDAO(DAO):
         """Returns list of Location objects given the product id"""
         self.cursor.execute(f"""
             SELECT
-            {LocationDAO.__COLUMN_SHELF_LABEL},
-            {LocationDAO.__COLUMN_STARTING_NUMBER},
-            {LocationDAO.__COLUMN_ENDING_NUMBER}
+            {LocationDAO.__COLUMN_BATCH_NUMBER},
+            {LocationDAO.__COLUMN_QUANTITY},
+            {LocationDAO.__COLUMN_SHELF_LABEL}
             FROM {LocationDAO.__table_name}
             WHERE {LocationDAO.__COLUMN_PRODUCT_ID}={product_id}
         """)
@@ -522,20 +521,20 @@ class LocationDAO(DAO):
         data = self.cursor.fetchall()
         locations = list()
         for location in data:
-            shelf_label = location[0]
-            start = location[1]
-            end = location[2]
-            location_object = Location(shelf_label, start, end)
+            batch_number = int(location[0])
+            quantity = int(location[1])
+            shelf_label = location[2]
+            location_object = Location(batch_number, quantity, shelf_label)
             locations.append(location_object)
 
         return locations
 
-    def remove_product_location(self, product_id: int, shelf_label: str):
+    def remove_product_location(self, product_id: int, batch_number: int):
         """Removes a shelf location of a product in the PRODUCT_LOCATIONS table"""
         self.cursor.execute(f"""
             DELETE FROM {LocationDAO.__table_name}
             WHERE {LocationDAO.__COLUMN_PRODUCT_ID}={product_id}
-            AND {LocationDAO.__COLUMN_SHELF_LABEL}='{shelf_label}'""")
+            AND {LocationDAO.__COLUMN_BATCH_NUMBER}={batch_number}""")
         self.connection.commit()
 
     def remove_all_product_locations(self, product_id: int):

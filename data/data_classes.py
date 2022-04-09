@@ -144,18 +144,21 @@ class LogEntry:
 
 @dataclass
 class Location:
+    batch_number: int
+    quantity: int
     shelf_label: str
-    starting_number: int
-    ending_number: int
 
     def __str__(self):
-        return f"{self.shelf_label}{self.starting_number:03d} to {self.shelf_label}{self.ending_number:03d}"
+        return self.shelf_label
+
+    def get_batch_number(self) -> int:
+        return self.batch_number
+
+    def get_batch_quantity(self) -> int:
+        return self.quantity
 
     def get_shelf_label(self) -> str:
         return self.shelf_label
-
-    def get_range(self) -> tuple[int, int]:
-        return self.starting_number, self.ending_number
 
 
 @dataclass

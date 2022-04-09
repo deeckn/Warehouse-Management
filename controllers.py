@@ -64,7 +64,7 @@ class HomePage(Controller):
         input = self.view.get_search_input()
         filter_option = self.view.get_filter()
         self.view.clear_product_cards()
-        products = self.model.search_product(input, filter_option) # [None]
+        products = self.model.search_product(input, filter_option)  # [None]
         if None not in products:
             for product in products:
                 card = self.view.add_product_card(product)
@@ -158,6 +158,7 @@ class CustomerPage(Controller):
     def search_users(self):
         search_string = self.view.get_search_input()
         if len(search_string) == 0:
+            self.view.reset_card_list()
             self.__fill_customer_cards(self.model.get_all_customers())
             return
 

@@ -64,42 +64,10 @@ class HomePage(Controller):
         input = self.view.get_search_input()
         filter_option = self.view.get_filter()
         self.view.clear_product_cards()
-        products = self.model.search_product(input, filter_option)
+        products = self.model.search_product(input, filter_option) # [None]
         if None not in products:
             for product in products:
                 card = self.view.add_product_card(product)
-
-                def quantity_check():
-                    new_quantity = card.get_new_quantity()
-                    add_state = True
-                    export_state = True
-                    if new_quantity == 0:
-                        add_state = False
-                        export_state = False
-                    elif new_quantity > card.get_product().get_quantity():
-                        export_state = False
-                    card.set_enable_add_bt(add_state)
-                    card.set_enable_export_bt(export_state)
-
-                card.set_quantity_changed_listener(quantity_check)
-
-                def add():
-                    new_quantity = card.get_new_quantity()
-                    self.model.add_product_quantity(product, new_quantity)
-                    card.add_quantity(new_quantity)
-                    card.update_card()
-                    self.update_activity_logs()
-
-                def export():
-                    new_quantity = card.get_new_quantity()
-                    if new_quantity == 0:
-                        return
-                    self.model.export_product(product, new_quantity)
-                    card.export_quantity(new_quantity)
-                    card.update_card()
-                    self.update_activity_logs()
-                card.set_add_bt_listener(add)
-                card.set_export_bt_listener(export)
 
                 def generate(temp):
                     def quantity_check():

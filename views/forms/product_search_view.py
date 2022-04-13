@@ -1,10 +1,11 @@
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+
+from PySide6.QtGui import QPixmap, QPainter, QTransform, QColor, Qt
+from PySide6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QHBoxLayout, QRadioButton, QScrollArea, QVBoxLayout
 from data.data_classes import ProductItem
 from views.theme import Theme
 from views.items.product_card_home_item import ProductCardHomeItem
 from data.filter_options import *
+
 
 class ProductSearchView(QWidget):
     def __init__(self, parent=None) -> None:
@@ -31,7 +32,7 @@ class ProductSearchView(QWidget):
         option.setGeometry(53, 146, 368, 21)
         option_layout = QHBoxLayout(option)
         option_layout.setContentsMargins(0, 0, 0, 0)
-        
+
         self.filter_id = QRadioButton("ID")
         self.filter_id.setFixedWidth(45)
         self.filter_id.setFont(Theme.POPPINS_BOLD_14)
@@ -119,9 +120,10 @@ class ProductSearchView(QWidget):
 
     def setEnabled_search_bt(self, status: bool):
         self.product_search_button.setEnabled(status)
-        self.product_search_button.setObjectName("yellow_btn" if status else "disable_yellow_btn")
+        self.product_search_button.setObjectName(
+            "yellow_btn" if status else "disable_yellow_btn")
         self.product_search_button.style().unpolish(self.product_search_button)
         self.product_search_button.style().polish(self.product_search_button)
-        
+
     def set_input_changed_listener(self, function):
         self.product_search_input.textChanged.connect(function)

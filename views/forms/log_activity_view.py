@@ -2,7 +2,6 @@ from PySide6.QtWidgets import QWidget, QScrollArea, QVBoxLayout, QSpacerItem, QS
 from PySide6.QtGui import Qt
 from data.data_classes import LogEntry
 from views.theme import Theme
-import os.path
 from views.items.log_item import LogItem
 
 

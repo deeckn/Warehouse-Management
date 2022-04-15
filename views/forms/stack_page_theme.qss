@@ -92,3 +92,24 @@ QPushButton#disable_yellow_btn {
     background-color: #E7B861;
     border-radius: 10px;
 }
+
+QPushButton#symbol_red {
+    background-color: #FF7474;
+    border-radius: 15px;
+    border: 2px solid #000000; 
+}
+
+QPushButton#symbol_green {
+    background-color: #2ACAB0;
+    border-radius: 15px;
+    border: 2px solid #000000;
+}
+
+QPushButton#export_btn {
+    background-color: #2ACAB0;
+    border-radius: 22px;
+}
+
+QPushButton#back_btn, #next_btn {
+    background-color: transparent;
+}

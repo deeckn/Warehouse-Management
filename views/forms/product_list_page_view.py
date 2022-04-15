@@ -1,7 +1,5 @@
 from views.forms.stack_page import StackPage
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide6.QtWidgets import QLabel
 from views.forms.product_list import ProductList
 from views.forms.product_input_form import ProductInputForm
 from views.items.product_list_card import ProductListCard
@@ -21,7 +19,6 @@ class ProductListPageView(StackPage):
 
         self.product_list = ProductList(self)
         self.product_list.move(640, 176)
-
 
         # title page name
         title = QLabel("Product List", self)

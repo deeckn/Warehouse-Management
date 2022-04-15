@@ -1,19 +1,13 @@
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
-                            QMetaObject, QObject, QPoint, QRect, QSize, Qt,
-                            QTime, QUrl)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor, QFont,
-                           QFontDatabase, QGradient, QIcon, QImage,
-                           QKeySequence, QLinearGradient, QPainter, QPalette,
-                           QPixmap, QRadialGradient, QTransform,QIntValidator)
-from PySide6.QtWidgets import (QApplication, QFrame, QLabel, QLineEdit,
-                               QPushButton, QScrollArea, QSizePolicy,
-                               QVBoxLayout, QWidget,QScrollArea, QGridLayout)
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import (
+    QLabel, QScrollArea, QVBoxLayout, QWidget, QScrollArea, QGridLayout)
 from PySide6.QtCharts import (QChart, QChartView, QPieSeries, QPieSlice)
 
 from data.data_classes import ProductItem
 from views.items.customer_stock_item import CustomerStockItem
 from views.items.product_card_inventory import ProductCardInventory
 from views.theme import Theme
+
 
 class InventoryOverviewView(QWidget):
     def __init__(self):
@@ -25,52 +19,59 @@ class InventoryOverviewView(QWidget):
         self.previous_customer = None
 
         container1 = QWidget(self)
-        container1.setGeometry(100,219,464,762)
+        container1.setGeometry(100, 219, 464, 762)
         container1.setStyleSheet("background-color: white;"
-        "border-radius: 25;")
+                                 "border-radius: 25;")
 
         container2 = QWidget(self)
-        container2.setGeometry(628,219,835,792)
+        container2.setGeometry(628, 219, 835, 792)
         container2.setStyleSheet("background-color: white;"
-        "border-radius: 25;")
+                                 "border-radius: 25;")
 
         inventory_overview_label = QLabel("Inventory Overview", self)
-        inventory_overview_label.setGeometry(100,60,725,108)
-        inventory_overview_label.setStyleSheet("background-color: None; color: " + Theme.DARK_BLUE + ";")
+        inventory_overview_label.setGeometry(100, 60, 725, 108)
+        inventory_overview_label.setStyleSheet(
+            "background-color: None; color: " + Theme.DARK_BLUE + ";")
         inventory_overview_label.setFont(Theme.POPPINS_BOLD_72)
 
-        product_list_label = QLabel("Product List",self)
-        product_list_label.setGeometry(655,271,782,52)
+        product_list_label = QLabel("Product List", self)
+        product_list_label.setGeometry(655, 271, 782, 52)
         product_list_label.setStyleSheet("background-color: None;")
         product_list_label.setAlignment(Qt.AlignCenter)
         product_list_label.setFont(Theme.POPPINS_BOLD_36)
 
         customer_selection_label = QLabel("Customer Selection", self)
-        customer_selection_label.setGeometry(150,266,364,54)
-        customer_selection_label.setStyleSheet("background-color: None; color: " + Theme.BLUE + "")
+        customer_selection_label.setGeometry(150, 266, 364, 54)
+        customer_selection_label.setStyleSheet(
+            "background-color: None; color: " + Theme.BLUE + "")
         customer_selection_label.setFont(Theme.POPPINS_BOLD_36)
 
         customer_name_label = QLabel("Customer's name", self)
-        customer_name_label.setGeometry(134,349,198,25)
-        customer_name_label.setStyleSheet("background-color: None; color: " + Theme.DARK_BLUE + ";")
+        customer_name_label.setGeometry(134, 349, 198, 25)
+        customer_name_label.setStyleSheet(
+            "background-color: None; color: " + Theme.DARK_BLUE + ";")
         customer_name_label.setFont(Theme.POPPINS_BOLD_14)
         customer_name_label.setAlignment(Qt.AlignCenter)
 
         product_stocked_label = QLabel("Product stocked", self)
-        product_stocked_label.setGeometry(348,349,175,25)
-        product_stocked_label.setStyleSheet("background-color: None; color: " + Theme.DARK_BLUE + ";")
+        product_stocked_label.setGeometry(348, 349, 175, 25)
+        product_stocked_label.setStyleSheet(
+            "background-color: None; color: " + Theme.DARK_BLUE + ";")
         product_stocked_label.setFont(Theme.POPPINS_BOLD_14)
         product_stocked_label.setAlignment(Qt.AlignCenter)
 
         base_widget_customer = QWidget(self)
-        base_widget_customer.setGeometry(134,383,416,235)
+        base_widget_customer.setGeometry(134, 383, 416, 235)
         base_widget_customer.setStyleSheet("background-color: transparent;")
-        
+
         self.scroll_area_customer = QScrollArea(base_widget_customer)
-        self.scroll_area_customer.setGeometry(0,0,416,235)
-        self.scroll_area_customer.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scroll_area_customer.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scroll_area_customer.setStyleSheet("background-color: transparent; border: none;")
+        self.scroll_area_customer.setGeometry(0, 0, 416, 235)
+        self.scroll_area_customer.setVerticalScrollBarPolicy(
+            Qt.ScrollBarAlwaysOff)
+        self.scroll_area_customer.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarAlwaysOff)
+        self.scroll_area_customer.setStyleSheet(
+            "background-color: transparent; border: none;")
         self.scroll_area_customer.setWidgetResizable(True)
 
         self.scroll_area_widget_customer = QWidget()
@@ -84,14 +85,17 @@ class InventoryOverviewView(QWidget):
         self.scroll_area_customer.setWidget(self.scroll_area_widget_customer)
 
         base_widget_product = QWidget(self)
-        base_widget_product.setGeometry(655,371,782,566)
+        base_widget_product.setGeometry(655, 371, 782, 566)
         base_widget_product.setStyleSheet("background-color: transparent;")
-        
+
         self.scroll_area_product = QScrollArea(base_widget_product)
-        self.scroll_area_product.setGeometry(0,0,782,566)
-        self.scroll_area_product.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scroll_area_product.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-        self.scroll_area_product.setStyleSheet("background-color: transparent; border: none;")
+        self.scroll_area_product.setGeometry(0, 0, 782, 566)
+        self.scroll_area_product.setVerticalScrollBarPolicy(
+            Qt.ScrollBarAlwaysOff)
+        self.scroll_area_product.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarAlwaysOff)
+        self.scroll_area_product.setStyleSheet(
+            "background-color: transparent; border: none;")
         self.scroll_area_product.setWidgetResizable(True)
 
         self.scroll_area_widget_product = QWidget()
@@ -105,7 +109,7 @@ class InventoryOverviewView(QWidget):
         self.scroll_area_product.setWidget(self.scroll_area_widget_product)
 
         self.pie_chart_widget = QWidget(self)
-        self.pie_chart_widget.setGeometry(150,602,400,400)
+        self.pie_chart_widget.setGeometry(150, 602, 400, 400)
         self.pie_chart_widget.setStyleSheet("background-color: transparent;")
         self.series = None
         self.chart = QChart()
@@ -113,11 +117,11 @@ class InventoryOverviewView(QWidget):
         self.chartview = QChartView(self.chart)
         self.gridlayout = QGridLayout()
         self.pie_chart_widget.setLayout(self.gridlayout)
-    
+
         self.customer_selected_function = None
 
     # Add Product Item to the product list
-    def add_product_item(self, product:ProductItem) -> None:
+    def add_product_item(self, product: ProductItem) -> None:
         card = ProductCardInventory(product)
         self.scroll_area_widget_product.layout().addWidget(card)
 
@@ -136,11 +140,11 @@ class InventoryOverviewView(QWidget):
     def clear_customer_item(self) -> None:
         for i in reversed(range(self.layout_customer.count())):
             self.layout_customer.itemAt(i).widget().deleteLater()
-    
+
     def set_customer_selected_function(self, function) -> None:
         self.customer_selected_function = function
 
-    def draw_pie_chart_of_selected_customer(self, name:str, percent: float)->None:
+    def draw_pie_chart_of_selected_customer(self, name: str, percent: float) -> None:
         if(not self.gridlayout.isEmpty()):
             self.series.clear()
             self.chart.removeAllSeries()

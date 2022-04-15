@@ -46,7 +46,7 @@ class BaseView(QWidget):
         # Side bt bar layout
         self.side_menu_bt_bar_layout = QVBoxLayout(self.side_menu_bt_bar)
 
-        self.logout_bt = SideMenuItem("out", "Log out")
+        self.logout_bt = SideMenuItem("logout", "Log out")
         self.logout_bt.add_function(self.logout_bt.unclick)
         self.side_menu_layout.addWidget(self.logout_bt)
 

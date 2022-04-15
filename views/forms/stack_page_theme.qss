@@ -109,3 +109,7 @@ QPushButton#export_btn {
     background-color: #2ACAB0;
     border-radius: 22px;
 }
+
+QPushButton#back_btn, #next_btn {
+    background-color: transparent;
+}

@@ -1,19 +1,18 @@
 from PySide6.QtCore import Qt
-from PySide6.QtGui import QColor, QPixmap
+from PySide6.QtGui import QColor, QPixmap, QIcon
 from PySide6.QtWidgets import QWidget, QLabel, QPushButton, QScrollArea, QVBoxLayout, QGridLayout
 from PySide6.QtCharts import QChart, QChartView, QPieSeries, QPieSlice
 from views.forms.stack_page import StackPage 
 from views.theme import Theme
 from data.data_classes import Customer
 from views.items.report_card_item import ReportCardItem
+import views.rc_icons
 
 class ReportView(StackPage):
 
-    def __init__(self, img_type: str):
+    def __init__(self):
         super().__init__()
         self.set_styleSheet("stack_page_theme.qss")
-
-        self.img_type = img_type  
 
         report_label = QLabel("Report", self)
         report_label.setObjectName("report_label")
@@ -51,12 +50,20 @@ class ReportView(StackPage):
         widget_2.setObjectName("container")
         widget_2.setGeometry(760, 220, 660, 770)
 
+        backPath = QPixmap(":/icons/back_btn.png")
+        backIcon = QIcon(backPath)
         self.back_button = QPushButton(widget_2)
         self.back_button.setObjectName("back_btn")
+        self.back_button.setIcon(backIcon)
+        self.back_button.setIconSize(backPath.rect().size())
         self.back_button.setGeometry(50, 50, 50, 50)
-
+        
+        nextPath = QPixmap(":/icons/next_btn.png")
+        nextIcon = QIcon(nextPath)
         self.next_button = QPushButton(widget_2)
         self.next_button.setObjectName("next_btn")
+        self.next_button.setIcon(nextIcon)
+        self.next_button.setIconSize(nextPath.rect().size())
         self.next_button.setGeometry(560, 50, 50, 50)
     
         self.quarter_label = QLabel("2021/2", widget_2)
@@ -121,13 +128,6 @@ class ReportView(StackPage):
         self.chartview = QChartView(self.chart)
         self.gridlayout = QGridLayout()
         self.pie_chart_widget.setLayout(self.gridlayout)
-
-        # IMG
-        img = QPixmap(f":/icons/{img_type}.svg").scaled(50, 50)
-        self.paint(img, "#F8F8FF")  # paint the svg to ghost white
-        self.img_label = QLabel(self)
-        self.img_label.setPixmap(img)
-        self.img_label.setGeometry(38, 21, 50, 50)
 
     def draw_pie_chart_of_selected_customer(self, name:str, percent: float)->None:
         if(not self.gridlayout.isEmpty()):

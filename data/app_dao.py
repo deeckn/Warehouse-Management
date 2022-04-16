@@ -556,6 +556,9 @@ class ProductDAO(DAO):
     __COLUMN_WEIGHT = "weight"
     __COLUMN_LAST_STORED = "last_stored"
     __COLUMN_OWNER = "owner"
+    __COLUMN_LENGTH = "length"
+    __COLUMN_WIDTH = "width"
+    __COLUMN_HEIGHT = "height"
 
     __category_dao: CategoryDAO
     __location_dao: LocationDAO
@@ -573,6 +576,7 @@ class ProductDAO(DAO):
             return
 
         try:
+            length, width, height = product.get_dimension().get_dimension()
             self.cursor.execute(f"""
                 INSERT INTO {ProductDAO.__table_name}
                 ({ProductDAO.__COLUMN_NAME},
@@ -580,14 +584,20 @@ class ProductDAO(DAO):
                 {ProductDAO.__COLUMN_LOW_STOCK},
                 {ProductDAO.__COLUMN_WEIGHT},
                 {ProductDAO.__COLUMN_LAST_STORED},
-                {ProductDAO.__COLUMN_OWNER})
+                {ProductDAO.__COLUMN_OWNER},
+                {ProductDAO.__COLUMN_LENGTH},
+                {ProductDAO.__COLUMN_WIDTH},
+                {ProductDAO.__COLUMN_HEIGHT})
                 VALUES
                 ('{product.get_name()}',
                 {product.get_quantity()},
                 {product.get_low_stock_quantity()},
                 {product.get_weight()},
                 '{product.get_last_stored()}',
-                {product.get_owner().get_id()})
+                {product.get_owner().get_id()},
+                {length},
+                {width},
+                {height})
             """)
             self.connection.commit()
 
@@ -646,6 +656,7 @@ class ProductDAO(DAO):
         categories = self.__category_dao.get_product_categories(product_id)
         locations = self.__location_dao.get_product_location(product_id)
         owner = self.__customer_dao.get_customer(data[6])
+        dimension = Dimension(float(data[7]), float(data[8]), float(data[9]))
         product = ProductItem(
             data[0],
             data[1],
@@ -655,7 +666,8 @@ class ProductDAO(DAO):
             data[4],
             data[5],
             owner,
-            categories
+            categories,
+            dimension
         )
         return product
 
@@ -675,6 +687,7 @@ class ProductDAO(DAO):
         categories = self.__category_dao.get_product_categories(data[0])
         locations = self.__location_dao.get_product_location(data[0])
         owner = self.__customer_dao.get_customer(data[6])
+        dimension = Dimension(float(data[7]), float(data[8]), float(data[9]))
         product = ProductItem(
             data[0],
             data[1],
@@ -684,7 +697,8 @@ class ProductDAO(DAO):
             data[4],
             data[5],
             owner,
-            categories
+            categories,
+            dimension
         )
         return product
 
@@ -721,6 +735,11 @@ class ProductDAO(DAO):
             categories = self.__category_dao.get_product_categories(product[0])
             locations = self.__location_dao.get_product_location(product[0])
             owner = self.__customer_dao.get_customer(product[6])
+            dimension = Dimension(
+                float(data[7]),
+                float(data[8]),
+                float(data[9])
+            )
             product_object = ProductItem(
                 product[0],
                 product[1],
@@ -730,7 +749,8 @@ class ProductDAO(DAO):
                 product[4],
                 product[5],
                 owner,
-                categories
+                categories,
+                dimension
             )
             all_products.append(product_object)
 
@@ -752,6 +772,11 @@ class ProductDAO(DAO):
             categories = self.__category_dao.get_product_categories(product[0])
             locations = self.__location_dao.get_product_location(product[0])
             owner = self.__customer_dao.get_customer(product[6])
+            dimension = Dimension(
+                float(data[7]),
+                float(data[8]),
+                float(data[9])
+            )
             product_object = ProductItem(
                 product[0],
                 product[1],
@@ -761,7 +786,8 @@ class ProductDAO(DAO):
                 product[4],
                 product[5],
                 owner,
-                categories
+                categories,
+                dimension
             )
             low_stock_products.append(product_object)
 
@@ -787,6 +813,11 @@ class ProductDAO(DAO):
             categories = self.__category_dao.get_product_categories(product[0])
             locations = self.__location_dao.get_product_location(product[0])
             owner = self.__customer_dao.get_customer(product[6])
+            dimension = Dimension(
+                float(data[7]),
+                float(data[8]),
+                float(data[9])
+            )
             product_object = ProductItem(
                 product[0],
                 product[1],
@@ -796,7 +827,8 @@ class ProductDAO(DAO):
                 product[4],
                 product[5],
                 owner,
-                categories
+                categories,
+                dimension
             )
             products.append(product_object)
 
@@ -810,7 +842,10 @@ class ProductDAO(DAO):
         low_stock: int = None,
         weight: float = None,
         last_stored: str = None,
-        owner_id: int = None
+        owner_id: int = None,
+        length: float = None,
+        width: float = None,
+        height: float = None
     ):
         query = f"UPDATE {ProductDAO.__table_name} SET "
 
@@ -826,6 +861,12 @@ class ProductDAO(DAO):
             query += f'{ProductDAO.__COLUMN_LAST_STORED}="{last_stored}", '
         if owner_id is not None:
             query += f'{ProductDAO.__COLUMN_OWNER}={owner_id}, '
+        if length is not None:
+            query += f'{ProductDAO.__COLUMN_LENGTH}={length}, '
+        if width is not None:
+            query += f'{ProductDAO.__COLUMN_WIDTH}={width}, '
+        if height is not None:
+            query += f'{ProductDAO.__COLUMN_HEIGHT}={height}, '
 
         if query[-2] == ",":
             query = query[:-2]

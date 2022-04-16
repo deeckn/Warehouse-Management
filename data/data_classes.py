@@ -162,8 +162,17 @@ class Location:
 
 
 @dataclass
-class ProductItem:
+class Dimension:
+    __length: float
+    __width: float
+    __height: float
 
+    def get_dimension(self) -> tuple[float, float, float]:
+        return self.__length, self.__width, self.__height
+
+
+@dataclass
+class ProductItem:
     __id: int
     __name: str
     __quantity: int
@@ -173,6 +182,7 @@ class ProductItem:
     __last_stored: str
     __owner: Customer
     __categories: list[ProductCategory]
+    __dimension: Dimension
 
     def get_owner(self) -> Customer:
         return self.__owner
@@ -209,6 +219,9 @@ class ProductItem:
 
     def export_quantity(self, exported_quantity: int):
         self.__quantity -= exported_quantity
+
+    def get_dimension(self) -> Dimension:
+        return self.__dimension
 
 
 @dataclass

@@ -736,9 +736,9 @@ class ProductDAO(DAO):
             locations = self.__location_dao.get_product_location(product[0])
             owner = self.__customer_dao.get_customer(product[6])
             dimension = Dimension(
-                float(data[7]),
-                float(data[8]),
-                float(data[9])
+                float(product[7]),
+                float(product[8]),
+                float(product[9])
             )
             product_object = ProductItem(
                 product[0],
@@ -773,9 +773,9 @@ class ProductDAO(DAO):
             locations = self.__location_dao.get_product_location(product[0])
             owner = self.__customer_dao.get_customer(product[6])
             dimension = Dimension(
-                float(data[7]),
-                float(data[8]),
-                float(data[9])
+                float(product[7]),
+                float(product[8]),
+                float(product[9])
             )
             product_object = ProductItem(
                 product[0],

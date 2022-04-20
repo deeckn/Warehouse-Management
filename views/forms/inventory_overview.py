@@ -7,6 +7,7 @@ from data.data_classes import ProductItem
 from views.items.customer_stock_item import CustomerStockItem
 from views.items.product_card_inventory import ProductCardInventory
 from views.theme import Theme
+from PySide6 import QtCore
 
 
 class InventoryOverviewView(QWidget):
@@ -37,7 +38,7 @@ class InventoryOverviewView(QWidget):
         product_list_label = QLabel("Product List", self)
         product_list_label.setGeometry(655, 271, 782, 52)
         product_list_label.setStyleSheet("background-color: None;")
-        product_list_label.setAlignment(Qt.AlignCenter)
+        product_list_label.setAlignment(QtCore.Qt.AlignCenter)
         product_list_label.setFont(Theme.POPPINS_BOLD_36)
 
         customer_selection_label = QLabel("Customer Selection", self)
@@ -51,14 +52,14 @@ class InventoryOverviewView(QWidget):
         customer_name_label.setStyleSheet(
             "background-color: None; color: " + Theme.DARK_BLUE + ";")
         customer_name_label.setFont(Theme.POPPINS_BOLD_14)
-        customer_name_label.setAlignment(Qt.AlignCenter)
+        customer_name_label.setAlignment(QtCore.Qt.AlignCenter)
 
         product_stocked_label = QLabel("Product stocked", self)
         product_stocked_label.setGeometry(348, 349, 175, 25)
         product_stocked_label.setStyleSheet(
             "background-color: None; color: " + Theme.DARK_BLUE + ";")
         product_stocked_label.setFont(Theme.POPPINS_BOLD_14)
-        product_stocked_label.setAlignment(Qt.AlignCenter)
+        product_stocked_label.setAlignment(QtCore.Qt.AlignCenter)
 
         base_widget_customer = QWidget(self)
         base_widget_customer.setGeometry(134, 383, 416, 235)
@@ -67,9 +68,9 @@ class InventoryOverviewView(QWidget):
         self.scroll_area_customer = QScrollArea(base_widget_customer)
         self.scroll_area_customer.setGeometry(0, 0, 416, 235)
         self.scroll_area_customer.setVerticalScrollBarPolicy(
-            Qt.ScrollBarAlwaysOff)
+            QtCore.Qt.ScrollBarAlwaysOff)
         self.scroll_area_customer.setHorizontalScrollBarPolicy(
-            Qt.ScrollBarAlwaysOff)
+            QtCore.Qt.ScrollBarAlwaysOff)
         self.scroll_area_customer.setStyleSheet(
             "background-color: transparent; border: none;")
         self.scroll_area_customer.setWidgetResizable(True)
@@ -80,7 +81,7 @@ class InventoryOverviewView(QWidget):
         self.layout_customer = QVBoxLayout(self)
         self.layout_customer.setSpacing(24)
 
-        self.layout_customer.setAlignment(Qt.AlignTop)
+        self.layout_customer.setAlignment(QtCore.Qt.AlignTop)
         self.scroll_area_widget_customer.setLayout(self.layout_customer)
         self.scroll_area_customer.setWidget(self.scroll_area_widget_customer)
 
@@ -91,9 +92,9 @@ class InventoryOverviewView(QWidget):
         self.scroll_area_product = QScrollArea(base_widget_product)
         self.scroll_area_product.setGeometry(0, 0, 782, 566)
         self.scroll_area_product.setVerticalScrollBarPolicy(
-            Qt.ScrollBarAlwaysOff)
+            QtCore.Qt.ScrollBarAlwaysOff)
         self.scroll_area_product.setHorizontalScrollBarPolicy(
-            Qt.ScrollBarAlwaysOff)
+            QtCore.Qt.ScrollBarAlwaysOff)
         self.scroll_area_product.setStyleSheet(
             "background-color: transparent; border: none;")
         self.scroll_area_product.setWidgetResizable(True)
@@ -104,7 +105,7 @@ class InventoryOverviewView(QWidget):
         self.layout_product = QVBoxLayout(self)
         self.layout_product.setSpacing(30)
 
-        self.layout_product.setAlignment(Qt.AlignTop)
+        self.layout_product.setAlignment(QtCore.Qt.AlignTop)
         self.scroll_area_widget_product.setLayout(self.layout_product)
         self.scroll_area_product.setWidget(self.scroll_area_widget_product)
 

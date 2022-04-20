@@ -104,6 +104,9 @@ class StorageShelf:
     def get_columns(self) -> int:
         return self.__columns
 
+    def get_dimensions(self) -> tuple[float, float, float]:
+        return self.__length, self.__width, self.__height
+
 
 @dataclass
 class LogEntry:

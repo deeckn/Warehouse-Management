@@ -41,7 +41,12 @@ class Application:
             InventoryOverviewModel()
         )
 
-        self.current_controller = self.customer_page
+        self.report_page = ReportPage(
+            ReportView(),
+            ReportModel(self.current_user)
+        )
+
+        self.current_controller = self.report_page
 
     def start(self):
         self.current_controller.open_page()

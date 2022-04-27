@@ -1,13 +1,14 @@
 from abc import ABC
 from data.access_level import AdminAccess, EmployeeAccess
+from models import *
+from PySide6.QtWidgets import QWidget
+from datetime import date
 from views.forms.account_view import AccountView
 from views.forms.customer_list_page_view import CustomerListPageView
 from views.forms.inventory_overview import InventoryOverviewView
 from views.forms.login_view import LoginView
-from models import *
-from PySide6.QtWidgets import QWidget
 from views.forms.notifications_view import NotificationView
-from datetime import date
+from views.forms.report_view import ReportView
 import views.rc_icons
 
 
@@ -472,3 +473,65 @@ class InventoryOverviewPage(Controller):
         if products is not None:
             for product in products:
                 self.view.add_product_item(product)
+
+
+class ReportPage(Controller):
+    view: ReportView
+    model: ReportModel
+
+    def __init__(self, view: QWidget, model: Model):
+        super().__init__(view, model)
+        self.quarter_reports = self.model.get_all_reports()
+        self.index_limit = len(self.quarter_reports)-1
+        self.report_index = 0
+        self.update_dashboard(self.quarter_reports[self.report_index])
+        self.load_cards()
+
+        self.view.set_next_button_listener(self.next_quarter)
+        self.view.set_back_button_listener(self.previous_quarter)
+        self.view.set_export_button_listener(self.export_report)
+
+    def update_dashboard(self, report: QuarterlyReport):
+        # Update Quarter Label
+        self.view.set_quarter_label(report.get_year(), report.get_quarter())
+
+        # Update Pie Chart
+        self.view.draw_pie_chart_of_selected_customer(
+            "", report.get_utilized_space_percentage())
+
+        # Update Revenue
+        self.view.set_total_show_label(report.get_total_revenue())
+        self.view.set_monthly_show_label(report.get_monthly_revenue())
+
+        # Capacity Utilization
+        self.view.set_capacity_show_label(
+            report.get_utilized_space_percentage())
+
+    def next_quarter(self):
+        if not self.is_right_end():
+            self.report_index += 1
+
+        self.update_dashboard(self.quarter_reports[self.report_index])
+
+    def previous_quarter(self):
+        if not self.is_left_end():
+            self.report_index -= 1
+
+        self.update_dashboard(self.quarter_reports[self.report_index])
+
+    def is_right_end(self) -> bool:
+        return self.report_index == self.index_limit
+
+    def is_left_end(self) -> bool:
+        return self.report_index == 0
+
+    def load_cards(self):
+        customers = self.model.get_all_customers()
+        for customer in customers:
+            percentage = self.model.calculate_customer_stock_percentage(
+                customer)
+            self.view.add_report_card(customer, percentage)
+
+    def export_report(self):
+        file_path = self.view.save_file_to()
+        self.model.generate_csv_report(file_path)

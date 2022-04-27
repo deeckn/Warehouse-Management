@@ -479,6 +479,7 @@ class LocationDAO(DAO):
     __COLUMN_BATCH_NUMBER = "batch_number"
     __COLUMN_QUANTITY = "quantity"
     __COLUMN_SHELF_LABEL = "shelf_label"
+    __COLUMN_SHELF_NUMBER = "shelf_number"
 
     def __init__(self, connection: sqlite3.Connection):
         super().__init__(connection)
@@ -492,12 +493,14 @@ class LocationDAO(DAO):
                 ({LocationDAO.__COLUMN_PRODUCT_ID},
                 {LocationDAO.__COLUMN_BATCH_NUMBER},
                 {LocationDAO.__COLUMN_QUANTITY},
-                {LocationDAO.__COLUMN_SHELF_LABEL})
+                {LocationDAO.__COLUMN_SHELF_LABEL},
+                {LocationDAO.__COLUMN_BATCH_NUMBER})
                 VALUES
                 ({product_id},
                 {location.get_batch_number()},
                 {location.get_batch_quantity()},
-                '{location.get_shelf_label()}')
+                '{location.get_shelf_label()}',
+                {location.get_shelf_number()})
             """)
             self.connection.commit()
         except sqlite3.IntegrityError:
@@ -513,7 +516,8 @@ class LocationDAO(DAO):
             SELECT
             {LocationDAO.__COLUMN_BATCH_NUMBER},
             {LocationDAO.__COLUMN_QUANTITY},
-            {LocationDAO.__COLUMN_SHELF_LABEL}
+            {LocationDAO.__COLUMN_SHELF_LABEL},
+            {LocationDAO.__COLUMN_SHELF_NUMBER}
             FROM {LocationDAO.__table_name}
             WHERE {LocationDAO.__COLUMN_PRODUCT_ID}={product_id}
         """)
@@ -524,10 +528,44 @@ class LocationDAO(DAO):
             batch_number = int(location[0])
             quantity = int(location[1])
             shelf_label = location[2]
-            location_object = Location(batch_number, quantity, shelf_label)
+            shelf_number = location[3]
+            location_object = Location(
+                batch_number, quantity, shelf_label, shelf_number)
             locations.append(location_object)
 
         return locations
+
+    def get_products_on_shelf(self, shelf_label: str) -> list[tuple[int, int]]:
+        """Returns a list of product and its quantity located in a shelf"""
+        self.cursor.execute(f"""
+            SELECT 
+            {LocationDAO.__COLUMN_PRODUCT_ID},
+            {LocationDAO.__COLUMN_QUANTITY}
+            FROM {LocationDAO.__table_name}
+            WHERE {LocationDAO.__COLUMN_SHELF_LABEL}='{shelf_label}'
+        """)
+
+        data = self.cursor.fetchall()
+        if data is None:
+            return None
+
+        products = list()
+        for product in data:
+            info = int(product[0]), int(product[1])
+            products.append(info)
+
+        return products
+
+    def get_batch_count(self, product_id: int) -> int:
+        """Returns the number of batches a product has"""
+        self.cursor.execute(f"""
+            SELECT COUNT(*)
+            FROM {LocationDAO.__table_name}
+            WHERE {LocationDAO.__COLUMN_PRODUCT_ID}={product_id}
+        """)
+
+        result = self.cursor.fetchone()[0]
+        return int(result)
 
     def remove_product_location(self, product_id: int, batch_number: int):
         """Removes a shelf location of a product in the PRODUCT_LOCATIONS table"""
@@ -756,6 +794,18 @@ class ProductDAO(DAO):
 
         return all_products
 
+    def get_total_product_count(self) -> int:
+        self.cursor.execute(f"SELECT COUNT(*) FROM {ProductDAO.__table_name}")
+        return int(self.cursor.fetchone()[0])
+
+    def get_customer_product_count(self, customer_id: int) -> int:
+        self.cursor.execute(f"""
+            SELECT COUNT(*)
+            FROM {ProductDAO.__table_name}
+            WHERE {ProductDAO.__COLUMN_OWNER}={customer_id}
+        """)
+        return int(self.cursor.fetchone()[0])
+
     def get_low_quantity_products(self) -> list[ProductItem]:
         self.cursor.execute(f"""
             SELECT *
@@ -814,9 +864,9 @@ class ProductDAO(DAO):
             locations = self.__location_dao.get_product_location(product[0])
             owner = self.__customer_dao.get_customer(product[6])
             dimension = Dimension(
-                float(data[7]),
-                float(data[8]),
-                float(data[9])
+                float(product[7]),
+                float(product[8]),
+                float(product[9])
             )
             product_object = ProductItem(
                 product[0],

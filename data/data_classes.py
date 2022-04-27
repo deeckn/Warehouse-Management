@@ -107,6 +107,12 @@ class StorageShelf:
     def get_dimensions(self) -> tuple[float, float, float]:
         return self.__length, self.__width, self.__height
 
+    def get_volume(self) -> float:
+        return self.__length * self.__width * self.__height
+
+    def get_entire_volume(self) -> float:
+        return self.get_volume() * self.__rows * self.__columns
+
 
 @dataclass
 class LogEntry:
@@ -150,6 +156,7 @@ class Location:
     batch_number: int
     quantity: int
     shelf_label: str
+    shelf_number: int
 
     def __str__(self):
         return self.shelf_label
@@ -163,6 +170,9 @@ class Location:
     def get_shelf_label(self) -> str:
         return self.shelf_label
 
+    def get_shelf_number(self) -> int:
+        return self.shelf_number
+
 
 @dataclass
 class Dimension:
@@ -172,6 +182,9 @@ class Dimension:
 
     def get_dimension(self) -> tuple[float, float, float]:
         return self.__length, self.__width, self.__height
+
+    def get_volume(self) -> float:
+        return self.__length * self.__width * self.__height
 
 
 @dataclass
@@ -226,6 +239,9 @@ class ProductItem:
     def get_dimension(self) -> Dimension:
         return self.__dimension
 
+    def get_volume(self) -> float:
+        return self.__dimension.get_volume()
+
 
 @dataclass
 class QuarterlyReport:
@@ -240,11 +256,11 @@ class QuarterlyReport:
     def get_quarter(self) -> int:
         return self.__quarter
 
-    def get_utilized_space(self) -> float:
-        return self.__utilized_space
+    def get_utilized_space_percentage(self) -> float:
+        return self.__utilized_space * 100
 
-    def get_unutilized_space(self) -> float:
-        return 1 - self.__utilized_space
+    def get_unutilized_space_percentage(self) -> float:
+        return 1 - self.__utilized_space * 100
 
     def get_total_revenue(self) -> float:
         return self.__total_revenue

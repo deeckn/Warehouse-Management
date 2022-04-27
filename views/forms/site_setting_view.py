@@ -93,10 +93,10 @@ class SiteSettingView(QWidget):
         length_label.setStyleSheet(u"background-color: transparent; \n"
                                    "color: #406882; ")
 
-        weight_label = QLabel("Weight (m)", self)
-        weight_label.setGeometry(169, 656, 108, 28)
-        weight_label.setFont(font)
-        weight_label.setStyleSheet(u"background-color: transparent;\n"
+        width_label = QLabel("Width (m)", self)
+        width_label.setGeometry(169, 656, 108, 28)
+        width_label.setFont(font)
+        width_label.setStyleSheet(u"background-color: transparent;\n"
                                    "color: #406882;")
 
         height_label = QLabel("Height (m)", self)
@@ -180,11 +180,11 @@ class SiteSettingView(QWidget):
                                            "padding-left: 14;\n"
                                            "padding-top: 5;")
 
-        self.weight_lineEdit = QLineEdit(self)
-        self.weight_lineEdit.setGeometry(307, 650, 125, 42)
-        self.weight_lineEdit.setFont(font)
-        self.weight_lineEdit.setValidator(QIntValidator(0, 9999999))
-        self.weight_lineEdit.setStyleSheet(u"border-radius: 0;\n"
+        self.width_lineEdit = QLineEdit(self)
+        self.width_lineEdit.setGeometry(307, 650, 125, 42)
+        self.width_lineEdit.setFont(font)
+        self.width_lineEdit.setValidator(QIntValidator(0, 9999999))
+        self.width_lineEdit.setStyleSheet(u"border-radius: 0;\n"
                                            "background-color: #DDDDDD;"
                                            "padding-left: 14;\n"
                                            "padding-top: 5;")
@@ -333,8 +333,8 @@ class SiteSettingView(QWidget):
     def set_length_LineEdit(self, text: str) -> None:
         self.length_lineEdit.setText(text)
 
-    def set_weight_LineEdit(self, text: str) -> None:
-        self.weight_lineEdit.setText(text)
+    def set_width_LineEdit(self, text: str) -> None:
+        self.width_lineEdit.setText(text)
 
     def set_height_LineEdit(self, text: str) -> None:
         self.height_lineEdit.setText(text)
@@ -362,8 +362,8 @@ class SiteSettingView(QWidget):
     def get_length_LineEdit(self) -> str:
         return self.length_lineEdit.text()
 
-    def get_weight_LineEdit(self) -> str:
-        return self.weight_lineEdit.text()
+    def get_width_LineEdit(self) -> str:
+        return self.width_lineEdit.text()
 
     def get_height_LineEdit(self) -> str:
         return self.height_lineEdit.text()
@@ -403,18 +403,69 @@ class SiteSettingView(QWidget):
         for i in reversed(range(self.layout_.count())):
             self.layout_.itemAt(i).widget().setParent(None)
 
+    # Reset Shelves List and LineEdit
+    def reset_site_setting_view(self):
+        self.clear_shelf_list()
+        self.current_shelf = None
+
     def reset_input(self):
         self.search_lineEdit.setText("")
         self.shelf_label_informtion_lineEdit.setText("")
         self.max_weight_lineEdit.setText("")
         self.length_lineEdit.setText("")
-        self.weight_lineEdit.setText("")
+        self.width_lineEdit.setText("")
         self.height_lineEdit.setText("")
         self.row_lineEdit.setText("")
         self.column_lineEdit.setText("")
 
+    # Check Boolean
+    def is_no_empty_lineEdit(self):
+        """Check if form is valid for add submission"""
+        return not \
+            (
+            self.search_lineEdit.text() == "" or 
+            self.shelf_label_informtion_lineEdit.text() == "" or 
+            self.max_weight_lineEdit.text() == "" or
+            self.length_lineEdit.text() == "" or
+            self.width_lineEdit.text() == "" or
+            self.height_lineEdit.text() == "" or
+            self.row_lineEdit.text() == "" or
+            self.column_lineEdit.text() == "" 
+            )
 
-    def reset_site_setting_view(self):
-        self.clear_shelf_list()
-        self.current_shelf = None
-        self.reset_input()
+    def is_current_edited(self):
+        """Check if the current selected customer is edited"""
+        label = self.shelf_label_informtion_lineEdit.text()
+        max_weight = self.max_weight_lineEdit.text()
+        length = self.length_lineEdit.text()
+        width = self.width_lineEdit.text()
+        height = self.height_lineEdit.text()
+        row = self.row_lineEdit.text()
+        column = self.column_lineEdit.text()
+
+        current_shelf = self.current_shelf
+        if label != current_shelf.get_shelf_label:
+            return True
+
+        if max_weight != str(current_shelf.get_max_weight()):
+            return True
+
+        if length != str(current_shelf.get_length()):
+            return True
+
+        if width != str(current_shelf.get_width()):
+            return True
+
+        if height != str(current_shelf.get_height()):
+            return True
+        
+        if row != str(current_shelf.get_row()):
+            return True
+        
+        if column != str(current_shelf.get_column()):
+            return True
+
+        return False
+
+    def is_card_selected(self):
+        return self.current_shelf != None

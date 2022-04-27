@@ -79,7 +79,7 @@ class ShelfItem(QWidget):
         """"get Shelf Database"""
         return self.__shelf
 
-    def get_shelf(self) -> str:
+    def get_shelf_label(self) -> str:
         """get Shelf of Shelf"""
         return self.__shelf.get_label()
 

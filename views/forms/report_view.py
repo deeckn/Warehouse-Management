@@ -1,12 +1,13 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QPixmap, QIcon
-from PySide6.QtWidgets import QWidget, QLabel, QPushButton, QScrollArea, QVBoxLayout, QGridLayout
+from PySide6.QtWidgets import QWidget, QLabel, QPushButton, QScrollArea, QVBoxLayout, QGridLayout, QFileDialog
 from PySide6.QtCharts import QChart, QChartView, QPieSeries, QPieSlice
-from views.forms.stack_page import StackPage 
+from views.forms.stack_page import StackPage
 from views.theme import Theme
 from data.data_classes import Customer
 from views.items.report_card_item import ReportCardItem
 import views.rc_icons
+
 
 class ReportView(StackPage):
 
@@ -57,7 +58,7 @@ class ReportView(StackPage):
         self.back_button.setIcon(backIcon)
         self.back_button.setIconSize(backPath.rect().size())
         self.back_button.setGeometry(50, 50, 50, 50)
-        
+
         nextPath = QPixmap(":/icons/next_btn.png")
         nextIcon = QIcon(nextPath)
         self.next_button = QPushButton(widget_2)
@@ -65,7 +66,7 @@ class ReportView(StackPage):
         self.next_button.setIcon(nextIcon)
         self.next_button.setIconSize(nextPath.rect().size())
         self.next_button.setGeometry(560, 50, 50, 50)
-    
+
         self.quarter_label = QLabel("2021/2", widget_2)
         self.quarter_label.setGeometry(130, 50, 400, 50)
         self.quarter_label.setFont(Theme.POPPINS_REGULAR_36)
@@ -81,6 +82,7 @@ class ReportView(StackPage):
 
         self.export_button = QPushButton("EXPORT", widget_2)
         self.export_button.setObjectName("export_btn")
+        self.export_button.setStyleSheet(f"color: white;")
         self.export_button.setGeometry(420, 660, 190, 70)
         self.export_button.setFont(Theme.POPPINS_BOLD_24)
 
@@ -99,7 +101,7 @@ class ReportView(StackPage):
         self.total_show_label = QLabel("0", widget_2)
         self.total_show_label.setObjectName("legend")
         self.total_show_label.setGeometry(280, 500, 150, 40)
-        self.total_show_label.setFont(Theme.POPPINS_REGULAR_24) 
+        self.total_show_label.setFont(Theme.POPPINS_REGULAR_24)
 
         self.monthly_show_label = QLabel("0", widget_2)
         self.monthly_show_label.setObjectName("legend")
@@ -109,7 +111,7 @@ class ReportView(StackPage):
         self.capacity_show_label = QLabel("0", widget_2)
         self.capacity_show_label.setObjectName("legend")
         self.capacity_show_label.setGeometry(340, 580, 150, 40)
-        self.capacity_show_label.setFont(Theme.POPPINS_REGULAR_24) 
+        self.capacity_show_label.setFont(Theme.POPPINS_REGULAR_24)
 
         unused_button = QPushButton(widget_2)
         unused_button.setObjectName("symbol_red")
@@ -120,7 +122,7 @@ class ReportView(StackPage):
         utilized_button.setGeometry(370, 290, 30, 30)
 
         self.pie_chart_widget = QWidget(widget_2)
-        self.pie_chart_widget.setGeometry(20,130,370,370)
+        self.pie_chart_widget.setGeometry(20, 130, 370, 370)
         self.pie_chart_widget.setStyleSheet("background-color: transparent;")
         self.series = None
         self.chart = QChart()
@@ -129,10 +131,11 @@ class ReportView(StackPage):
         self.gridlayout = QGridLayout()
         self.pie_chart_widget.setLayout(self.gridlayout)
 
-    def draw_pie_chart_of_selected_customer(self, name:str, percent: float)->None:
-        if(not self.gridlayout.isEmpty()):
+    def draw_pie_chart_of_selected_customer(self, name: str, percent: float) -> None:
+        if not self.gridlayout.isEmpty():
             self.series.clear()
             self.chart.removeAllSeries()
+
         self.series = QPieSeries()
         slice = QPieSlice(name, percent)
         slice.setBrush(QColor("#2ACAB0"))
@@ -147,17 +150,17 @@ class ReportView(StackPage):
         self.chart.addSeries(self.series)
         self.gridlayout.addWidget(self.chartview)
 
-    def set_quarter_label(self, quarter: str):
-        return self.quarter_label.setText(quarter)
+    def set_quarter_label(self, year: int, quarter: int):
+        return self.quarter_label.setText(f"{year}/{quarter}")
 
-    def set_total_show_label(self, total:int):
-        return self.total_show_label.setText("$"+total)
+    def set_total_show_label(self, total: float):
+        return self.total_show_label.setText(f"${total:.2f}")
 
-    def set_monthly_show_label(self, monthly:int):
-        return self.monthly_show_label.setText("$"+monthly)
+    def set_monthly_show_label(self, monthly: int):
+        return self.monthly_show_label.setText(f"${monthly:.2f}")
 
-    def set_capacity_show_label(self, capacity:int):
-        return self.total_show_label.setText(capacity+"%")
+    def set_capacity_show_label(self, capacity: int):
+        return self.capacity_show_label.setText(f"{capacity:.1f}%")
 
     # Set Button Listeners
 
@@ -170,8 +173,8 @@ class ReportView(StackPage):
     def set_export_button_listener(self, function):
         self.export_button.clicked.connect(function)
 
-    #Report card
-    def add_report_card(self, customer: Customer, percent: int):
+    # Report card
+    def add_report_card(self, customer: Customer, percent: float):
         """Inserts a new CustomerCardItem object to the list given an Customer object"""
         card = ReportCardItem(self, customer, percent)
         self.scrollArea_widget.layout().addWidget(card)
@@ -180,3 +183,10 @@ class ReportView(StackPage):
         """Clears the list represented in the scrollarea"""
         for i in reversed(range(self.layout.count())):
             self.layout.itemAt(i).widget().setParent(None)
+
+    # Save file dialog
+    def save_file_to(self) -> str:
+        option = QFileDialog.Options()
+        file = QFileDialog.getSaveFileName(
+            self, "Save File", "default.csv", "*.csv", options=option)
+        return file[0]

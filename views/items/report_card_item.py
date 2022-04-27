@@ -30,8 +30,11 @@ class ReportCardItem(QWidget):
         self.__set_card_info()
 
     def __set_card_info(self):
-        text = "Company Name: " + self.current_customer.get_name() + "\nStock: " + \
-            str(self.percent_stock) + " %\nExpired: " + self.current_customer.get_expiry_date().replace("_", "/")
+        text = f"""
+    Customer Name: {self.current_customer.get_name()}
+    Stock: {self.percent_stock}%
+    Contract End: {self.current_customer.get_expiry_date().replace("_", "/")}
+        """
 
         self.card.setText(text)
 

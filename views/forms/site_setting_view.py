@@ -402,3 +402,19 @@ class SiteSettingView(QWidget):
         """Clears the list represented in the scrollarea"""
         for i in reversed(range(self.layout_.count())):
             self.layout_.itemAt(i).widget().setParent(None)
+
+    def reset_input(self):
+        self.search_lineEdit.setText("")
+        self.shelf_label_informtion_lineEdit.setText("")
+        self.max_weight_lineEdit.setText("")
+        self.length_lineEdit.setText("")
+        self.weight_lineEdit.setText("")
+        self.height_lineEdit.setText("")
+        self.row_lineEdit.setText("")
+        self.column_lineEdit.setText("")
+
+
+    def reset_site_setting_view(self):
+        self.clear_shelf_list()
+        self.current_shelf = None
+        self.reset_input()

@@ -9,6 +9,7 @@ from views.forms.inventory_overview import InventoryOverviewView
 from views.forms.login_view import LoginView
 from views.forms.notifications_view import NotificationView
 from views.forms.report_view import ReportView
+from views.forms.site_setting_view import SiteSettingView
 import views.rc_icons
 
 
@@ -535,3 +536,19 @@ class ReportPage(Controller):
     def export_report(self):
         file_path = self.view.save_file_to()
         self.model.generate_csv_report(file_path)
+
+class SiteSettingPage(Controller):
+    view: SiteSettingView
+    model: SiteSettingsModel
+
+    def __init__(self, view: QWidget, model: Model):
+        super().__init__(view, model)
+
+        self.__fill_strorage_shelf(self.model.get_all_shelves())
+
+    def __fill_strorage_shelf(self, shelves):
+        if shelves is None:
+            return
+
+        for shelf in shelves:
+            self.view.add_shelf(shelf)

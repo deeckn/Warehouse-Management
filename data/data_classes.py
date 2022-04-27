@@ -180,6 +180,15 @@ class Dimension:
     __width: float
     __height: float
 
+    def get_length(self) -> float:
+        return self.__length
+
+    def get_width(self) -> float:
+        return self.__width
+
+    def get_height(self) -> float:
+        return self.__height
+
     def get_dimension(self) -> tuple[float, float, float]:
         return self.__length, self.__width, self.__height
 

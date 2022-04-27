@@ -486,7 +486,6 @@ class LocationDAO(DAO):
 
     def add_product_location(self, product_id: int, location: Location):
         """Adds a product and location entry to the PRODUCT_LOCATIONS table"""
-
         try:
             self.cursor.execute(f"""
                 INSERT INTO {LocationDAO.__table_name}
@@ -494,7 +493,7 @@ class LocationDAO(DAO):
                 {LocationDAO.__COLUMN_BATCH_NUMBER},
                 {LocationDAO.__COLUMN_QUANTITY},
                 {LocationDAO.__COLUMN_SHELF_LABEL},
-                {LocationDAO.__COLUMN_BATCH_NUMBER})
+                {LocationDAO.__COLUMN_SHELF_NUMBER})
                 VALUES
                 ({product_id},
                 {location.get_batch_number()},
@@ -583,6 +582,19 @@ class LocationDAO(DAO):
         """)
         self.connection.commit()
 
+    def get_occupied_slots(self, shelf_label: str) -> list[int]:
+        self.cursor.execute(f"""
+            SELECT {LocationDAO.__COLUMN_SHELF_NUMBER}
+            FROM {LocationDAO.__table_name}
+            WHERE {LocationDAO.__COLUMN_SHELF_LABEL}='{shelf_label}'
+        """)
+        data = self.cursor.fetchall()
+        if data is None:
+            return None
+
+        data = list(map(lambda n: int(n[0]), data))
+        return data
+
 
 class ProductDAO(DAO):
 
@@ -650,11 +662,12 @@ class ProductDAO(DAO):
                     category
                 )
 
-            for location in product.get_locations():
-                self.__location_dao.add_product_location(
-                    current_product.get_id(),
-                    location
-                )
+            if product.get_locations() is not None:
+                for location in product.get_locations():
+                    self.__location_dao.add_product_location(
+                        current_product.get_id(),
+                        location
+                    )
 
         except sqlite3.IntegrityError:
             print(

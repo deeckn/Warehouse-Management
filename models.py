@@ -244,6 +244,7 @@ class ProductListModel(Model):
         return self.__product_dao.get_product(product_id)
 
     def search_products_by_name(self, product_name: str) -> list[ProductItem]:
+        """Returns a list of product items that corresonds to the query string"""
         return self.__product_dao.get_product_contains_with(product_name)
 
     def is_batch_fit(self, product: ProductItem, quantity: int, shelf: StorageShelf) -> bool:
@@ -275,6 +276,9 @@ class ProductListModel(Model):
 
     def add_new_product(self, product: ProductItem, quantity: int, shelf_label: str, shelf_number: int) -> bool:
         """Adds a new product to the system, returns True for successful operation"""
+        if self.__product_dao.exist(product):
+            return False
+
         shelf = self.__shelf_dao.get_shelf_by_label(shelf_label)
         if shelf is None:
             return False
@@ -286,8 +290,11 @@ class ProductListModel(Model):
         self.__product_dao.add_product(product)
 
         # Add first batch
+        data_product = self.__product_dao.get_product_by_name(
+            product.get_name(), product.get_owner().get_id())
         location = Location(1, quantity, shelf_label, shelf_number)
-        self.__location_dao.add_product_location(product.get_id(), location)
+        self.__location_dao.add_product_location(
+            data_product.get_id(), location)
 
         # Logging
         log = LogEntry(
@@ -305,10 +312,56 @@ class ProductListModel(Model):
         location = Location(batch_count+1, quantity,
                             shelf_label, shelf_number)
         self.__location_dao.add_product_location(product_id, location)
+
+        # Update quantity
+        product_quantity = self.__product_dao.get_product(
+            product_id).get_quantity()
+        product_quantity += quantity
+        self.__product_dao.update_product(
+            product_id, quantity=product_quantity)
+
         return True
 
     def edit_product(self, old_data: ProductItem, new_data: ProductItem):
-        pass
+        """Updates product information based on the difference of objects"""
+        name = None if old_data.get_name() == new_data.get_name() else new_data.get_name()
+
+        quantity = None if old_data.get_quantity(
+        ) == new_data.get_quantity() else new_data.get_quantity()
+
+        low_stock = None if old_data.get_low_stock_quantity(
+        ) == new_data.get_low_stock_quantity() else new_data.get_low_stock_quantity()
+
+        weight = None if old_data.get_weight(
+        ) == new_data.get_weight() else new_data.get_weight()
+
+        last_stored = None if old_data.get_last_stored(
+        ) == new_data.get_last_stored() else new_data.get_last_stored()
+
+        owner_id = None if old_data.get_owner().get_id(
+        ) == new_data.get_owner().get_id() else new_data.get_owner().get_id()
+
+        length = None if old_data.get_dimension().get_length(
+        ) == new_data.get_dimension().get_length() else new_data.get_dimension().get_length()
+
+        width = None if old_data.get_dimension().get_width(
+        ) == new_data.get_dimension().get_width() else new_data.get_dimension().get_width()
+
+        height = None if old_data.get_dimension().get_height(
+        ) == new_data.get_dimension().get_height() else new_data.get_dimension().get_height()
+
+        self.__product_dao.update_product(
+            old_data.get_id(),
+            name,
+            quantity,
+            low_stock,
+            weight,
+            last_stored,
+            owner_id,
+            length,
+            width,
+            height
+        )
 
     def delete_product(self, product_id: int):
         """Deletes a product from the system"""
@@ -317,6 +370,10 @@ class ProductListModel(Model):
         log = LogEntry(
             f"{self.__current_user.get_username()} deleted Product ID: {product_id} from the system")
         self.__log_dao.add_log_entry(log)
+
+    def get_occupied_slots(self, shelf_label: str) -> list[int]:
+        """Returns a list of shelf numbers (slots) that are occupied"""
+        return self.__location_dao.get_occupied_slots(shelf_label)
 
 
 class AccountModel(Model):

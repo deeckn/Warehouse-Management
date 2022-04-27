@@ -203,38 +203,120 @@ class CustomerListModel(Model):
 
 class ProductListModel(Model):
 
-    __current_search_filter: FilterOption
-    __search_query: str
-    __current_customer: Customer
-    __current_products: list[ProductItem]
+    __current_user: User
+    __product_dao: ProductDAO
+    __location_dao: LocationDAO
+    __shelf_dao: ShelfDAO
+    __log_dao: LogDAO
+    __customer_dao: CustomerDAO
 
-    def __init__(self):
-        self.__current_customer = None
-        self.__current_products = list()
-        self.__current_search_filter = None
-        self.__search_query = ""
+    def __init__(self, current_user: User):
+        self.__current_user = current_user
+        self.__product_dao = AppDAO.get_dao("product")
+        self.__location_dao = AppDAO.get_dao("location")
+        self.__shelf_dao = AppDAO.get_dao("shelf")
+        self.__log_dao = AppDAO.get_dao("log")
+        self.__customer_dao = AppDAO.get_dao("customer")
 
-    def set_product_search_filter(self, filter: FilterOption):
-        self.__current_search_filter = filter
+    def get_all_products(self) -> list[ProductItem]:
+        """Returns all products as a list of ProductItem objects"""
+        return self.__product_dao.get_all_products()
 
-    def set_product_search_query(self, query: str):
-        self.__search_query = query
+    def get_product(self, product_id: int) -> ProductItem:
+        """Returns a product object given the id"""
+        return self.__product_dao.get_product(product_id)
 
-    def find_product_information(self):
-        "find product depending on search filter"
+    def search_products_by_customer(self, customer_name: str) -> list[ProductItem]:
+        """Returns a list of products based on customer name query"""
+        customers = self.__customer_dao.get_customer_contains_with(
+            customer_name)
+        products: list[ProductItem] = list()
+        for customer in customers:
+            customer_products = self.__product_dao.get_customer_products(
+                customer.get_id())
+            if customer_products is not None:
+                products.extend(customer_products)
+
+        return products
+
+    def search_product_by_id(self, product_id: int) -> ProductItem:
+        """Returns a product item given an ID"""
+        return self.__product_dao.get_product(product_id)
+
+    def search_products_by_name(self, product_name: str) -> list[ProductItem]:
+        return self.__product_dao.get_product_contains_with(product_name)
+
+    def is_batch_fit(self, product: ProductItem, quantity: int, shelf: StorageShelf) -> bool:
+        """Returns True if the batch can fit in the shelf"""
+
+        product_length, product_width, product_height = product.get_dimension().get_dimension()
+        shelf_length, shelf_width, shelf_height = shelf.get_dimensions()
+
+        if (product_length > shelf_length) | \
+                (product_width > shelf_width) | \
+                (product_height > shelf_height):
+            return False
+
+        shelf_volume = shelf.get_volume()
+
+        product_data = self.__location_dao.get_products_on_shelf(
+            shelf.get_label())
+        occupied_volume = 0
+
+        for data in product_data:
+            temp_product = self.__product_dao.get_product(data[0])
+            product_volume = temp_product.get_volume()
+            occupied_volume += product_volume * data[1]
+
+        shelf_volume -= occupied_volume
+        batch_volume = product_length * product_width * product_height * quantity
+
+        return batch_volume < shelf_volume
+
+    def add_new_product(self, product: ProductItem, quantity: int, shelf_label: str, shelf_number: int) -> bool:
+        """Adds a new product to the system, returns True for successful operation"""
+        shelf = self.__shelf_dao.get_shelf_by_label(shelf_label)
+        if shelf is None:
+            return False
+
+        if not self.is_batch_fit(product, quantity, shelf):
+            return False
+
+        # Add new product
+        self.__product_dao.add_product(product)
+
+        # Add first batch
+        location = Location(1, quantity, shelf_label, shelf_number)
+        self.__location_dao.add_product_location(product.get_id(), location)
+
+        # Logging
+        log = LogEntry(
+            f"{self.__current_user.get_username()} added {product.get_name()} to the system")
+        self.__log_dao.add_log_entry(log)
+
+        return True
+
+    def add_new_batch(self, product_id: int, quantity: int, shelf_label: str, shelf_number: int) -> bool:
+        """Adds a new product batch, returns True for a successful operation"""
+        batch_count = self.__location_dao.get_batch_count(product_id)
+        if batch_count == 0:
+            return False
+
+        location = Location(batch_count+1, quantity,
+                            shelf_label, shelf_number)
+        self.__location_dao.add_product_location(product_id, location)
+        return True
+
+    def edit_product(self, old_data: ProductItem, new_data: ProductItem):
         pass
 
-    def load_product_information(self):
-        "get product information from database"
-        pass
+    def delete_product(self, product_id: int):
+        """Deletes a product from the system"""
+        self.__product_dao.delete_product(product_id)
 
-    def update_product_information(self, product: ProductItem):
-        "add & save product in database"
-        pass
-
-    def delete_product_information(self, product: ProductItem):
-        "update product in database"
-        pass
+        log = LogEntry(
+            f"{self.__current_user.get_username()} deleted Product ID: {product_id} from the system")
+        self.__log_dao.add_log_entry(log)
 
 
 class AccountModel(Model):
@@ -536,6 +618,7 @@ class ReportModel(Model):
     __customer_dao: CustomerDAO
     __product_dao: ProductDAO
     __log_dao: LogDAO
+
     __notification_model: NotificationModel
 
     def __init__(self, current_user: User):
@@ -544,16 +627,23 @@ class ReportModel(Model):
         self.__customer_dao = AppDAO.get_dao("customer")
         self.__product_dao = AppDAO.get_dao("product")
         self.__log_dao = AppDAO.get_dao("log")
+
         self.__notification_model = NotificationModel()
+
+    def calculate_customer_stock_percentage(self, customer: Customer) -> float:
+        customer_count = self.__product_dao.get_customer_product_count(
+            customer.get_id())
+        total_count = self.__product_dao.get_total_product_count()
+        return (customer_count / total_count) * 100
 
     def get_all_reports(self) -> list[QuarterlyReport]:
         return self.__report_dao.get_all_reports()
 
-    def get_contract_ending_customers(self) -> list[Customer]:
-        return self.__notification_model.get_contract_ending_customers()
+    def get_all_customers(self) -> list[Customer]:
+        return self.__customer_dao.get_all_customers()
 
-    def generate_csv_report(self):
-        with open("test.csv", "w") as file:
+    def generate_csv_report(self, file_path: str):
+        with open(file_path, "w") as file:
             # Quarterly Report
             reports = self.__report_dao.get_all_reports()
 
@@ -563,7 +653,7 @@ class ReportModel(Model):
 
                 for report in reports:
                     file.write(
-                        f"{report.get_year()},{report.get_quarter()},{report.get_total_revenue()},{report.get_utilized_space()*100}%,\n"
+                        f"{report.get_year()},{report.get_quarter()},{report.get_total_revenue()},{report.get_utilized_space_percentage()}%,\n"
                     )
 
             # Customer List

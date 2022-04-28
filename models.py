@@ -1,4 +1,6 @@
 from abc import ABC
+
+from matplotlib.style import available
 from data.data_classes import *
 from data.filter_options import *
 from data.app_dao import *
@@ -374,6 +376,17 @@ class ProductListModel(Model):
     def get_occupied_slots(self, shelf_label: str) -> list[int]:
         """Returns a list of shelf numbers (slots) that are occupied"""
         return self.__location_dao.get_occupied_slots(shelf_label)
+
+    def get_available_shelves(self, product: ProductItem) -> list[StorageShelf]:
+        """Returns a list of available shelves that the given product can fit"""
+        product_volume = product.get_dimension().get_volume()
+        shelves = self.__shelf_dao.get_all_shelves()
+
+        available_shelves: list[StorageShelf] = list()
+        for shelf in shelves:
+            if shelf.get_volume() > product_volume:
+                available_shelves.append(shelf)
+        return available_shelves
 
 
 class AccountModel(Model):

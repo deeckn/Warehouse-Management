@@ -9,12 +9,29 @@ from views.forms.login_view import LoginView
 class Application:
     def __init__(self):
         self.app = QApplication(sys.argv)
-        self.current_user = AppDAO.get_dao("user").get_user_by_id(1)
+        self.current_user = None
 
+        # Login Page
         self.login_page = LoginPage(
             LoginView(),
-            LoginModel()
+            LoginModel(),
+            self
         )
+
+        # User pages
+        self.home_page = None
+        self.customer_page = None
+        self.notification_page = None
+
+        # Admin Pages
+        self.account_page = None
+        self.inventory_page = None
+        self.report_page = None
+
+    def initialize_pages(self):
+        """Initial pages triggered by the login page"""
+        if self.current_user is None:
+            return
 
         self.customer_page = CustomerPage(
             CustomerListPageView(),
@@ -46,8 +63,9 @@ class Application:
             ReportModel(self.current_user)
         )
 
-        self.current_controller = self.report_page
-
     def start(self):
-        self.current_controller.open_page()
+        self.login_page.open_page()
         sys.exit(self.app.exec())
+
+    def set_current_user(self, user: User):
+        self.current_user = user

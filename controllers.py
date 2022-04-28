@@ -29,9 +29,10 @@ class LoginPage(Controller):
     view: LoginView
     model: LoginModel
 
-    def __init__(self, view: QWidget, model: Model):
+    def __init__(self, view: QWidget, model: Model, root):
         super().__init__(view, model)
         self.view.set_login_button_listener(self.verify_login)
+        self.root = root
 
     def verify_login(self):
         username = self.view.get_username()
@@ -42,17 +43,17 @@ class LoginPage(Controller):
 
         if self.model.is_valid():
             self.view.hide_error_label()
-            user_access = self.model.get_current_user().get_access_level()
-            if isinstance(user_access, AdminAccess):
-                print("Open Admin Page")
-            else:
-                print("Open Employee Page")
             self.model.set_current_user(username)
+            self.set_current_user(self.get_current_user())
+            self.root.initialize_pages()
         else:
             self.view.show_error_label()
 
     def get_current_user(self) -> User:
         return self.model.get_current_user()
+
+    def set_current_user(self, user: User):
+        self.root.set_current_user(user)
 
 
 class HomePage(Controller):
@@ -536,6 +537,7 @@ class ReportPage(Controller):
     def export_report(self):
         file_path = self.view.save_file_to()
         self.model.generate_csv_report(file_path)
+
 
 class SiteSettingPage(Controller):
     view: SiteSettingView

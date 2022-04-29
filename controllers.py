@@ -546,11 +546,34 @@ class SiteSettingPage(Controller):
     def __init__(self, view: QWidget, model: Model):
         super().__init__(view, model)
 
+        # fill all of Shelves
         self.__fill_strorage_shelf(self.model.get_all_shelves())
 
+        # Set all buttons to disable
+        self.set_all_button_disable()
+
+        # Set every buttons
         self.view.set_add_button_listener(self.add_shelf)
         self.view.set_delete_button_listener(self.delete_shelf)
         self.view.set_save_button_listener(self.edit_shelf)
+        self.view.set_search_listener(self.search_shelf)
+
+        # Set change on Input
+        self.view.set_input_on_change_listener(self.validate_buttons)
+
+        # Set select and unselect Shelves
+        self.view.set_unselect_event(lambda: self.view.reset_input())
+
+        self.view.set_select_event(lambda: self.view.set_lineEdit_from_shelf(
+            self.view.get_selected_shelf())
+        )
+
+        # Thank to Kris Code many of them he was implement it krub :)
+        
+    def set_all_button_disable(self):
+        self.view.set_add_button_enabled(False)
+        self.view.set_delete_button_enabled(False)
+        self.view.set_save_button_enabled(False)
 
     def __fill_strorage_shelf(self, shelves):
         if shelves is None:
@@ -560,7 +583,11 @@ class SiteSettingPage(Controller):
             self.view.add_shelf(shelf)
         
     def search_shelf(self):
-        pass
+        if not self.view.is_search_lineEdit_filled():
+            return
+        search_shelves = self.model.get_shelves_contains_with(self.view.get_search_LineEdit())
+        self.view.reset_site_setting_view()
+        self.__fill_strorage_shelf(search_shelves)
 
     def add_shelf(self):
         if self.view.is_card_selected() or not self.view.is_no_empty_lineEdit() :
@@ -598,11 +625,29 @@ class SiteSettingPage(Controller):
         row = self.view.get_row_LineEdit()
         column = self.view.get_column_LineEdit()
     
-        editted_shelf = StorageShelf(label, max_weight, length, width, height, row, column)
-
-        self.model.update_shelf(self.view.get_selected_shelf(), editted_shelf)
-
+        edited_shelf = StorageShelf(label, max_weight, length, width, height, row, column)
+        self.model.update_shelf(self.view.get_selected_shelf(), edited_shelf)
         self.__update_list()
+
+    def validate_buttons(self):
+        # Add Button
+        if self.view.is_card_selected() or not self.view.is_no_empty_lineEdit():
+            self.view.set_add_button_enabled(False)
+        else:
+            self.view.set_add_button_enabled(True)
+
+        # Save Button
+        if self.view.is_card_selected() and self.view.is_current_edited():
+            self.view.set_save_button_enabled(True)
+        else:
+            self.view.set_save_button_enabled(False)
+
+        # Delete Button
+        if self.view.is_card_selected() and not self.view.is_current_edited():
+            self.view.set_delete_button_enabled(True)
+        else:
+            self.view.set_delete_button_enabled(False)
+
     def __update_list(self):
         self.view.reset_site_setting_view()
         self.__fill_strorage_shelf(self.model.get_all_shelves())

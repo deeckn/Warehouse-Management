@@ -32,6 +32,9 @@ class SiteSettingView(QWidget):
         self.current_shelf: ShelfItem = None
         self.previous_shelf = None
 
+        self.select_event = None
+        self.unselect_event = None
+
         # font
         font = QFont()
         font.setFamilies([u"Poppins"])
@@ -324,8 +327,9 @@ class SiteSettingView(QWidget):
         return self.current_shelf.get_column()
 
     # Set LineEdits
+
     def set_shelf_LineEdit(self, text: str) -> None:
-        self.shelf_label_informtion_lineEdit.setText(text)
+        self.shelf_label_lineEdit.setText(text)
 
     def set_max_weight_LineEdit(self, text: str) -> None:
         self.max_weight_lineEdit.setText(text)
@@ -387,6 +391,14 @@ class SiteSettingView(QWidget):
     def set_search_listener(self, function) -> None:
         self.search_button.clicked.connect(function)
 
+    # set Event
+
+    def set_select_event(self, event):
+        self.select_event = event
+    
+    def set_unselect_event(self, event):
+        self.unselect_event = event
+
     # Set Enable Buttons
     def set_add_button_enabled(self, boolean):
         style = f"background-color:  {Theme.GREEN}; color: white; border-bottom-right-radius: 23px;" if boolean else f"background-color:  {Theme.LIGHTER_DARK_GREEN}; color: {Theme.DARK_WHITE}; border-bottom-right-radius: 23px;"
@@ -406,12 +418,12 @@ class SiteSettingView(QWidget):
     # Set LineEdit from Shelf
     def set_lineEdit_from_shelf(self, shelf:StorageShelf):
         self.shelf_label_lineEdit.setText(shelf.get_label())
-        self.max_weight_lineEdit.setText(shelf.get_max_weight())
-        self.length_lineEdit.setText(shelf.get_length())
-        self.width_lineEdit.setText(shelf.get_width())
-        self.height_lineEdit.setText(shelf.get_height())
-        self.row_lineEdit.setText(shelf.get_rows())
-        self.column_lineEdit.setText(shelf.get_columns())
+        self.max_weight_lineEdit.setText(str(shelf.get_max_weight()))
+        self.length_lineEdit.setText(str(shelf.get_length()))
+        self.width_lineEdit.setText(str(shelf.get_width()))
+        self.height_lineEdit.setText(str(shelf.get_height()))
+        self.row_lineEdit.setText(str(shelf.get_rows()))
+        self.column_lineEdit.setText(str(shelf.get_columns()))
 
     # Employee Account List
     def add_shelf(self, shelf: StorageShelf):
@@ -502,6 +514,9 @@ class SiteSettingView(QWidget):
             return True
 
         return False
+    
+    def is_search_lineEdit_filled(self):
+        return self.search_lineEdit != ""
 
     def is_card_selected(self):
         return self.current_shelf != None

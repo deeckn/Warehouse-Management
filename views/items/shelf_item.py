@@ -136,10 +136,19 @@ class ShelfItem(QWidget):
         """Set Column Label in Widget"""
         self.column_label.setText("Column: " + str(self.get_column()))
 
+    def unclick(self):
+        self.container.setStyleSheet("background-color: #F8F8FF; border-radius: 30;")
+
     def mousePressEvent(self, event: QMouseEvent) -> None:
+        if self.parent_widget.current_shelf == self:
+            self.unclick()
+            self.parent_widget.current_shelf = None
+            self.parent_widget.unselect_event()
+            return
         if(self.parent_widget.previous_shelf != None):
             self.parent_widget.previous_shelf.container.setStyleSheet("background-color: #F8F8FF; border-radius: 30;")
         self.parent_widget.current_shelf = self
+        self.parent_widget.select_event()
         self.container.setStyleSheet("background-color: #F8F8FF; border-radius: 30; border: 3px solid #FDCB6E;")
         self.shelf_label.setStyleSheet("background-color: transparent;\n"
         "border: 0px")

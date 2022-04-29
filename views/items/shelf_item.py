@@ -114,7 +114,7 @@ class ShelfItem(QWidget):
     # Set Functions
     def set_shelf_label(self) -> None:
         """Set Shelf Label in Widget"""
-        self.shelf_label.setText("Shelf: " + str(self.get_shelf()))
+        self.shelf_label.setText("Shelf: " + str(self.get_shelf_label()))
 
     def set_max_weight_label(self) -> None:
         """Set Max Weight Label in Widget"""

@@ -548,9 +548,61 @@ class SiteSettingPage(Controller):
 
         self.__fill_strorage_shelf(self.model.get_all_shelves())
 
+        self.view.set_add_button_listener(self.add_shelf)
+        self.view.set_delete_button_listener(self.delete_shelf)
+        self.view.set_save_button_listener(self.edit_shelf)
+
     def __fill_strorage_shelf(self, shelves):
         if shelves is None:
             return
 
         for shelf in shelves:
             self.view.add_shelf(shelf)
+        
+    def search_shelf(self):
+        pass
+
+    def add_shelf(self):
+        if self.view.is_card_selected() or not self.view.is_no_empty_lineEdit() :
+            return
+        
+        label = self.view.get_shelf_LineEdit()
+        max_weight = self.view.get_max_weight_LineEdit()
+        length = self.view.get_length_LineEdit()
+        width = self.view.get_width_LineEdit()
+        height = self.view.get_height_LineEdit()
+        row = self.view.get_row_LineEdit()
+        column = self.view.get_column_LineEdit()
+
+        self.model.add_shelf( label, max_weight, length, width, height, row, column)
+
+        self.__update_list()
+    
+    def delete_shelf(self):
+        if not self.view.is_card_selected():
+            return
+
+        self.model.delete_shelf(self.view.get_selected_shelf())
+
+        self.__update_list()
+
+    def edit_shelf(self):
+        if not self.view.is_card_selected() or not self.view.is_current_edited() :
+            return
+        
+        label = self.view.get_shelf_LineEdit()
+        max_weight = self.view.get_max_weight_LineEdit()
+        length = self.view.get_length_LineEdit()
+        width = self.view.get_width_LineEdit()
+        height = self.view.get_height_LineEdit()
+        row = self.view.get_row_LineEdit()
+        column = self.view.get_column_LineEdit()
+    
+        editted_shelf = StorageShelf(label, max_weight, length, width, height, row, column)
+
+        self.model.update_shelf(self.view.get_selected_shelf(), editted_shelf)
+
+        self.__update_list()
+    def __update_list(self):
+        self.view.reset_site_setting_view()
+        self.__fill_strorage_shelf(self.model.get_all_shelves())

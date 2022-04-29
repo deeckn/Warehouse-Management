@@ -18,7 +18,7 @@ from PySide6.QtWidgets import (
 
 from views.items.shelf_item import ShelfItem
 from data.data_classes import StorageShelf
-
+from views.theme import Theme
 
 class SiteSettingView(QWidget):
     def __init__(self):
@@ -154,10 +154,10 @@ class SiteSettingView(QWidget):
                                            "padding-left: 14;\n"
                                            "padding-top: 5;")
 
-        self.shelf_label_informtion_lineEdit = QLineEdit(self)
-        self.shelf_label_informtion_lineEdit.setGeometry(151, 516, 150, 42)
-        self.shelf_label_informtion_lineEdit.setFont(font)
-        self.shelf_label_informtion_lineEdit.setStyleSheet(u"border-radius: 0;\n"
+        self.shelf_label_lineEdit = QLineEdit(self)
+        self.shelf_label_lineEdit.setGeometry(151, 516, 150, 42)
+        self.shelf_label_lineEdit.setFont(font)
+        self.shelf_label_lineEdit.setStyleSheet(u"border-radius: 0;\n"
                                                            "background-color: #DDDDDD;"
                                                            "padding-left: 14;\n"
                                                            "padding-top: 5;")
@@ -354,7 +354,7 @@ class SiteSettingView(QWidget):
         return self.search_lineEdit.text()
 
     def get_shelf_LineEdit(self) -> str:
-        return self.shelf_label_informtion_lineEdit.text()
+        return self.shelf_label_lineEdit.text()
 
     def get_max_weight_LineEdit(self) -> str:
         return self.max_weight_lineEdit.text()
@@ -387,6 +387,32 @@ class SiteSettingView(QWidget):
     def set_search_listener(self, function) -> None:
         self.search_button.clicked.connect(function)
 
+    # Set Enable Buttons
+    def set_add_button_enabled(self, boolean):
+        style = f"background-color:  {Theme.GREEN}; color: white; border-bottom-right-radius: 23px;" if boolean else f"background-color:  {Theme.LIGHTER_DARK_GREEN}; color: {Theme.DARK_WHITE}; border-bottom-right-radius: 23px;"
+        self.add_button.setStyleSheet(style)
+        self.add_button.setEnabled(boolean)
+
+    def set_delete_button_enabled(self, boolean):
+        style = f"background-color: {Theme.RED}; color: white;border-bottom-left-radius: 23px;" if boolean else f"background-color: {Theme.DARK_RED}; color: {Theme.DARK_WHITE}; border-bottom-left-radius: 23px;"
+        self.delete_button.setStyleSheet(style)
+        self.delete_button.setEnabled(boolean)
+
+    def set_save_button_enabled(self, boolean):
+        style = f"background-color:  {Theme.YELLOW}; color: white; border-radius: none;" if boolean else f"background-color: {Theme.DARK_YELLOW}; color: {Theme.DARK_WHITE}; border: none;"
+        self.save_button.setStyleSheet(style)
+        self.save_button.setEnabled(boolean)
+
+    # Set LineEdit from Shelf
+    def set_lineEdit_from_shelf(self, shelf:StorageShelf):
+        self.shelf_label_lineEdit.setText(shelf.get_label())
+        self.max_weight_lineEdit.setText(shelf.get_max_weight())
+        self.length_lineEdit.setText(shelf.get_length())
+        self.width_lineEdit.setText(shelf.get_width())
+        self.height_lineEdit.setText(shelf.get_height())
+        self.row_lineEdit.setText(shelf.get_rows())
+        self.column_lineEdit.setText(shelf.get_columns())
+
     # Employee Account List
     def add_shelf(self, shelf: StorageShelf):
         """Inserts a new ShelfItem object to the list"""
@@ -394,7 +420,7 @@ class SiteSettingView(QWidget):
         self.scroll_area_widget.layout().addWidget(card)
         # self.layout_.addWidget(card)
 
-    def get_selected_account(self) -> StorageShelf:
+    def get_selected_shelf(self) -> StorageShelf:
         """Returns the selected ShelfItem object on the UI"""
         return self.current_shelf.get_current_shelf()
 
@@ -405,12 +431,13 @@ class SiteSettingView(QWidget):
 
     # Reset Shelves List and LineEdit
     def reset_site_setting_view(self):
+        """Clears all of View components"""
         self.clear_shelf_list()
         self.current_shelf = None
 
     def reset_input(self):
         self.search_lineEdit.setText("")
-        self.shelf_label_informtion_lineEdit.setText("")
+        self.shelf_label_lineEdit.setText("")
         self.max_weight_lineEdit.setText("")
         self.length_lineEdit.setText("")
         self.width_lineEdit.setText("")
@@ -423,8 +450,7 @@ class SiteSettingView(QWidget):
         """Check if form is valid for add submission"""
         return not \
             (
-            self.search_lineEdit.text() == "" or 
-            self.shelf_label_informtion_lineEdit.text() == "" or 
+            self.shelf_label_lineEdit.text() == "" or 
             self.max_weight_lineEdit.text() == "" or
             self.length_lineEdit.text() == "" or
             self.width_lineEdit.text() == "" or
@@ -433,9 +459,19 @@ class SiteSettingView(QWidget):
             self.column_lineEdit.text() == "" 
             )
 
+    # Check LineEdit Change
+    def set_input_on_change_listener(self, function):
+        self.shelf_label_lineEdit.textChanged.connect(function)
+        self.max_weight_lineEdit.textChanged.connect(function)
+        self.length_lineEdit.textChanged.connect(function)
+        self.width_lineEdit.textChanged.connect(function)
+        self.height_lineEdit.textChanged.connect(function)
+        self.row_lineEdit.textChanged.connect(function)
+        self.column_lineEdit.textChanged.connect(function)
+
     def is_current_edited(self):
         """Check if the current selected customer is edited"""
-        label = self.shelf_label_informtion_lineEdit.text()
+        label = self.shelf_label_lineEdit.text()
         max_weight = self.max_weight_lineEdit.text()
         length = self.length_lineEdit.text()
         width = self.width_lineEdit.text()

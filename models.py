@@ -1,6 +1,5 @@
 from abc import ABC
 
-from matplotlib.style import available
 from data.data_classes import *
 from data.filter_options import *
 from data.app_dao import *

@@ -57,6 +57,10 @@ class Theme:
     POPPINS_BOLD_18.setPixelSize(18)
     POPPINS_BOLD_18.setBold(True)
 
+    POPPINS_BOLD_16 = QFont(font)
+    POPPINS_BOLD_16.setPixelSize(16)
+    POPPINS_BOLD_16.setBold(True)
+
     POPPINS_BOLD_14 = QFont(font)
     POPPINS_BOLD_14.setPixelSize(14)
     POPPINS_BOLD_14.setBold(True)

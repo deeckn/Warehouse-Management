@@ -14,6 +14,7 @@ class CustomerInputForm(InputForm):
         h1 = f"color: {Theme.BLUE}; background-color: none;"
         line_break_top = "border-top: 1px solid black; background-color: none;"
         guide = "background-color: white; color: black;"
+        radio_bt_style = f"color: {Theme.BLUE};"
 
         # Customer Search Input
         self.customer_search_le = QLineEdit(self)
@@ -57,7 +58,6 @@ class CustomerInputForm(InputForm):
 
         # Packaging Service Radio Buttons
         option = QWidget(self)
-        option.setObjectName("option")
         option.setGeometry(65, 523, 235, 22)
         option_layout = QHBoxLayout(option)
         option_layout.setContentsMargins(0, 0, 0, 0)
@@ -71,6 +71,7 @@ class CustomerInputForm(InputForm):
         for radio_bt in (self.applied_option, self.not_applied_option):
             radio_bt.setFont(Theme.POPPINS_REGULAR_14)
             radio_bt.setObjectName("packing_option")
+            radio_bt.setStyleSheet(radio_bt_style)
             option_layout.addWidget(radio_bt)
 
         self.date_joined_picker = QDateEdit(self)

@@ -5,7 +5,7 @@ from views.forms.site_setting_view import SiteSettingView
 
 
 class AdminAppView(BaseView):
-    def __init__(self):
+    def __init__(self, pages: dict):
         super().__init__()
         self.account_bt = SideMenuItem("user", "ACCOUNT SETTINGS")
         self.site_bt = SideMenuItem("fix", "SITE SETTINGS")
@@ -26,10 +26,18 @@ class AdminAppView(BaseView):
         self.overview_bt.set_function(self.move_overview)
         self.report_bt.set_function(self.move_report)
 
-        self.account_view = AccountView()
+        # Pages
+        self.account_view = pages["account"].view
         self.add_page(self.account_view)
-        self.site_setting_view = SiteSettingView()
+
+        self.site_setting_view = pages["site"].view
         self.add_page(self.site_setting_view)
+
+        self.inventory_view = pages["inventory"].view
+        self.add_page(self.inventory_view)
+
+        self.report_view = pages["report"].view
+        self.add_page(self.report_view)
 
     # Setter
 

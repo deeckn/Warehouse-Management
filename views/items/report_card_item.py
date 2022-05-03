@@ -32,28 +32,7 @@ class ReportCardItem(QWidget):
     def __set_card_info(self):
         text = f"""
     Customer Name: {self.current_customer.get_name()}
-    Stock: {self.percent_stock}%
+    Stock: {self.percent_stock:.2f}%
     Contract End: {self.current_customer.get_expiry_date().replace("_", "/")}
         """
-
         self.card.setText(text)
-
-    def mousePressEvent(self, event: QMouseEvent) -> None:
-        self.parent_widget.previous_card.setStyleSheet(f"""
-            color: black; 
-            background-color: {Theme.GHOST_WHITE}; 
-            padding-left: 20px; 
-            margin: 0px 20px 15px 35px; 
-            border-radius: 10px;
-        """)
-
-        self.parent_widget.current_card = self
-        self.setStyleSheet(f"""
-            color: black; 
-            background-color: #FDCB6E; 
-            padding-left: 20px; 
-            margin: 0px 20px 15px 35px; 
-            border-radius: 10px; 
-        """)
-        self.parent_widget.previous_card = self.parent_widget.current_card
-        self.parent_widget.card_selected_function()

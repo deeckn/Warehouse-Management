@@ -55,6 +55,9 @@ class LoginPage(Controller):
     def set_current_user(self, user: User):
         self.root.set_current_user(user)
 
+    def clear_input_fields(self):
+        self.view.clear_info()
+
 
 class HomePage(Controller):
     def __init__(self, view: QWidget, model: Model):

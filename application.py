@@ -82,12 +82,14 @@ class Application(QStackedWidget):
             )
 
         # Application Path based on AccessLevel
-        if isinstance(self.current_user.get_access_level(), AdminAccess):
+        if self.main_app_view is None:
             self.main_app_setup()
-            self.admin_app_setup()
+
+        if isinstance(self.current_user.get_access_level(), AdminAccess):
+            if self.admin_app_view is None:
+                self.admin_app_setup()
             self.move_login_to_admin()
         else:
-            self.main_app_setup()
             self.move_admin_to_main()
 
     def main_app_setup(self):
@@ -118,10 +120,12 @@ class Application(QStackedWidget):
     # Move Methods
     def reset_admin_and_main(self):
         self.main_app_view.reset()
-        self.admin_app_view.reset()
+        if self.admin_app_view is not None:
+            self.admin_app_view.reset()
 
     def move_to_login(self):
         self.current_user = None
+        self.login_page.clear_input_fields()
         self.reset_admin_and_main()
         self.setCurrentIndex(0)
 

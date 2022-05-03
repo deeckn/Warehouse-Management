@@ -100,6 +100,14 @@ class Application(QStackedWidget):
             "product": None,
             "notification": self.notification_page,
         })
+
+        self.main_app_view.set_admin_bt_listener(self.move_main_to_admin)
+
+        if isinstance(self.current_user.get_access_level(), AdminAccess):
+            self.main_app_view.show_admin_bt()
+        else:
+            self.main_app_view.hide_admin_bt()
+
         self.main_app_view.set_user_label(self.current_user.get_username())
         self.main_app_view.set_logout_bt_listener(self.move_to_login)
         self.addWidget(self.main_app_view)

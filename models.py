@@ -1,6 +1,5 @@
 from abc import ABC
 
-from matplotlib.style import available
 from data.data_classes import *
 from data.filter_options import *
 from data.app_dao import *
@@ -478,6 +477,9 @@ class AccountModel(Model):
 
     def delete_user_account(self, user: User):
         """Deletes a user object from the database"""
+        if user.get_id() == self.__current_admin.get_id():
+            return
+
         self.__user_dao.delete_user_by_id(user.get_id())
 
         # Logging

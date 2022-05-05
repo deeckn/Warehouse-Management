@@ -1,3 +1,4 @@
+from controllers import HomePage
 from views.forms.base_view import BaseView
 from views.forms.home_view import HomePageView
 from views.forms.customer_list_page_view import CustomerListPageView
@@ -7,7 +8,7 @@ from views.items.side_menu_item import SideMenuItem
 
 
 class MainAppView(BaseView):
-    def __init__(self):
+    def __init__(self, pages: dict):
         super().__init__()
         self.home_bt = SideMenuItem("home", "HOME")
         self.customer_bt = SideMenuItem("user", "CUSTOMER LIST")
@@ -23,16 +24,16 @@ class MainAppView(BaseView):
         self.home_bt.click()
         self.hide_admin_bt()
 
-        self.home_page = HomePageView()
+        self.home_page = pages["home"].view
         self.add_page(self.home_page)
 
-        self.customer_list_page = CustomerListPageView()
+        self.customer_list_page = pages["customer"].view
         self.add_page(self.customer_list_page)
 
         self.product_list_page = ProductListPageView()
         self.add_page(self.product_list_page)
 
-        self.noti_page = NotificationView()
+        self.noti_page = pages["notification"].view
         self.add_page(self.noti_page)
 
         # Controller

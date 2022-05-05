@@ -610,6 +610,7 @@ class SiteSettingPage(Controller):
             return
 
         self.model.delete_shelf(self.view.get_selected_shelf())
+        self.view.reset_input()
 
         self.__update_list()
 
@@ -627,6 +628,7 @@ class SiteSettingPage(Controller):
     
         edited_shelf = StorageShelf(label, max_weight, length, width, height, row, column)
         self.model.update_shelf(self.view.get_selected_shelf(), edited_shelf)
+        self.view.reset_input()
         self.__update_list()
 
     def validate_buttons(self):
@@ -643,7 +645,7 @@ class SiteSettingPage(Controller):
             self.view.set_save_button_enabled(False)
 
         # Delete Button
-        if self.view.is_card_selected() and not self.view.is_current_edited():
+        if self.view.is_card_selected():
             self.view.set_delete_button_enabled(True)
         else:
             self.view.set_delete_button_enabled(False)

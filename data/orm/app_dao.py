@@ -1,4 +1,3 @@
-
 from sqlalchemy import desc
 from .schema import Session, engine
 from .schema import User, Customer, ProductCategory, ProductLocation, Shelf, QuarterlyReport, Log, Product
@@ -166,17 +165,16 @@ class CustomerDAO(DAO):
 
     def exist(self, customer: Customer) -> bool:
         """Returns True if a customer exist in the database"""
-        query = self.session.query(Customer).filter(
-            Customer.name == customer.get_name() and
-            Customer.phone == customer.get_phone() and
-            Customer.email == customer.get_email() and
-            Customer.packing_service == customer.get_packing_service() and
-            Customer.rental_duration == customer.get_rental_duration() and
-            Customer.date_joined == customer.get_date_joined() and
-            Customer.expiry_date == customer.get_expiry_date() and
+        return self.session.query(Customer).filter(
+            Customer.name == customer.get_name(),
+            Customer.phone == customer.get_phone(),
+            Customer.email == customer.get_email(),
+            Customer.packing_service == customer.get_packing_service(),
+            Customer.rental_duration == customer.get_rental_duration(),
+            Customer.date_joined == customer.get_date_joined(),
+            Customer.expiry_date == customer.get_expiry_date(),
             Customer.total_payment == customer.get_total_payment()
-        )
-        return query is not None
+        ).first() is not None
 
     def delete_customer(self, customer_id: int):
         """Deletes customer data given an id"""
@@ -305,10 +303,20 @@ class LocationDAO(DAO):
 
     def get_products_on_shelf(self, shelf_label: str) -> list[tuple[int, int]]:
         """Returns a list of product and its quantity located in a shelf"""
-        data = self.session.query(ProductLocation).filter(
+        data: list[ProductLocation] = self.session.query(ProductLocation).filter(
             ProductLocation.shelf_label == shelf_label
         ).all()
-        return data
+
+        if data is None:
+            return None
+
+        formatted_data = []
+        for location in data:
+            formatted_data.append(
+                (location.product_id, location.get_batch_quantity())
+            )
+
+        return formatted_data
 
     def get_batch_count(self, product_id: int) -> int:
         """Returns the number of batches a product has"""
@@ -364,6 +372,18 @@ class ProductDAO(DAO):
         """Adds a Product object to the PRODUCTS table"""
         if product is None or self.exist(product):
             return
+
+        categories = product.get_category_list()
+        locations = product.get_locations()
+
+        if categories is None or locations is None:
+            return
+
+        for category in categories:
+            self.__category_dao.add_product_category(category)
+
+        for location in locations:
+            self.__location_dao.add_product_location(location)
 
         self.session.add(product)
         self.session.commit()
@@ -562,6 +582,8 @@ class ProductDAO(DAO):
         if product is None:
             return
 
+        self.__location_dao.remove_all_product_locations(product_id)
+        self.__category_dao.remove_all_product_categories(product_id)
         self.session.delete(product)
         self.session.commit()
 
@@ -676,7 +698,7 @@ class ReportDAO(DAO):
         return self.session.query(QuarterlyReport).filter(
             QuarterlyReport.year == report.get_year(),
             QuarterlyReport.quarter == report.get_quarter()
-        ) is not None
+        ).first() is not None
 
 
 class LogDAO(DAO):

@@ -48,7 +48,7 @@ class User(Base):
         return self.access_level
 
     def __str__(self) -> str:
-        return f"<User first_name={self.first_name} last_name={self.last_name} username={self.username} password={self.password} access={self.access_level} />"
+        return f"<User first_name={self.first_name} last_name={self.last_name} username={self.username} password={self.password} access={self.access_level}/>"
 
 
 class Customer(Base):
@@ -102,6 +102,9 @@ class Customer(Base):
     def get_total_payment(self) -> float:
         return self.total_payment
 
+    def __str__(self) -> str:
+        return f"<Customer name={self.name} phone={self.phone} email={self.email} packing={self.packing_service} rent_duration={self.rental_duration} joined={self.date_joined} expires={self.expiry_date} payment={self.total_payment}/>"
+
 
 class ProductCategory(Base):
     # Schema
@@ -118,7 +121,7 @@ class ProductCategory(Base):
         return self.category
 
     def __str__(self) -> str:
-        return self.category
+        return f"<ProductCategory product_id={self.product_id} category={self.category}/>"
 
 
 class ProductLocation(Base):
@@ -154,7 +157,7 @@ class ProductLocation(Base):
         return f"{self.shelf_label}{self.shelf_number:03d}"
 
     def __str__(self):
-        return self.shelf_label
+        return f"<ProductLocation id={self.product_id} batch={self.batch_number} location={self.get_location()}/>"
 
 
 class Product(Base):
@@ -172,6 +175,9 @@ class Product(Base):
     length = Column("length", Float())
     width = Column("width", Float())
     height = Column("height", Float())
+
+    categories: list[ProductCategory] = None
+    locations: list[ProductLocation] = None
 
     def __init__(
         self,
@@ -303,6 +309,9 @@ class Shelf(Base):
     def get_entire_volume(self) -> float:
         return self.get_volume() * self.rows * self.columns
 
+    def __str__(self) -> str:
+        return f"<Shelf label={self.label} max_weight={self.max_weight} dim={self.length}*{self.width}*{self.height} rows={self.rows} columns={self.columns}/>"
+
 
 class Log(Base):
     # Schema
@@ -341,7 +350,7 @@ class Log(Base):
         return self.date, self.time, self.description
 
     def __str__(self) -> str:
-        return f"Date: {self.date}, Time: {self.time}, Description: {self.description}"
+        return f"<Log date={self.date} time={self.time} description={self.description}/>"
 
 
 class QuarterlyReport(Base):
@@ -376,3 +385,6 @@ class QuarterlyReport(Base):
 
     def get_monthly_revenue(self) -> float:
         return self.total_revenue / 12
+
+    def __str__(self) -> str:
+        return f"<QuarterlyReport year={self.year} quarter={self.quarter} util_space={self.utilized_space} revenue={self.total_revenue}/>"

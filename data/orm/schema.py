@@ -195,6 +195,7 @@ class Product(Base):
         self.length = length
         self.width = width
         self.height = height
+        self.__owner_object = None
 
     def insert_categories(self, categories: list[ProductCategory]):
         self.categories = categories
@@ -202,8 +203,11 @@ class Product(Base):
     def insert_locations(self, locations: list[ProductLocation]):
         self.locations = locations
 
+    def set_owner_object(self, owner: Customer):
+        self.__owner_object = owner
+
     def get_owner(self) -> Customer:
-        return self.owner
+        return self.__owner_object
 
     def get_id(self) -> int:
         return self.product_id

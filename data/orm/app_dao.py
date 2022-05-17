@@ -1,3 +1,5 @@
+
+from sqlalchemy import desc
 from .schema import Session, engine
 from .schema import User, Customer, ProductCategory, ProductLocation, Shelf, QuarterlyReport, Log, Product
 from abc import ABC
@@ -50,6 +52,9 @@ class UserDAO(DAO):
 
     def add_user(self, user: User):
         """Adds a User persistent object to the database"""
+        if user is None or self.exist(user):
+            return
+
         self.session.add(user)
         self.session.commit()
 
@@ -137,6 +142,9 @@ class CustomerDAO(DAO):
 
     def add_customer(self, customer: Customer):
         """Adds a Customer object to the database"""
+        if customer is None or self.exist(customer):
+            return
+
         self.session.add(customer)
         self.session.commit()
 
@@ -348,10 +356,13 @@ class LocationDAO(DAO):
 class ProductDAO(DAO):
     def __init__(self, session: Session):
         super().__init__(session)
+        self.__customer_dao: CustomerDAO = AppDAO.get_dao("customer")
+        self.__category_dao: CategoryDAO = AppDAO.get_dao("category")
+        self.__location_dao: LocationDAO = AppDAO.get_dao("location")
 
     def add_product(self, product: Product):
         """Adds a Product object to the PRODUCTS table"""
-        if product is None:
+        if product is None or self.exist(product):
             return
 
         self.session.add(product)
@@ -359,36 +370,143 @@ class ProductDAO(DAO):
 
     def exist(self, product: Product) -> bool:
         """Returns True if a Product exist in the database"""
-        pass
+        return self.session.query(Product).filter(
+            Product.name == product.get_name(),
+            Product.quantity == product.get_quantity(),
+            Product.low_stock == product.low_stock,
+            Product.weight == product.get_weight(),
+            Product.last_stored == product.get_last_stored(),
+            Product.owner == product.owner,
+            Product.length == product.length,
+            Product.width == product.width,
+            Product.height == product.height,
+        ).first() is not None
 
     def get_product(self, product_id: int) -> Product:
         """Returns a Product object given an id"""
-        pass
+        product: Product = self.session.query(Product).filter(
+            Product.product_id == product_id).first()
+        if product is None:
+            return None
+
+        owner = self.__customer_dao.get_customer(product.owner)
+        categories = self.__category_dao.get_product_categories(
+            product.product_id)
+        locations = self.__location_dao.get_product_locations(
+            product.product_id)
+
+        product.set_owner_object(owner)
+        product.insert_categories(categories)
+        product.insert_locations(locations)
+        return product
 
     def get_product_by_name(self, product_name: str, owner_id: int) -> Product:
         """Returns a Product object given the name and owner id"""
-        pass
+        product: Product = self.session.query(Product).filter(
+            Product.name == product_name,
+            Product.owner == owner_id
+        ).first()
+
+        if product is None:
+            return None
+
+        owner = self.__customer_dao.get_customer(product.owner)
+        categories = self.__category_dao.get_product_categories(
+            product.product_id)
+        locations = self.__location_dao.get_product_locations(
+            product.product_id)
+
+        product.set_owner_object(owner)
+        product.insert_categories(categories)
+        product.insert_locations(locations)
+        return product
 
     def get_customer_products(self, owner_id: int) -> list[Product]:
         """Returns a Product object list given the owner id"""
-        pass
+        products: list[Product] = self.session.query(
+            Product).filter(Product.owner == owner_id).all()
+
+        if products is None:
+            return None
+
+        for product in products:
+            owner = self.__customer_dao.get_customer(product.owner)
+            categories = self.__category_dao.get_product_categories(
+                product.product_id)
+            locations = self.__location_dao.get_product_locations(
+                product.product_id)
+            product.set_owner_object(owner)
+            product.insert_categories(categories)
+            product.insert_locations(locations)
+
+        return products
 
     def get_all_products(self) -> list[Product]:
         """Returns all products as a list of Product objects"""
-        pass
+        products: list[Product] = self.session.query(Product).all()
+
+        if products is None:
+            return None
+
+        for product in products:
+            owner = self.__customer_dao.get_customer(product.owner)
+            categories = self.__category_dao.get_product_categories(
+                product.product_id)
+            locations = self.__location_dao.get_product_locations(
+                product.product_id)
+            product.set_owner_object(owner)
+            product.insert_categories(categories)
+            product.insert_locations(locations)
+
+        return products
 
     def get_total_product_count(self) -> int:
-        pass
+        """Returns the total number of products in the system"""
+        return self.session.query(Product).count()
 
     def get_customer_product_count(self, customer_id: int) -> int:
-        pass
+        """Returns the total number of products owned by a customer"""
+        return self.session.query(Product).filter(Product.owner == customer_id).count()
 
     def get_low_quantity_products(self) -> list[Product]:
-        pass
+        """Returns a list of low quantity products"""
+        products: list[Product] = self.session.query(Product).filter(
+            Product.quantity <= Product.low_stock).all()
+
+        if products is None:
+            return None
+
+        for product in products:
+            owner = self.__customer_dao.get_customer(product.owner)
+            categories = self.__category_dao.get_product_categories(
+                product.product_id)
+            locations = self.__location_dao.get_product_locations(
+                product.product_id)
+            product.set_owner_object(owner)
+            product.insert_categories(categories)
+            product.insert_locations(locations)
+
+        return products
 
     def get_product_contains_with(self, name: str) -> list[Product]:
         """Returns a list of Product objects based on a proper substring"""
-        pass
+        products: list[Product] = self.session.query(
+            Product).filter(Product.name.like(f"%{name}%")).all()
+
+        if products is None:
+            return None
+
+        for product in products:
+            owner = self.__customer_dao.get_customer(product.owner)
+            categories = self.__category_dao.get_product_categories(
+                product.product_id)
+            locations = self.__location_dao.get_product_locations(
+                product.product_id)
+            product.set_owner_object(owner)
+            product.insert_categories(categories)
+            product.insert_locations(locations)
+
+        return products
 
     def update_product(
         self,
@@ -403,11 +521,49 @@ class ProductDAO(DAO):
         width: float = None,
         height: float = None
     ):
-        pass
+        product: Product = self.session.query(Product).filter(
+            Product.product_id == id).first()
+        if product is None:
+            return
+
+        if name is not None:
+            product.name = name
+
+        if quantity is not None:
+            product.quantity = quantity
+
+        if low_stock is not None:
+            product.low_stock = low_stock
+
+        if weight is not None:
+            product.weight = weight
+
+        if last_stored is not None:
+            product.last_stored = last_stored
+
+        if owner_id is not None:
+            product.owner = owner_id
+
+        if length is not None:
+            product.length = length
+
+        if width is not None:
+            product.width = width
+
+        if height is not None:
+            product.height = height
+
+        self.session.commit()
 
     def delete_product(self, product_id: int):
         """Removes a product from the database"""
-        pass
+        product = self.session.query(Product).filter(
+            Product.product_id == product_id).first()
+        if product is None:
+            return
+
+        self.session.delete(product)
+        self.session.commit()
 
 
 class ShelfDAO(DAO):
@@ -416,7 +572,7 @@ class ShelfDAO(DAO):
 
     def add_shelf(self, shelf: Shelf):
         """Add shelf object to the STORAGE_SHELF table"""
-        if shelf is None:
+        if shelf is None or self.exist(shelf):
             return
         self.session.add(shelf)
         self.session.commit()
@@ -447,10 +603,11 @@ class ShelfDAO(DAO):
         rows: int = None,
         columns: int = None
     ):
-        shelf: Shelf = self.session.query(Shelf).filter(Shelf.label == label).first()
+        shelf: Shelf = self.session.query(
+            Shelf).filter(Shelf.label == label).first()
         if shelf is None:
             return
-        
+
         if max_weight is not None:
             shelf.max_weight = max_weight
 
@@ -470,7 +627,6 @@ class ShelfDAO(DAO):
             shelf.columns = columns
 
         self.session.commit()
-        
 
     def delete_shelf(self, shelf_label: str):
         """Removes a shelf from the database"""
@@ -492,14 +648,35 @@ class ReportDAO(DAO):
 
     def add_report(self, report: QuarterlyReport):
         """Add QuarterlyReport object to the QUARTERLY_REPORT table"""
-        pass
+        if report is None or self.exists(report):
+            return
+
+        self.session.add(report)
+        self.session.commit()
 
     def get_all_reports(self) -> list[QuarterlyReport]:
         """Returns a list of all QuarterlyReport objects in the database"""
-        pass
+        return self.session.query(QuarterlyReport).all()
 
     def update_report(self, year: int, quarter: int, utilization: float = None, revenue: float = None):
-        pass
+        report: QuarterlyReport = self.session.query(QuarterlyReport).filter(
+            QuarterlyReport.year == year, QuarterlyReport.quarter == quarter).first()
+        if report is None:
+            return
+
+        if utilization is not None:
+            report.utilized_space = utilization
+
+        if revenue is not None:
+            report.total_revenue = revenue
+
+        self.session.commit()
+
+    def exists(self, report: QuarterlyReport) -> bool:
+        return self.session.query(QuarterlyReport).filter(
+            QuarterlyReport.year == report.get_year(),
+            QuarterlyReport.quarter == report.get_quarter()
+        ) is not None
 
 
 class LogDAO(DAO):
@@ -507,7 +684,13 @@ class LogDAO(DAO):
         super().__init__(session)
 
     def get_all_log_entries(self) -> list[Log]:
-        pass
+        """Returns a list of Logs"""
+        return self.session.query(Log).order_by(desc(Log.log_id)).limit(20).all()
 
     def add_log_entry(self, log_entry: Log):
-        pass
+        """Adds a log entry to the database"""
+        if log_entry is None:
+            return
+
+        self.session.add(log_entry)
+        self.session.commit()

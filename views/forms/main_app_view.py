@@ -20,17 +20,17 @@ class MainAppView(BaseView):
         self.home_bt.click()
         self.hide_admin_bt()
 
-        self.home_page = pages["home"].view
-        self.add_page(self.home_page)
+        self.home_page = pages["home"]
+        self.add_page(self.home_page.view)
 
-        self.customer_list_page = pages["customer"].view
-        self.add_page(self.customer_list_page)
+        self.customer_list_page = pages["customer"]
+        self.add_page(self.customer_list_page.view)
 
         self.product_list_page = ProductListPageView()
         self.add_page(self.product_list_page)
 
-        self.noti_page = pages["notification"].view
-        self.add_page(self.noti_page)
+        self.noti_page = pages["notification"]
+        self.add_page(self.noti_page.view)
 
         # Controller
         self.home_bt.set_function(self.move_home)
@@ -54,6 +54,7 @@ class MainAppView(BaseView):
 
     # Move
     def move_home(self):
+        self.home_page.update_activity_logs()
         self.stack.setCurrentIndex(0)
         self.unclick_current_bt()
         self.current_bt = self.home_bt

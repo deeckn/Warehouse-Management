@@ -125,6 +125,13 @@ class Application(QStackedWidget):
         self.admin_app_view.set_logout_bt_listener(self.move_to_login)
         self.addWidget(self.admin_app_view)
 
+    def update_user_label(self, username: str):
+        if self.main_app_view is not None:
+            self.main_app_view.set_user_label(username)
+
+        if self.admin_app_view is not None:
+            self.admin_app_view.set_user_label(username)
+
     # Move Methods
     def reset_admin_and_main(self):
         self.main_app_view.reset()

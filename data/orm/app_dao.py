@@ -702,12 +702,14 @@ class ReportDAO(DAO):
 
 
 class LogDAO(DAO):
+    LOG_LIMIT = 20
+
     def __init__(self, session: Session):
         super().__init__(session)
 
     def get_all_log_entries(self) -> list[Log]:
         """Returns a list of Logs"""
-        return self.session.query(Log).order_by(desc(Log.log_id)).limit(20).all()
+        return self.session.query(Log).order_by(desc(Log.log_id)).limit(LogDAO.LOG_LIMIT).all()
 
     def add_log_entry(self, log_entry: Log):
         """Adds a log entry to the database"""

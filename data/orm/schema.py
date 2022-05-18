@@ -75,6 +75,11 @@ class Customer(Base):
         self.expiry_date = expiry_date
         self.total_payment = total_payment
 
+        if packing_service:
+            self.total_payment = 6000 * self.rental_duration
+        else:
+            self.total_payment = 4000 * self.rental_duration
+
     def get_id(self) -> int:
         return self.customer_id
 

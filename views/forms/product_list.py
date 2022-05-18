@@ -1,4 +1,4 @@
-from data.data_classes import ProductItem, Customer
+from data.orm.schema import Product
 from views.forms.item_list import ItemList
 from views.items.product_list_card import ProductListCard
 
@@ -11,7 +11,7 @@ class ProductList(ItemList):
         self.select_event = None
         self.unselect_event = None
 
-    def add_card(self, product: ProductItem):
+    def add_card(self, product: Product):
         """Add new proudct card to the list"""
         card = ProductListCard(self.qparent, product)
         self.scroll_area_layout.addWidget(card)

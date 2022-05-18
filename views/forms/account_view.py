@@ -1,9 +1,9 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QRadioButton, QScrollArea, QVBoxLayout
-from views.forms.stack_page import StackPage  # For real test
-from data.data_classes import User
+from views.forms.stack_page import StackPage
 from views.items.employee_card_item import EmployeeCardItem
+from data.orm.schema import User
 
 
 class AccountView(StackPage):

@@ -1,8 +1,8 @@
 from abc import ABC
 
-from data.data_classes import *
+from data.orm.schema import *
+from data.orm.app_dao import *
 from data.filter_options import *
-from data.app_dao import *
 from datetime import date
 from dateutil import relativedelta
 
@@ -59,8 +59,8 @@ class HomeModel(Model):
         self.__customer_dao = AppDAO.get_dao("customer")
         self.__log_dao = AppDAO.get_dao("log")
 
-    def search_product(self, search_input: str, filter: FilterOption) -> list[ProductItem]:
-        """Returns a list of ProductItem objects based on the search query and filter"""
+    def search_product(self, search_input: str, filter: FilterOption) -> list[Product]:
+        """Returns a list of Product objects based on the search query and filter"""
 
         if isinstance(filter, IdFilter):
             return [self.__product_dao.get_product(int(search_input))]
@@ -75,7 +75,7 @@ class HomeModel(Model):
                 return None
 
             customer_ids = list(map(lambda c: c.get_id(), customers))
-            products: list[ProductItem] = list()
+            products: list[Product] = list()
             for id in customer_ids:
                 temp = self.__product_dao.get_customer_products(id)
                 if temp is None:
@@ -85,27 +85,27 @@ class HomeModel(Model):
 
         return None
 
-    def get_activity_logs(self) -> list[LogEntry]:
-        """Returns a list of all LogEntry objects in the database"""
+    def get_activity_logs(self) -> list[Log]:
+        """Returns a list of all Log objects in the database"""
         return self.__log_dao.get_all_log_entries()
 
-    def add_product_quantity(self, product: ProductItem, quantity: int):
+    def add_product_quantity(self, product: Product, quantity: int):
         current_quantity = product.get_quantity()
         self.__product_dao.update_product(
             id=product.get_id(), quantity=current_quantity+quantity)
 
         # Logging
-        log = LogEntry(
+        log = Log(
             f"{self.__current_user.get_username()} added {quantity} items for Product ID: {product.get_id()}")
         self.__log_dao.add_log_entry(log)
 
-    def export_product(self, product: ProductItem, quantity: int):
+    def export_product(self, product: Product, quantity: int):
         current_quantity = product.get_quantity()
         self.__product_dao.update_product(
             id=product.get_id(), quantity=current_quantity-quantity)
 
         # Logging
-        log = LogEntry(
+        log = Log(
             f"{self.__current_user.get_username()} exported {quantity} items for Product ID: {product.get_id()}")
         self.__log_dao.add_log_entry(log)
 
@@ -135,7 +135,7 @@ class CustomerListModel(Model):
             self.__customer_dao.add_customer(customer)
 
             # Logging
-            log = LogEntry(
+            log = Log(
                 f"{self.__current_user.get_username()} added {customer.get_name()} to the system")
             self.__log_dao.add_log_entry(log)
 
@@ -182,7 +182,7 @@ class CustomerListModel(Model):
         )
 
         # Logging
-        log = LogEntry(
+        log = Log(
             f"{self.__current_user.get_username()} updated Customer ID: {previous_info.get_id()} information")
         self.__log_dao.add_log_entry(log)
 
@@ -191,7 +191,7 @@ class CustomerListModel(Model):
         self.__customer_dao.delete_customer(customer.get_id())
 
         # Logging
-        log = LogEntry(
+        log = Log(
             f"{self.__current_user.get_username()} deleted Customer ID: {customer.get_id()} from the system")
         self.__log_dao.add_log_entry(log)
 
@@ -219,19 +219,19 @@ class ProductListModel(Model):
         self.__log_dao = AppDAO.get_dao("log")
         self.__customer_dao = AppDAO.get_dao("customer")
 
-    def get_all_products(self) -> list[ProductItem]:
-        """Returns all products as a list of ProductItem objects"""
+    def get_all_products(self) -> list[Product]:
+        """Returns all products as a list of Product objects"""
         return self.__product_dao.get_all_products()
 
-    def get_product(self, product_id: int) -> ProductItem:
+    def get_product(self, product_id: int) -> Product:
         """Returns a product object given the id"""
         return self.__product_dao.get_product(product_id)
 
-    def search_products_by_customer(self, customer_name: str) -> list[ProductItem]:
+    def search_products_by_customer(self, customer_name: str) -> list[Product]:
         """Returns a list of products based on customer name query"""
         customers = self.__customer_dao.get_customer_contains_with(
             customer_name)
-        products: list[ProductItem] = list()
+        products: list[Product] = list()
         for customer in customers:
             customer_products = self.__product_dao.get_customer_products(
                 customer.get_id())
@@ -240,15 +240,15 @@ class ProductListModel(Model):
 
         return products
 
-    def search_product_by_id(self, product_id: int) -> ProductItem:
+    def search_product_by_id(self, product_id: int) -> Product:
         """Returns a product item given an ID"""
         return self.__product_dao.get_product(product_id)
 
-    def search_products_by_name(self, product_name: str) -> list[ProductItem]:
+    def search_products_by_name(self, product_name: str) -> list[Product]:
         """Returns a list of product items that corresonds to the query string"""
         return self.__product_dao.get_product_contains_with(product_name)
 
-    def is_batch_fit(self, product: ProductItem, quantity: int, shelf: StorageShelf) -> bool:
+    def is_batch_fit(self, product: Product, quantity: int, shelf: Shelf) -> bool:
         """Returns True if the batch can fit in the shelf"""
 
         product_length, product_width, product_height = product.get_dimension().get_dimension()
@@ -275,7 +275,7 @@ class ProductListModel(Model):
 
         return batch_volume < shelf_volume
 
-    def add_new_product(self, product: ProductItem, quantity: int, shelf_label: str, shelf_number: int) -> bool:
+    def add_new_product(self, product: Product, quantity: int, shelf_label: str, shelf_number: int) -> bool:
         """Adds a new product to the system, returns True for successful operation"""
         if self.__product_dao.exist(product):
             return False
@@ -293,12 +293,12 @@ class ProductListModel(Model):
         # Add first batch
         data_product = self.__product_dao.get_product_by_name(
             product.get_name(), product.get_owner().get_id())
-        location = Location(1, quantity, shelf_label, shelf_number)
+        location = ProductLocation(1, quantity, shelf_label, shelf_number)
         self.__location_dao.add_product_location(
             data_product.get_id(), location)
 
         # Logging
-        log = LogEntry(
+        log = Log(
             f"{self.__current_user.get_username()} added {product.get_name()} to the system")
         self.__log_dao.add_log_entry(log)
 
@@ -310,8 +310,8 @@ class ProductListModel(Model):
         if batch_count == 0:
             return False
 
-        location = Location(batch_count+1, quantity,
-                            shelf_label, shelf_number)
+        location = ProductLocation(batch_count+1, quantity,
+                                   shelf_label, shelf_number)
         self.__location_dao.add_product_location(product_id, location)
 
         # Update quantity
@@ -323,7 +323,7 @@ class ProductListModel(Model):
 
         return True
 
-    def edit_product(self, old_data: ProductItem, new_data: ProductItem):
+    def edit_product(self, old_data: Product, new_data: Product):
         """Updates product information based on the difference of objects"""
         name = None if old_data.get_name() == new_data.get_name() else new_data.get_name()
 
@@ -368,7 +368,7 @@ class ProductListModel(Model):
         """Deletes a product from the system"""
         self.__product_dao.delete_product(product_id)
 
-        log = LogEntry(
+        log = Log(
             f"{self.__current_user.get_username()} deleted Product ID: {product_id} from the system")
         self.__log_dao.add_log_entry(log)
 
@@ -376,12 +376,12 @@ class ProductListModel(Model):
         """Returns a list of shelf numbers (slots) that are occupied"""
         return self.__location_dao.get_occupied_slots(shelf_label)
 
-    def get_available_shelves(self, product: ProductItem) -> list[StorageShelf]:
+    def get_available_shelves(self, product: Product) -> list[Shelf]:
         """Returns a list of available shelves that the given product can fit"""
         product_volume = product.get_dimension().get_volume()
         shelves = self.__shelf_dao.get_all_shelves()
 
-        available_shelves: list[StorageShelf] = list()
+        available_shelves: list[Shelf] = list()
         for shelf in shelves:
             if shelf.get_volume() > product_volume:
                 available_shelves.append(shelf)
@@ -407,7 +407,7 @@ class AccountModel(Model):
         self.__user_dao.add_user(user)
 
         # Logging
-        log = LogEntry(
+        log = Log(
             f"ADMIN: {self.__current_admin.get_username()} created a new account for {user.get_username()}")
         self.__log_dao.add_log_entry(log)
 
@@ -459,7 +459,7 @@ class AccountModel(Model):
         ) == previous_info.get_password() else new_user_info.get_password()
 
         self.__user_dao.update_user(
-            new_user_info.get_id(),
+            previous_info.get_id(),
             first_name=first_name,
             last_name=last_name,
             username=username,
@@ -467,7 +467,7 @@ class AccountModel(Model):
         )
 
         # Logging
-        log = LogEntry(
+        log = Log(
             f"ADMIN: {self.__current_admin.get_username()} updated ID:{previous_info.get_id()} account")
         self.__log_dao.add_log_entry(log)
 
@@ -483,7 +483,7 @@ class AccountModel(Model):
         self.__user_dao.delete_user_by_id(user.get_id())
 
         # Logging
-        log = LogEntry(
+        log = Log(
             f"ADMIN: {self.__current_admin.get_username()} deleted User: {user.get_username()} from the system")
         self.__log_dao.add_log_entry(log)
 
@@ -499,8 +499,8 @@ class NotificationModel(Model):
         self.__product_dao = AppDAO.get_dao("product")
         self.__customer_dao = AppDAO.get_dao("customer")
 
-    def get_low_stock_products(self) -> list[ProductItem]:
-        """Returns a list of low stock ProductItem objects"""
+    def get_low_stock_products(self) -> list[Product]:
+        """Returns a list of low stock Product objects"""
         products = self.__product_dao.get_low_quantity_products()
         products.sort(key=lambda p: p.get_quantity(), reverse=False)
         return products
@@ -567,7 +567,7 @@ class SiteSettingsModel(Model):
         if self.__shelf_dao.get_shelf_by_label(label):
             return False
 
-        shelf = StorageShelf(
+        shelf = Shelf(
             label,
             max_weight,
             length,
@@ -579,17 +579,17 @@ class SiteSettingsModel(Model):
         self.__shelf_dao.add_shelf(shelf)
 
         # Logging
-        log = LogEntry(
+        log = Log(
             f"ADMIN: {self.__current_admin.get_username()} added a new shelf with the label {label}")
         self.__log_dao.add_log_entry(log)
 
         return True
 
-    def search_shelf(self, label: str) -> StorageShelf:
-        """Returns a StorageShelf object given the label"""
+    def search_shelf(self, label: str) -> Shelf:
+        """Returns a Shelf object given the label"""
         return self.__shelf_dao.get_shelf_by_label(label)
 
-    def update_shelf(self, previous_info: StorageShelf, new_info: StorageShelf):
+    def update_shelf(self, previous_info: Shelf, new_info: Shelf):
         """Updates shelf information based on new data"""
         max_weight = new_info.get_max_weight() if previous_info.get_max_weight(
         ) != new_info.get_max_weight() else None
@@ -620,16 +620,16 @@ class SiteSettingsModel(Model):
         )
 
         # Logging
-        log = LogEntry(
+        log = Log(
             f"ADMIN: {self.__current_admin.get_username()} updated {previous_info.get_label()} information")
         self.__log_dao.add_log_entry(log)
 
-    def delete_shelf(self, shelf: StorageShelf):
+    def delete_shelf(self, shelf: Shelf):
         """Deletes a shelf from the database"""
         self.__shelf_dao.delete_shelf(shelf.get_label())
 
         # Logging
-        log = LogEntry(
+        log = Log(
             f"ADMIN: {self.__current_admin.get_username()} deleted {shelf.get_label()} from the system")
         self.__log_dao.add_log_entry(log)
 
@@ -637,12 +637,12 @@ class SiteSettingsModel(Model):
         """Returns the total number of slots"""
         return rows * columns
 
-    def get_shelves_contains_with(self, shelf_search: str) -> list[StorageShelf]:
-        """Returns a list of StorageShelf objects given a search query"""
+    def get_shelves_contains_with(self, shelf_search: str) -> list[Shelf]:
+        """Returns a list of Shelf objects given a search query"""
         return self.__shelf_dao.get_shelves_contains_with(shelf_search)
 
-    def get_all_shelves(self) -> list[StorageShelf]:
-        """Returns a list of all StorageShelf objects from the database"""
+    def get_all_shelves(self) -> list[Shelf]:
+        """Returns a list of all Shelf objects from the database"""
         return self.__shelf_dao.get_all_shelves()
 
 
@@ -658,11 +658,11 @@ class InventoryOverviewModel(Model):
         """Returns a list of Customers"""
         return self.__customer_dao.get_all_customers()
 
-    def get_all_product_list(self) -> list[ProductItem]:
+    def get_all_product_list(self) -> list[Product]:
         """Returns a list of Products"""
         return self.__product_dao.get_all_products()
 
-    def get_product_list_by_owner_id(self, owner_id: int) -> list[ProductItem]:
+    def get_product_list_by_owner_id(self, owner_id: int) -> list[Product]:
         """Returns a list of Owner's Products"""
         return self.__product_dao.get_customer_products(owner_id)
 
@@ -790,6 +790,6 @@ class ReportModel(Model):
 
             file.close()
 
-        log = LogEntry(
+        log = Log(
             f"{self.__current_user.get_username()} exported report CSV file")
         self.__log_dao.add_log_entry(log)

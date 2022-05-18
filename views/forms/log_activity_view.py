@@ -1,6 +1,6 @@
 from PySide6.QtWidgets import QWidget, QScrollArea, QVBoxLayout, QSpacerItem, QSizePolicy, QLabel
 from PySide6.QtGui import Qt
-from data.data_classes import LogEntry
+from data.orm.schema import Log
 from views.theme import Theme
 from views.items.log_item import LogItem
 
@@ -44,7 +44,7 @@ class LogWindowView(QWidget):
         self.spacer = QSpacerItem(
             0, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-    def add_log(self, log_entry: LogEntry):
+    def add_log(self, log_entry: Log):
         self.scroll_area_layout.removeItem(self.spacer)
         self.scroll_area_layout.addWidget(LogItem(log_entry))
         self.scroll_area_layout.addItem(self.spacer)

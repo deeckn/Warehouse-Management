@@ -4,7 +4,7 @@ from PySide6.QtWidgets import QWidget, QLabel, QPushButton, QScrollArea, QVBoxLa
 from PySide6.QtCharts import QChart, QChartView, QPieSeries, QPieSlice
 from views.forms.stack_page import StackPage
 from views.theme import Theme
-from data.data_classes import Customer
+from data.orm.schema import Customer
 from views.items.report_card_item import ReportCardItem
 import views.rc_icons
 

@@ -1,4 +1,4 @@
-from data.data_classes import Customer
+from data.orm.schema import Customer
 from views.forms.stack_page import StackPage
 from views.forms.customer_input_form import CustomerInputForm
 from views.forms.customer_list import CustomerList

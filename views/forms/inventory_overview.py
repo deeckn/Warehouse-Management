@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (
     QLabel, QScrollArea, QVBoxLayout, QWidget, QScrollArea, QGridLayout)
 from PySide6.QtCharts import (QChart, QChartView, QPieSeries, QPieSlice)
 
-from data.data_classes import ProductItem
+from data.orm.schema import Product
 from views.items.customer_stock_item import CustomerStockItem
 from views.items.product_card_inventory import ProductCardInventory
 from views.theme import Theme
@@ -122,7 +122,7 @@ class InventoryOverviewView(QWidget):
         self.customer_selected_function = None
 
     # Add Product Item to the product list
-    def add_product_item(self, product: ProductItem) -> None:
+    def add_product_item(self, product: Product) -> None:
         card = ProductCardInventory(product)
         self.scroll_area_widget_product.layout().addWidget(card)
 
@@ -146,7 +146,7 @@ class InventoryOverviewView(QWidget):
         self.customer_selected_function = function
 
     def draw_pie_chart_of_selected_customer(self, name: str, percent: float) -> None:
-        if(not self.gridlayout.isEmpty()):
+        if not self.gridlayout.isEmpty():
             self.series.clear()
             self.chart.removeAllSeries()
         self.series = QPieSeries()

@@ -1,7 +1,6 @@
 from PySide6.QtWidgets import QWidget, QLabel
 from PySide6.QtGui import QFont, QMouseEvent
-from data.access_level import AdminAccess
-from data.data_classes import User
+from data.orm.schema import User
 from views.theme import Theme
 
 
@@ -30,7 +29,7 @@ class EmployeeCardItem(QWidget):
 
     def __set_card_info(self):
         accessLevel = ""
-        if isinstance(self.current_employee.get_access_level(), AdminAccess):
+        if self.current_employee.get_access_level() == "a":
             accessLevel = "Admin"
         else:
             accessLevel = "Employee"

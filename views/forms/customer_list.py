@@ -1,4 +1,4 @@
-from data.data_classes import Customer
+from data.orm.schema import Customer
 from views.forms.item_list import ItemList
 from views.items.customer_item import CustomerCard
 

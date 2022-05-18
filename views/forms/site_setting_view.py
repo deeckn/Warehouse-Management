@@ -1,24 +1,13 @@
-# -*- coding: utf-8 -*-
 
-################################################################################
-# Form generated from reading UI file 'site_setting_view.ui'
-##
-# Created by: Qt User Interface Compiler version 6.2.2
-##
-# WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
-
-from shelve import Shelf
-import sys
-
-from PySide6.QtCore import (QRect, Qt)
-from PySide6.QtGui import (QFont, QIntValidator)
+from PySide6.QtCore import QRect, Qt
+from PySide6.QtGui import QFont, QIntValidator
 from PySide6.QtWidgets import (
-    QFrame, QLabel, QLineEdit, QPushButton, QScrollArea, QVBoxLayout, QWidget, QScrollArea, )
+    QFrame, QLabel, QLineEdit, QPushButton, QScrollArea, QVBoxLayout, QWidget, QScrollArea)
 
 from views.items.shelf_item import ShelfItem
-from data.data_classes import StorageShelf
+from data.orm.schema import Shelf
 from views.theme import Theme
+
 
 class SiteSettingView(QWidget):
     def __init__(self):
@@ -100,7 +89,7 @@ class SiteSettingView(QWidget):
         width_label.setGeometry(169, 656, 108, 28)
         width_label.setFont(font)
         width_label.setStyleSheet(u"background-color: transparent;\n"
-                                   "color: #406882;")
+                                  "color: #406882;")
 
         height_label = QLabel("Height (m)", self)
         height_label.setGeometry(169, 705, 102, 28)
@@ -161,9 +150,9 @@ class SiteSettingView(QWidget):
         self.shelf_label_lineEdit.setGeometry(151, 516, 150, 42)
         self.shelf_label_lineEdit.setFont(font)
         self.shelf_label_lineEdit.setStyleSheet(u"border-radius: 0;\n"
-                                                           "background-color: #DDDDDD;"
-                                                           "padding-left: 14;\n"
-                                                           "padding-top: 5;")
+                                                "background-color: #DDDDDD;"
+                                                "padding-left: 14;\n"
+                                                "padding-top: 5;")
 
         self.max_weight_lineEdit = QLineEdit(self)
         self.max_weight_lineEdit.setGeometry(311, 516, 150, 42)
@@ -188,9 +177,9 @@ class SiteSettingView(QWidget):
         self.width_lineEdit.setFont(font)
         self.width_lineEdit.setValidator(QIntValidator(0, 9999999))
         self.width_lineEdit.setStyleSheet(u"border-radius: 0;\n"
-                                           "background-color: #DDDDDD;"
-                                           "padding-left: 14;\n"
-                                           "padding-top: 5;")
+                                          "background-color: #DDDDDD;"
+                                          "padding-left: 14;\n"
+                                          "padding-top: 5;")
 
         self.height_lineEdit = QLineEdit(self)
         self.height_lineEdit.setGeometry(307, 699, 125, 42)
@@ -395,7 +384,7 @@ class SiteSettingView(QWidget):
 
     def set_select_event(self, event):
         self.select_event = event
-    
+
     def set_unselect_event(self, event):
         self.unselect_event = event
 
@@ -416,7 +405,7 @@ class SiteSettingView(QWidget):
         self.save_button.setEnabled(boolean)
 
     # Set LineEdit from Shelf
-    def set_lineEdit_from_shelf(self, shelf:StorageShelf):
+    def set_lineEdit_from_shelf(self, shelf: Shelf):
         self.shelf_label_lineEdit.setText(shelf.get_label())
         self.max_weight_lineEdit.setText(str(shelf.get_max_weight()))
         self.length_lineEdit.setText(str(shelf.get_length()))
@@ -426,13 +415,13 @@ class SiteSettingView(QWidget):
         self.column_lineEdit.setText(str(shelf.get_columns()))
 
     # Employee Account List
-    def add_shelf(self, shelf: StorageShelf):
+    def add_shelf(self, shelf: Shelf):
         """Inserts a new ShelfItem object to the list"""
         card = ShelfItem(self, shelf)
         self.scroll_area_widget.layout().addWidget(card)
         # self.layout_.addWidget(card)
 
-    def get_selected_shelf(self) -> StorageShelf:
+    def get_selected_shelf(self) -> Shelf:
         """Returns the selected ShelfItem object on the UI"""
         return self.current_shelf.get_current_shelf()
 
@@ -462,13 +451,13 @@ class SiteSettingView(QWidget):
         """Check if form is valid for add submission"""
         return not \
             (
-            self.shelf_label_lineEdit.text() == "" or 
-            self.max_weight_lineEdit.text() == "" or
-            self.length_lineEdit.text() == "" or
-            self.width_lineEdit.text() == "" or
-            self.height_lineEdit.text() == "" or
-            self.row_lineEdit.text() == "" or
-            self.column_lineEdit.text() == "" 
+                self.shelf_label_lineEdit.text() == "" or
+                self.max_weight_lineEdit.text() == "" or
+                self.length_lineEdit.text() == "" or
+                self.width_lineEdit.text() == "" or
+                self.height_lineEdit.text() == "" or
+                self.row_lineEdit.text() == "" or
+                self.column_lineEdit.text() == ""
             )
 
     # Check LineEdit Change
@@ -506,15 +495,15 @@ class SiteSettingView(QWidget):
 
         if height != str(current_shelf.get_height()):
             return True
-        
+
         if row != str(current_shelf.get_row()):
             return True
-        
+
         if column != str(current_shelf.get_column()):
             return True
 
         return False
-    
+
     def is_search_lineEdit_filled(self):
         return self.search_lineEdit != ""
 

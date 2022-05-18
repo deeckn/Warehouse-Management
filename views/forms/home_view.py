@@ -2,7 +2,7 @@ from views.forms.stack_page import StackPage
 from views.theme import Theme
 from views.forms.log_activity_view import LogWindowView
 from views.forms.product_search_view import ProductSearchView
-from data.data_classes import LogEntry, ProductItem
+from data.orm.schema import Log, Product
 from data.filter_options import *
 from PySide6.QtCore import *
 from PySide6.QtGui import *
@@ -33,7 +33,7 @@ class HomePageView(StackPage):
         title.setFont(Theme.POPPINS_BOLD_64)
         title.setGeometry(100, 60, 195, 96)
 
-    def add_log(self, log: LogEntry):
+    def add_log(self, log: Log):
         self.log_window_view.add_log(log)
 
     def clear_logs(self):
@@ -44,7 +44,7 @@ class HomePageView(StackPage):
 
     def get_search_input(self) -> str:
         return self.product_search_view.get_search_input()
-    
+
     def get_filter(self) -> FilterOption:
         filter = self.product_search_view.get_filter()
         match filter:
@@ -61,7 +61,7 @@ class HomePageView(StackPage):
     def setEnabled_search_bt(self, status: bool):
         self.product_search_view.setEnabled_search_bt(status)
 
-    def add_product_card(self, product : ProductItem):
+    def add_product_card(self, product: Product):
         return self.product_search_view.add_product_card(product)
 
     def clear_product_cards(self):

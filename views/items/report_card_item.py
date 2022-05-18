@@ -1,7 +1,7 @@
 import datetime
 from PySide6.QtWidgets import QWidget, QLabel
-from PySide6.QtGui import QFont, QMouseEvent
-from data.data_classes import Customer
+from PySide6.QtGui import QFont
+from data.orm.schema import Customer
 from views.theme import Theme
 
 

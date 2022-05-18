@@ -1,7 +1,7 @@
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-from data.data_classes import Customer
+from data.orm.schema import Customer
 from views.theme import Theme
 
 
@@ -43,13 +43,13 @@ class CustomerCard(QWidget):
         self.customer_info_2.setText(text)
 
     def mousePressEvent(self, event) -> None:
-        if(self.qparent.current_customer == self):
+        if self.qparent.current_customer == self:
             self.unclick()
             self.qparent.current_customer = None
             self.qparent.unselect_event()
             return
 
-        if(self.qparent.current_customer != None):
+        if self.qparent.current_customer != None:
             self.qparent.current_customer.unclick()
 
         self.qparent.current_customer = self

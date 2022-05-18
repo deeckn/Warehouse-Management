@@ -1,7 +1,5 @@
 from views.forms.base_view import BaseView
 from views.items.side_menu_item import SideMenuItem
-from views.forms.account_view import AccountView
-from views.forms.site_setting_view import SiteSettingView
 
 
 class AdminAppView(BaseView):

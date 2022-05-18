@@ -1,5 +1,4 @@
 from abc import ABC
-from data.access_level import AdminAccess, EmployeeAccess
 from models import *
 from PySide6.QtWidgets import QWidget
 from datetime import date
@@ -196,7 +195,6 @@ class CustomerPage(Controller):
 
         # Initialize new customer
         new_customer = Customer(
-            None,
             name,
             phone,
             email,
@@ -250,7 +248,6 @@ class CustomerPage(Controller):
         expiring_day = f"{expiry_date.day:02d}_{expiry_date.month:02d}_{expiry_date.year:02d}"
 
         new_info = Customer(
-            prev_info.get_id(),
             self.view.get_name(),
             self.view.get_phone(),
             self.view.get_email(),
@@ -322,10 +319,9 @@ class AccountPage(Controller):
         username = self.model.generate_username(first_name, last_name)
         password = self.view.get_password_input()
         pass_confirm = self.view.get_password_confirm_input()
-        access = AdminAccess() if self.view.get_create_admin_status() else EmployeeAccess()
+        access = "admin" if self.view.get_create_admin_status() else "employee"
 
         new_user = User(
-            None,
             first_name,
             last_name,
             username,
@@ -380,8 +376,10 @@ class AccountPage(Controller):
         username = self.model.generate_username(first_name, last_name)
         password = self.view.get_change_password()
 
+        if password == "":
+            password = current_user.get_password()
+
         new_info = User(
-            current_user.get_id(),
             first_name,
             last_name,
             username,
@@ -464,7 +462,7 @@ class InventoryOverviewPage(Controller):
     def get_customer_percent_stocked(self, id: int) -> float:
         return self.model.get_product_stock(id)
 
-    def get_products_of_customer(self, id: int) -> list[ProductItem]:
+    def get_products_of_customer(self, id: int) -> list[Product]:
         return self.model.get_product_list_by_owner_id(id)
 
     def fill_selected_customer_products(self):
@@ -609,6 +607,7 @@ class SiteSettingPage(Controller):
         self.model.add_shelf(label, max_weight, length,
                              width, height, row, column)
 
+        self.view.reset_input()
         self.__update_list()
 
     def delete_shelf(self):
@@ -632,7 +631,7 @@ class SiteSettingPage(Controller):
         row = self.view.get_row_LineEdit()
         column = self.view.get_column_LineEdit()
 
-        edited_shelf = StorageShelf(
+        edited_shelf = Shelf(
             label, max_weight, length, width, height, row, column)
         self.model.update_shelf(self.view.get_selected_shelf(), edited_shelf)
         self.view.reset_input()

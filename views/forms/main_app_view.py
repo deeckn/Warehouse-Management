@@ -1,9 +1,5 @@
-from controllers import HomePage
 from views.forms.base_view import BaseView
-from views.forms.home_view import HomePageView
-from views.forms.customer_list_page_view import CustomerListPageView
 from views.forms.product_list_page_view import ProductListPageView
-from views.forms.notifications_view import NotificationView
 from views.items.side_menu_item import SideMenuItem
 
 

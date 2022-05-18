@@ -1,19 +1,19 @@
 from PySide6.QtWidgets import QWidget, QLabel, QHBoxLayout
 from PySide6.QtGui import Qt
 from views.theme import Theme
-from data.data_classes import LogEntry
+from data.orm.schema import Log
 
 
 class LogItem(QWidget):
-    def __init__(self, log_entry: LogEntry):
+    def __init__(self, log_entry: Log):
         QWidget.__init__(self, None)
 
         main_layout = QHBoxLayout(self)
         main_layout.setSpacing(0)
         main_layout.setContentsMargins(0, 0, 0, 0)
 
-        date_label = QLabel(log_entry.get_date().replace("_","/"))
-        time_label = QLabel(log_entry.get_time().replace("_",":"))
+        date_label = QLabel(log_entry.get_date().replace("_", "/"))
+        time_label = QLabel(log_entry.get_time().replace("_", ":"))
         event_label = QLabel(log_entry.get_description())
 
         for label in (date_label, time_label, event_label):

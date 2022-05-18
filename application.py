@@ -60,7 +60,7 @@ class Application(QStackedWidget):
             NotificationModel()
         )
 
-        if isinstance(self.current_user.get_access_level(), AdminAccess):
+        if self.current_user.get_access_level() == "admin":
             self.account_page = AccountPage(
                 AccountView(),
                 AccountModel(self.current_user)
@@ -85,7 +85,7 @@ class Application(QStackedWidget):
         if self.main_app_view is None:
             self.main_app_setup()
 
-        if isinstance(self.current_user.get_access_level(), AdminAccess):
+        if self.current_user.get_access_level() == "admin":
             if self.admin_app_view is None:
                 self.admin_app_setup()
             self.move_login_to_admin()
@@ -103,7 +103,7 @@ class Application(QStackedWidget):
 
         self.main_app_view.set_admin_bt_listener(self.move_main_to_admin)
 
-        if isinstance(self.current_user.get_access_level(), AdminAccess):
+        if self.current_user.get_access_level() == "admin":
             self.main_app_view.show_admin_bt()
         else:
             self.main_app_view.hide_admin_bt()

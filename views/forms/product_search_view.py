@@ -1,7 +1,7 @@
 
 from PySide6.QtGui import QPixmap, QPainter, QTransform, QColor, Qt
 from PySide6.QtWidgets import QWidget, QLabel, QLineEdit, QPushButton, QHBoxLayout, QRadioButton, QScrollArea, QVBoxLayout
-from data.data_classes import ProductItem
+from data.orm.schema import Product
 from views.theme import Theme
 from views.items.product_card_home_item import ProductCardHomeItem
 from data.filter_options import *
@@ -88,7 +88,7 @@ class ProductSearchView(QWidget):
         self.scroll_area_layout.setAlignment(Qt.AlignTop)
         scroll_area.setWidget(self.scroll_area_widget)
 
-    def add_product_card(self, product_item: ProductItem):
+    def add_product_card(self, product_item: Product):
         """Add product card on Product search window"""
         card = ProductCardHomeItem(product_item)
         self.scroll_area_layout.addWidget(card)

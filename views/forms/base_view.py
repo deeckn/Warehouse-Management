@@ -1,8 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QFont
-from PySide6.QtWidgets import (
-    QLabel, QWidget, QSpacerItem, QSizePolicy,
-    QVBoxLayout, QHBoxLayout, QStackedWidget)
+from PySide6.QtWidgets import (QLabel, QWidget, QSpacerItem, QSizePolicy,
+                               QVBoxLayout, QHBoxLayout, QStackedWidget)
 
 from views.items.side_menu_item import SideMenuItem
 

@@ -578,7 +578,7 @@ class SiteSettingPage(Controller):
         self.view.set_delete_button_enabled(False)
         self.view.set_save_button_enabled(False)
 
-    def __fill_strorage_shelf(self, shelves):
+    def __fill_strorage_shelf(self, shelves: list[StorageShelf]):
         if shelves is None:
             return
 

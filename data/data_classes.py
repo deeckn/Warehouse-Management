@@ -173,6 +173,9 @@ class Location:
     def get_shelf_number(self) -> int:
         return self.shelf_number
 
+    def get_location(self) -> str:
+        return f"{self.shelf_label}{self.shelf_number:03d}"
+
 
 @dataclass
 class Dimension:
@@ -238,6 +241,9 @@ class ProductItem:
 
     def get_category_list(self) -> list[ProductCategory]:
         return self.__categories
+
+    def get_num_of_batches(self) -> int:
+        return len(self.__locations)
 
     def add_quantity(self, new_quantity: int):
         self.__quantity += new_quantity

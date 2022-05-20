@@ -231,6 +231,7 @@ class ProductListModel(Model):
         """Returns a list of products based on customer name query"""
         customers = self.__customer_dao.get_customer_contains_with(
             customer_name)
+
         products: list[Product] = list()
         for customer in customers:
             customer_products = self.__product_dao.get_customer_products(
@@ -251,7 +252,7 @@ class ProductListModel(Model):
     def is_batch_fit(self, product: Product, quantity: int, shelf: Shelf) -> bool:
         """Returns True if the batch can fit in the shelf"""
 
-        product_length, product_width, product_height = product.get_dimension().get_dimension()
+        product_length, product_width, product_height = product.get_dimensions()
         shelf_length, shelf_width, shelf_height = shelf.get_dimensions()
 
         if (product_length > shelf_length) | \
@@ -275,27 +276,13 @@ class ProductListModel(Model):
 
         return batch_volume < shelf_volume
 
-    def add_new_product(self, product: Product, quantity: int, shelf_label: str, shelf_number: int) -> bool:
+    def add_new_product(self, product: Product) -> bool:
         """Adds a new product to the system, returns True for successful operation"""
         if self.__product_dao.exist(product):
             return False
 
-        shelf = self.__shelf_dao.get_shelf_by_label(shelf_label)
-        if shelf is None:
-            return False
-
-        if not self.is_batch_fit(product, quantity, shelf):
-            return False
-
         # Add new product
         self.__product_dao.add_product(product)
-
-        # Add first batch
-        data_product = self.__product_dao.get_product_by_name(
-            product.get_name(), product.get_owner().get_id())
-        location = ProductLocation(1, quantity, shelf_label, shelf_number)
-        self.__location_dao.add_product_location(
-            data_product.get_id(), location)
 
         # Logging
         log = Log(
@@ -307,12 +294,14 @@ class ProductListModel(Model):
     def add_new_batch(self, product_id: int, quantity: int, shelf_label: str, shelf_number: int) -> bool:
         """Adds a new product batch, returns True for a successful operation"""
         batch_count = self.__location_dao.get_batch_count(product_id)
+
         if batch_count == 0:
+            # Must add product first
             return False
 
         location = ProductLocation(batch_count+1, quantity,
                                    shelf_label, shelf_number)
-        self.__location_dao.add_product_location(product_id, location)
+        self.__location_dao.add_product_location(location)
 
         # Update quantity
         product_quantity = self.__product_dao.get_product(

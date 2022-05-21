@@ -51,12 +51,14 @@ class HomeModel(Model):
     __current_user: User
     __product_dao: ProductDAO
     __customer_dao: CustomerDAO
+    __location_dao: LocationDAO
     __log_dao: LogDAO
 
     def __init__(self, current_user: User):
         self.__current_user = current_user
         self.__product_dao = AppDAO.get_dao("product")
         self.__customer_dao = AppDAO.get_dao("customer")
+        self.__location_dao = AppDAO.get_dao("location")
         self.__log_dao = AppDAO.get_dao("log")
 
     def search_product(self, search_input: str, filter: FilterOption) -> list[Product]:
@@ -89,24 +91,50 @@ class HomeModel(Model):
         """Returns a list of all Log objects in the database"""
         return self.__log_dao.get_all_log_entries()
 
-    def add_product_quantity(self, product: Product, quantity: int):
-        current_quantity = product.get_quantity()
+    def add_product_quantity(self, product_id: int, batch_number: int, quantity: int):
+        product = self.__product_dao.get_product(product_id)
+        batch = self.__location_dao.get_batch(product_id, batch_number)
+
+        if product is None or batch is None:
+            return
+
+        total_quantity = product.get_quantity()
+
+        self.__location_dao.add_to_batch(batch, quantity)
+
         self.__product_dao.update_product(
-            id=product.get_id(), quantity=current_quantity+quantity)
+            id=product.get_id(),
+            quantity=total_quantity+quantity
+        )
 
         # Logging
         log = Log(
-            f"{self.__current_user.get_username()} added {quantity} items for Product ID: {product.get_id()}")
+            f"{self.__current_user.get_username()} added {quantity} items for Product ID: {product.get_id()} to batch=#{batch_number}")
         self.__log_dao.add_log_entry(log)
 
-    def export_product(self, product: Product, quantity: int):
-        current_quantity = product.get_quantity()
+    def export_product(self, product_id, batch_number: int, quantity: int):
+        product = self.__product_dao.get_product(product_id)
+        batch = self.__location_dao.get_batch(product_id, batch_number)
+
+        if product is None or batch is None:
+            return False
+
+        current_total = product.get_quantity()
+        current_quantity = batch.get_batch_quantity()
+
+        if current_quantity - quantity < 0:
+            return False
+
+        self.__location_dao.deduct_from_batch(batch, quantity)
+
         self.__product_dao.update_product(
-            id=product.get_id(), quantity=current_quantity-quantity)
+            product_id,
+            quantity=current_total - quantity
+        )
 
         # Logging
         log = Log(
-            f"{self.__current_user.get_username()} exported {quantity} items for Product ID: {product.get_id()}")
+            f"{self.__current_user.get_username()} exported {quantity} items for Product ID: {product_id} from batch=#{batch_number}")
         self.__log_dao.add_log_entry(log)
 
 

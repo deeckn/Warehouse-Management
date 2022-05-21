@@ -295,6 +295,13 @@ class LocationDAO(DAO):
         self.session.add(location)
         self.session.commit()
 
+    def get_batch(self, product_id: int, batch_number: int) -> ProductLocation:
+        batch = self.session.query(ProductLocation).filter(
+            ProductLocation.product_id == product_id,
+            ProductLocation.batch_number == batch_number
+        ).first()
+        return batch
+
     def get_product_locations(self, product_id: int) -> list[ProductLocation]:
         """Returns list of Location objects given the product id"""
         data = self.session.query(ProductLocation).filter(
@@ -359,6 +366,20 @@ class LocationDAO(DAO):
         for location in locations:
             slots.append(location.get_shelf_number())
         return slots
+
+    def add_to_batch(self, location: ProductLocation, quantity: int):
+        if location is None or quantity < 0:
+            return False
+
+        location.quantity = location.quantity + quantity
+        self.session.commit()
+
+    def deduct_from_batch(self, location: ProductLocation, quantity: int):
+        if location is None or quantity < 0:
+            return False
+
+        location.quantity = location.quantity - quantity
+        self.session.commit()
 
 
 class ProductDAO(DAO):

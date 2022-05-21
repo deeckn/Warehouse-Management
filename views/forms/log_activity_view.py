@@ -54,4 +54,5 @@ class LogWindowView(QWidget):
         if len(childs) > 1:
             childs = childs[1:]
             for widget in childs:
+                widget.setParent(None)
                 widget.close()

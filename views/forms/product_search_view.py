@@ -103,6 +103,7 @@ class ProductSearchView(QWidget):
         if len(childs) > 1:
             childs = childs[1:]
             for widget in childs:
+                widget.setParent(None)
                 widget.close()
 
     def get_card_list(self):

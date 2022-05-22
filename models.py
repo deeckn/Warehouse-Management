@@ -92,6 +92,7 @@ class HomeModel(Model):
         return self.__log_dao.get_all_log_entries()
 
     def add_product_quantity(self, product_id: int, batch_number: int, quantity: int):
+        """Refills the quantity of a given batch"""
         product = self.__product_dao.get_product(product_id)
         batch = self.__location_dao.get_batch(product_id, batch_number)
 
@@ -107,12 +108,20 @@ class HomeModel(Model):
             quantity=total_quantity+quantity
         )
 
+        # Update last stored date
+        today = datetime.now()
+        self.__product_dao.update_product(
+            id=product_id,
+            last_stored=f"{today.day:02d}_{today.month:02d}_{today.year}"
+        )
+
         # Logging
         log = Log(
             f"{self.__current_user.get_username()} added {quantity} items for Product ID: {product.get_id()} to batch=#{batch_number}")
         self.__log_dao.add_log_entry(log)
 
     def export_product(self, product_id, batch_number: int, quantity: int):
+        """Deducts the quantity of a given batch"""
         product = self.__product_dao.get_product(product_id)
         batch = self.__location_dao.get_batch(product_id, batch_number)
 
@@ -327,7 +336,7 @@ class ProductListModel(Model):
             # Must add product first
             return False
 
-        location = ProductLocation(batch_count+1, quantity,
+        location = ProductLocation(product_id, batch_count+1, quantity,
                                    shelf_label, shelf_number)
         self.__location_dao.add_product_location(location)
 
@@ -337,6 +346,13 @@ class ProductListModel(Model):
         product_quantity += quantity
         self.__product_dao.update_product(
             product_id, quantity=product_quantity)
+
+        # Update last stored
+        today = datetime.now()
+        self.__product_dao.update_product(
+            id=product_id,
+            last_stored=f"{today.day:02d}_{today.month:02d}_{today.year}"
+        )
 
         return True
 

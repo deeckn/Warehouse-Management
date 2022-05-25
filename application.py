@@ -34,6 +34,7 @@ class Application(QStackedWidget):
         self.home_page = None
         self.customer_page = None
         self.notification_page = None
+        self.product_page = None
 
         # Admin Pages
         self.account_page = None
@@ -58,6 +59,11 @@ class Application(QStackedWidget):
         self.notification_page = NotificationPage(
             NotificationView(),
             NotificationModel()
+        )
+
+        self.product_page = ProductPage(
+            ProductListPageView(),
+            ProductListModel(self.current_user)
         )
 
         if self.current_user.get_access_level() == "admin":
@@ -97,7 +103,7 @@ class Application(QStackedWidget):
         self.main_app_view = MainAppView({
             "home": self.home_page,
             "customer": self.customer_page,
-            "product": None,
+            "product": self.product_page,
             "notification": self.notification_page,
         })
 

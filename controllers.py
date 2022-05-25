@@ -7,6 +7,7 @@ from views.forms.customer_list_page_view import CustomerListPageView
 from views.forms.inventory_overview import InventoryOverviewView
 from views.forms.login_view import LoginView
 from views.forms.notifications_view import NotificationView
+from views.forms.product_list_page_view import ProductListPageView
 from views.forms.report_view import ReportView
 from views.forms.site_setting_view import SiteSettingView
 import views.rc_icons
@@ -83,7 +84,7 @@ class HomePage(Controller):
                         if new_quantity == 0:
                             add_state = False
                             export_state = False
-                        elif new_quantity > temp.get_product().get_quantity():
+                        elif new_quantity > temp.get_current_quantity():
                             export_state = False
                         temp.set_enable_add_bt(add_state)
                         temp.set_enable_export_bt(export_state)
@@ -91,7 +92,7 @@ class HomePage(Controller):
                     def add():
                         new_quantity = temp.get_new_quantity()
                         self.model.add_product_quantity(
-                            temp.get_product(), new_quantity)
+                            temp.get_product_id(), temp.get_current_batch(), new_quantity)
                         temp.add_quantity(new_quantity)
                         temp.update_card()
                         temp.clear_quantity_input()
@@ -113,6 +114,7 @@ class HomePage(Controller):
                 card.set_quantity_changed_listener(events[0])
                 card.set_add_bt_listener(events[1])
                 card.set_export_bt_listener(events[2])
+                card.set_event_batch_cb(card.update_card)
 
     def update_activity_logs(self):
         self.view.clear_logs()
@@ -660,3 +662,13 @@ class SiteSettingPage(Controller):
     def __update_list(self):
         self.view.reset_site_setting_view()
         self.__fill_strorage_shelf(self.model.get_all_shelves())
+
+
+class ProductPage(Controller):
+    view: ProductListPageView
+    model: ProductListModel
+
+    def __init__(self, view: QWidget, model: Model):
+        super().__init__(view, model)
+
+        self.view.set_event_choose_location(lambda: print("Hello"))

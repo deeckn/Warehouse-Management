@@ -26,8 +26,8 @@ class MainAppView(BaseView):
         self.customer_list_page = pages["customer"]
         self.add_page(self.customer_list_page.view)
 
-        self.product_list_page = ProductListPageView()
-        self.add_page(self.product_list_page)
+        self.product_list_page = pages["product"]
+        self.add_page(self.product_list_page.view)
 
         self.noti_page = pages["notification"]
         self.add_page(self.noti_page.view)

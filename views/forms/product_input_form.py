@@ -2,7 +2,8 @@ from itertools import product
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
-from data.categories import *
+from data.filter_options import *
+from data.orm.schema import *
 from views.theme import Theme
 from views.items.product_list_card import ProductListCard
 

@@ -15,3 +15,12 @@ class ProductList(ItemList):
         """Add new proudct card to the list"""
         card = ProductListCard(self.qparent, product)
         self.scroll_area_layout.addWidget(card)
+        return card
+
+    def clear_all_card(self):
+        childs = self.scroll_area_widget.children()
+        if len(childs) > 1:
+            childs = childs[1:]
+            for widget in childs:
+                widget.setParent(None)
+                widget.close()

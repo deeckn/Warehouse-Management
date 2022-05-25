@@ -1,6 +1,6 @@
 from cgitb import reset
 from PySide6.QtWidgets import QComboBox, QPushButton, QLabel, QWidget, QGridLayout
-from data.data_classes import StorageShelf
+from data.orm.schema import Shelf
 from views.theme import Theme
 from PySide6.QtCore import QRect, QSize
 from PySide6.QtGui import QPixmap
@@ -82,7 +82,7 @@ class LocationPageView(QWidget):
         ui_yellow_indicator.setFont(Theme.POPPINS_REGULAR_18)
         ui_yellow_indicator.move(490, 159)
 
-    def set_up(self, available_shelfs: list[StorageShelf]):
+    def set_up(self, available_shelfs: list[Shelf]):
         self.avail_shelfs = available_shelfs
 
         for storage_shelf in available_shelfs:

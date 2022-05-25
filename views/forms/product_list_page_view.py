@@ -1,4 +1,4 @@
-from data.data_classes import ProductItem
+from data.orm.schema import Product
 from views.forms.stack_page import StackPage
 from PySide6.QtWidgets import QLabel
 from views.forms.product_list import ProductList
@@ -70,7 +70,7 @@ class ProductListPageView(StackPage):
     def get_search_input(self) -> str:
         return self.product_form.get_search_input()
 
-    def add_card(self, product: ProductItem) -> ProductListCard:
+    def add_card(self, product: Product) -> ProductListCard:
         return self.product_list.add_card(product)
 
     def set_event_make_change_bt(self, function):

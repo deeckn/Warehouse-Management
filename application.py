@@ -11,7 +11,7 @@ class Application(QStackedWidget):
     def __init__(self):
         QStackedWidget.__init__(self, None)
         self.setFixedSize(1920, 1080)
-        self.setWindowTitle("GEB-ARAI-DEE")
+        self.setWindowTitle("Warehouse Management System")
 
         # Current User
         self.current_user = None

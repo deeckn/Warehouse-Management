@@ -244,6 +244,7 @@ class ProductListModel(Model):
     __current_user: User
     __product_dao: ProductDAO
     __location_dao: LocationDAO
+    __category_dao: CategoryDAO
     __shelf_dao: ShelfDAO
     __log_dao: LogDAO
     __customer_dao: CustomerDAO
@@ -252,6 +253,7 @@ class ProductListModel(Model):
         self.__current_user = current_user
         self.__product_dao = AppDAO.get_dao("product")
         self.__location_dao = AppDAO.get_dao("location")
+        self.__category_dao = AppDAO.get_dao("category")
         self.__shelf_dao = AppDAO.get_dao("shelf")
         self.__log_dao = AppDAO.get_dao("log")
         self.__customer_dao = AppDAO.get_dao("customer")
@@ -419,6 +421,20 @@ class ProductListModel(Model):
             if shelf.get_volume() > product_volume:
                 available_shelves.append(shelf)
         return available_shelves
+
+    def delete_batch(self, product_id: int, batch_number: int):
+        """Deletes a batch of products given the product ID and batch number"""
+        self.__location_dao.remove_product_location(product_id, batch_number)
+
+    def update_categories(self, product_id: int, new_category_list: list[ProductCategory]):
+        self.__category_dao.remove_all_product_categories(product_id)
+        for category in new_category_list:
+            self.__category_dao.add_product_category(category)
+
+    def update_locations(self, product_id: int, new_location_list: list[ProductLocation]):
+        self.__location_dao.remove_all_product_locations(product_id)
+        for location in new_location_list:
+            self.__location_dao.add_product_location(location)
 
 
 class AccountModel(Model):

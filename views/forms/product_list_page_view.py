@@ -1,4 +1,4 @@
-from data.orm.schema import Product
+from data.orm.schema import Product, ProductCategory, Shelf
 from views.forms.stack_page import StackPage
 from PySide6.QtWidgets import QLabel
 from views.forms.product_list import ProductList
@@ -43,7 +43,7 @@ class ProductListPageView(StackPage):
 
     def set_enable_search_button(self, bool: bool):
         """Set enable stat for search button in form"""
-        self.product_form.set_enable_search_button
+        self.product_form.set_enable_search_button(bool)
 
     def set_current_location(self, current_location: int):
         """Set the current location of LocationPage (Input only location number)"""
@@ -94,16 +94,16 @@ class ProductListPageView(StackPage):
     def get_quantity(self) -> int:
         return self.product_form.get_quantity()
 
-    def get_weight(self) -> int:
+    def get_weight(self) -> float:
         return self.product_form.get_weight()
 
-    def get_length(self) -> int:
+    def get_length(self) -> float:
         return self.product_form.get_length()
 
-    def get_width(self) -> int:
+    def get_width(self) -> float:
         return self.product_form.get_width()
 
-    def get_height(self) -> int:
+    def get_height(self) -> float:
         return self.product_form.get_height()
 
     def get_low_stock_quantity(self) -> int:
@@ -115,8 +115,92 @@ class ProductListPageView(StackPage):
     def get_location(self) -> str:
         return self.product_form.get_location()
 
-    def get_categoires(self) -> list[str]:
-        return self.product_form.get_categoires()
+    def get_categoires(self, product_id: int) -> list[ProductCategory]:
+        temp = []
+        for category in self.product_form.get_categoires():
+            temp.append(ProductCategory(product_id, category))
+        return temp
 
     def change_location(self, new_location: str):
         self.product_form.change_location(new_location)
+
+    def set_event_clear_button(self, function):
+        self.product_form.set_event_clear_button(function)
+
+    def set_event_choose_location(self, function):
+        self.product_form.set_event_choose_location_button(function)
+
+    def get_product_volume(self) -> float:
+        return self.product_form.get_product_volume()
+
+    def set_event_change_length(self, function):
+        self.product_form.set_event_change_length(function)
+
+    def set_event_change_width(self, function):
+        self.product_form.set_event_change_width(function)
+
+    def set_event_change_height(self, function):
+        self.product_form.set_event_change_height(function)
+
+    def check_dimension(self) -> bool:
+        return self.product_form.check_dimension()
+
+    def set_enable_choose_location(self, bool: bool):
+        self.product_form.set_enable_choose_location_button(bool)
+
+    def rerender_page(self, new_shelves: list[Shelf]):
+        self.location_page.rerender_page(new_shelves)
+
+    def set_event_back_button(self, function):
+        self.location_page.set_event_back_bt(function)
+
+    def set_event_change_shelf(self, function):
+        self.location_page.set_event_change_shelf(function)
+
+    def update_shelf(self):
+        self.location_page.update_shelf()
+
+    def update_table(self):
+        self.location_page.update_table()
+
+    def set_current_location(self, location: int):
+        self.location_page.set_current_location(location)
+
+    def get_current_location(self) -> str:
+        return self.product_form.get_location()
+
+    def get_selected(self) -> str:
+        return self.location_page.get_current_location()
+
+    def set_event_confirm_button(self, function):
+        self.location_page.set_event_confirm_bt(function)
+
+    def set_text_choose_location(self, text: str):
+        self.product_form.set_text_choose_location(text)
+
+    def set_current_shelf(self, label: str):
+        self.location_page.set_current_shelf(label)
+
+    def fill_occupied(self, occupied_slots: list[int]):
+        self.location_page.fill_occupied(occupied_slots)
+
+    def get_current_shelf(self) -> str:
+        return self.location_page.get_current_shelf()
+
+    def check_add_new(self) -> bool:
+        return self.product_form.check_add_new()
+
+    def get_current_filter(self) -> str:
+        return self.product_form.get_current_filter()
+
+    def clear_all_card(self):
+        self.product_list.clear_all_card()
+
+    def add_card(self, product: Product):
+        self.product_list.add_card(product)
+
+    def set_enable_make_change_button(self, boolean: bool):
+        self.product_form.set_enable_make_change_button(boolean)
+
+    def set_event_all_le(self, function):
+        self.product_form.set_event_all_le(function)

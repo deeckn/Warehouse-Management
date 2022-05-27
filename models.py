@@ -315,10 +315,8 @@ class ProductListModel(Model):
 
         return batch_volume < shelf_volume
 
-    def add_new_product(self, product: Product) -> bool:
+    def add_new_product(self, product: Product):
         """Adds a new product to the system, returns True for successful operation"""
-        if self.__product_dao.exist(product):
-            return False
 
         # Add new product
         self.__product_dao.add_product(product)
@@ -327,8 +325,6 @@ class ProductListModel(Model):
         log = Log(
             f"{self.__current_user.get_username()} added {product.get_name()} to the system")
         self.__log_dao.add_log_entry(log)
-
-        return True
 
     def add_new_batch(self, product_id: int, quantity: int, shelf_label: str, shelf_number: int) -> bool:
         """Adds a new product batch, returns True for a successful operation"""
@@ -356,6 +352,10 @@ class ProductListModel(Model):
             last_stored=f"{today.day:02d}_{today.month:02d}_{today.year}"
         )
 
+        log = Log(
+            f"{self.__current_user.get_username()} added new batch to Product ID: {id}")
+        self.__log_dao.add_log_entry(log)
+
         return True
 
     def edit_product(self, old_data: Product, new_data: Product):
@@ -377,14 +377,12 @@ class ProductListModel(Model):
         owner_id = None if old_data.get_owner().get_id(
         ) == new_data.get_owner().get_id() else new_data.get_owner().get_id()
 
-        length = None if old_data.get_dimension().get_length(
-        ) == new_data.get_dimension().get_length() else new_data.get_dimension().get_length()
+        old_length, old_width, old_height = old_data.get_dimensions()
+        new_length, new_width, new_height = new_data.get_dimensions()
 
-        width = None if old_data.get_dimension().get_width(
-        ) == new_data.get_dimension().get_width() else new_data.get_dimension().get_width()
-
-        height = None if old_data.get_dimension().get_height(
-        ) == new_data.get_dimension().get_height() else new_data.get_dimension().get_height()
+        length = None if old_length == new_length else new_length
+        width = None if old_width == new_width else new_width
+        height = None if old_height == new_height else new_height
 
         self.__product_dao.update_product(
             old_data.get_id(),
@@ -398,6 +396,9 @@ class ProductListModel(Model):
             width,
             height
         )
+        log = Log(
+            f"{self.__current_user.get_username()} edited Product ID: {old_data.get_id()}")
+        self.__log_dao.add_log_entry(log)
 
     def delete_product(self, product_id: int):
         """Deletes a product from the system"""
@@ -407,13 +408,15 @@ class ProductListModel(Model):
             f"{self.__current_user.get_username()} deleted Product ID: {product_id} from the system")
         self.__log_dao.add_log_entry(log)
 
+    def delete_batch(self, product_id: int, batch_number: int):
+        self.__location_dao.remove_product_location(product_id, batch_number)
+
     def get_occupied_slots(self, shelf_label: str) -> list[int]:
         """Returns a list of shelf numbers (slots) that are occupied"""
         return self.__location_dao.get_occupied_slots(shelf_label)
 
-    def get_available_shelves(self, product: Product) -> list[Shelf]:
+    def get_available_shelves(self, product_volume: float) -> list[Shelf]:
         """Returns a list of available shelves that the given product can fit"""
-        product_volume = product.get_dimension().get_volume()
         shelves = self.__shelf_dao.get_all_shelves()
 
         available_shelves: list[Shelf] = list()
@@ -435,6 +438,10 @@ class ProductListModel(Model):
         self.__location_dao.remove_all_product_locations(product_id)
         for location in new_location_list:
             self.__location_dao.add_product_location(location)
+
+    def get_latest_product_id(self) -> int:
+        latest_product = self.__product_dao.get_latest_product()
+        return latest_product.get_id()
 
 
 class AccountModel(Model):

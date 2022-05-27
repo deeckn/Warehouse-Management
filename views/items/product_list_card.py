@@ -1,3 +1,4 @@
+from itertools import product
 from PySide6.QtCore import *
 from PySide6.QtGui import *
 from PySide6.QtWidgets import *
@@ -39,7 +40,7 @@ class ProductListCard(QWidget):
         text = f"Customer: {product.get_owner().get_name()}\n" + \
             f"Product ID: {product.get_id()}\n" + \
             f"Product Name: {product.get_name()}\n" + \
-            f"Quantity: {self.current_location.get_batch_quantity()}\n" + \
+            f"Quantity: {product.get_quantity()}\n" + \
             f"Number of Batches: {product.get_num_of_batches()}\n" + \
             f"Location:"
 
@@ -93,7 +94,7 @@ class ProductListCard(QWidget):
         text = f"Customer: {self.product.get_owner().get_name()}\n" + \
             f"Product ID: {self.product.get_id()}\n" + \
             f"Product Name: {self.product.get_name()}\n" + \
-            f"Quantity: {self.current_location.get_batch_quantity()}\n" + \
+            f"Quantity: {self.product.get_quantity()}\n" + \
             f"Number of Batches: {self.product.get_num_of_batches()}\n" + \
             f"Location:"
 
@@ -114,4 +115,3 @@ class ProductListCard(QWidget):
     def update_current_location(self):
         index = self.location_cb.currentIndex()
         self.current_location = self.location[index]
-        self.update()

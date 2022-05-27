@@ -870,7 +870,6 @@ class ProductPage(Controller):
 
         # Replace old info with new info
         new_product.name = name
-        new_product.quantity = quantity
         new_product.low_stock = low_stock
         new_product.weight = weight
         new_product.owner = owner
@@ -879,22 +878,19 @@ class ProductPage(Controller):
         new_product.height = height
         new_product.owner = owner
 
-        # Edit overall product info
-        self.model.edit_product(old_product, new_product)
-
         # Edit categories
         new_categories = self.view.get_categoires(id)
         self.model.update_categories(id, new_categories)
 
+        new_locations = []
         # If batch id exist then edit location
-        if batch_id in range(1, old_product.get_num_of_batches+1):
+        if batch_id in range(1, old_product.get_num_of_batches()+1):
             # Get current locaiton
             str_cur_location = self.view.get_current_location()
             location_id = int(str_cur_location[2:])
             shelf_label = str_cur_location[:2]
 
             # Copy old location to new location
-            new_locations = []
             for location in old_product.locations:
 
                 new_locations.append(ProductLocation(
@@ -912,6 +908,14 @@ class ProductPage(Controller):
             # Update location
             self.model.update_locations(id, new_locations)
 
+        sum_quantity = 0
+        for location in new_locations:
+            sum_quantity += location.get_batch_quantity()
+
+        new_product.quantity = sum_quantity
+        # Edit overall product info
+        self.model.edit_product(old_product, new_product)
+
     def delete(self):
         # Get current product id and batch id
         id = self.view.get_product_id()
@@ -924,6 +928,16 @@ class ProductPage(Controller):
         if(product.get_num_of_batches() > 1):
             # Delete batch
             self.model.delete_batch(id, batch_id)
+            old_product = self.model.get_product(id)
+            new_product = self.model.get_product(id)
+
+            sum_quantity = 0
+            locations = old_product.get_locations()
+            for location in locations:
+                sum_quantity += location.get_batch_quantity()
+            new_product.quantity = sum_quantity
+
+            self.model.edit_product(old_product, new_product)
             return
         # Delete product info
         self.model.delete_product(id)
@@ -946,10 +960,9 @@ class ProductPage(Controller):
             result = self.model.search_products_by_name(input)
 
         # If there are result
-        if result != None:
+        if result != None and None not in result:
             # Clear all current card
             self.view.clear_all_card()
-
             # Loop each product in result to add card
             for prod in result:
                 self.view.add_card(prod)

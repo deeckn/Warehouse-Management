@@ -82,29 +82,26 @@ class ProductInputForm(QWidget):
         self.choose_location_bt = QPushButton(self, text="Choose Location")
         self.choose_location_bt.setFont(Theme.POPPINS_BOLD_18)
         self.choose_location_bt.setGeometry(263, 348, 187, 40)
+        self.set_enable_choose_location_button(False)
 
         self.weight_le = QLineEdit(self)
         self.weight_le.setFont(Theme.POPPINS_REGULAR_18)
         self.weight_le.setGeometry(50, 425, 187, 40)
-        self.weight_le.setValidator(QIntValidator(0, 9999999))
 
         self.length_le = QLineEdit(self)
         self.length_le.setFont(Theme.POPPINS_REGULAR_18)
         self.length_le.setGeometry(265, 425, 60, 40)
         self.length_le.setAlignment(Qt.AlignCenter)
-        self.length_le.setValidator(QIntValidator(0, 999))
 
         self.width_le = QLineEdit(self)
         self.width_le.setFont(Theme.POPPINS_REGULAR_18)
         self.width_le.setGeometry(328, 425, 60, 40)
         self.width_le.setAlignment(Qt.AlignCenter)
-        self.width_le.setValidator(QIntValidator(0, 999))
 
         self.height_le = QLineEdit(self)
         self.height_le.setFont(Theme.POPPINS_REGULAR_18)
         self.height_le.setGeometry(390, 425, 60, 40)
         self.height_le.setAlignment(Qt.AlignCenter)
-        self.height_le.setValidator(QIntValidator(0, 999))
 
         self.low_stock_quantity_le = QLineEdit(self)
         self.low_stock_quantity_le.setFont(Theme.POPPINS_REGULAR_18)
@@ -283,34 +280,43 @@ class ProductInputForm(QWidget):
         return self.current_modify
 
     def get_product_id(self) -> int:
-        return int(self.product_id_le.text())
+        text = self.product_id_le.text()
+        return 0 if text == "" else int(text)
 
     def get_product_name(self) -> str:
         return self.product_name_le.text()
 
     def get_batch_id(self) -> int:
-        return int(self.batch_id_le.text())
+        text = self.batch_id_le.text()
+        return 0 if text == "" else int(text)
 
     def get_quantity(self) -> int:
-        return int(self.quantity_le.text())
+        text = self.quantity_le.text()
+        return 0 if text == "" else int(text)
 
-    def get_weight(self) -> int:
-        return int(self.weight_le.text())
+    def get_weight(self) -> float:
+        text = self.weight_le.text()
+        return 0 if text == "" else float(text)
 
-    def get_length(self) -> int:
-        return int(self.length_le.text())
+    def get_length(self) -> float:
+        text = self.length_le.text()
+        return 0 if text == "" else float(text)
 
-    def get_width(self) -> int:
-        return int(self.width_le.text())
+    def get_width(self) -> float:
+        text = self.width_le.text()
+        return 0 if text == "" else float(text)
 
-    def get_height(self) -> int:
-        return int(self.height_le.text())
+    def get_height(self) -> float:
+        text = self.height_le.text()
+        return 0 if text == "" else float(text)
 
     def get_low_stock_quantity(self) -> int:
-        return int(self.quantity_le.text())
+        text = self.low_stock_quantity_le.text()
+        return 0 if text == "" else int(text)
 
     def get_owner_id(self) -> int:
-        return int(self.owner_id_le.text())
+        text = self.owner_id_le.text()
+        return 0 if text == "" else int(text)
 
     def get_location(self) -> str:
         locate = self.choose_location_bt.text()
@@ -318,6 +324,9 @@ class ProductInputForm(QWidget):
             return None
         else:
             return locate
+
+    def get_product_volume(self) -> float:
+        return self.get_length() * self.get_height() * self.get_width()
 
     def set_event_search_button(self, function):
         self.search_bt.clicked.connect(function)
@@ -417,7 +426,6 @@ class ProductInputForm(QWidget):
         self.set_enable_width(boolean)
         self.set_enable_low_stock(boolean)
         self.set_enable_owner_id(boolean)
-        self.set_enable_choose_location_button(boolean)
         self.set_enable_height(boolean)
         self.set_enable_make_change_button(boolean)
         self.set_enable_weight(boolean)
@@ -434,11 +442,23 @@ class ProductInputForm(QWidget):
     def set_event_delete(self, function):
         self.delete_option.toggled.connect(function)
 
+    def set_event_change_length(self, function):
+        self.length_le.textChanged.connect(function)
+
+    def set_event_change_width(self, function):
+        self.width_le.textChanged.connect(function)
+
+    def set_event_change_height(self, function):
+        self.height_le.textChanged.connect(function)
+
+    def check_dimension(self) -> bool:
+        return self.height_le.text() != "" and self.width_le.text() != "" and self.length_le.text() != ""
+
     def set_input_with_card(self, card: ProductListCard):
 
         product = card.get_product()
         location = card.get_current_location()
-        dimension = product.get_dimension()
+        dimension = product.get_dimensions()
         owner = product.get_owner()
         categories = product.get_category_list()
         self.clear_input()
@@ -447,12 +467,14 @@ class ProductInputForm(QWidget):
             self.product_name_le.setText(str(product.get_name()))
             self.quantity_le.setText(str(location.get_batch_quantity()))
             self.weight_le.setText(str(product.get_weight()))
-            self.length_le.setText(str(dimension.get_length()))
-            self.width_le.setText(str(dimension.get_width()))
-            self.height_le.setText(str(dimension.get_height()))
+            dimension = product.get_dimensions()  # L W H
+            self.length_le.setText(str(dimension[0]))
+            self.width_le.setText(str(dimension[1]))
+            self.height_le.setText(str(dimension[2]))
             self.low_stock_quantity_le.setText(
                 str(product.get_low_stock_quantity()))
             self.owner_id_le.setText(str(owner.get_id()))
+            self.input_categories(categories)
             return
 
         if self.current_modify == "Delete":
@@ -464,9 +486,10 @@ class ProductInputForm(QWidget):
             self.product_id_le.setText(str(product.get_id()))
             self.quantity_le.setText(str(location.get_batch_quantity()))
             self.weight_le.setText(str(product.get_weight()))
-            self.length_le.setText(str(dimension.get_length()))
-            self.width_le.setText(str(dimension.get_width()))
-            self.height_le.setText(str(dimension.get_height()))
+            dimension = product.get_dimensions()  # L W H
+            self.length_le.setText(str(dimension[0]))
+            self.width_le.setText(str(dimension[1]))
+            self.height_le.setText(str(dimension[2]))
             return
 
         if self.current_modify == "Edit":
@@ -476,30 +499,34 @@ class ProductInputForm(QWidget):
             self.quantity_le.setText(str(location.get_batch_quantity()))
             self.choose_location_bt.setText(location.get_location())
             self.weight_le.setText(str(product.get_weight()))
-            self.length_le.setText(str(dimension.get_length()))
-            self.width_le.setText(str(dimension.get_width()))
-            self.height_le.setText(str(dimension.get_height()))
+            dimension = product.get_dimensions()  # L W H
+            self.length_le.setText(str(dimension[0]))
+            self.width_le.setText(str(dimension[1]))
+            self.height_le.setText(str(dimension[2]))
             self.low_stock_quantity_le.setText(
                 str(product.get_low_stock_quantity()))
             self.owner_id_le.setText(str(owner.get_id()))
-            for catergory in categories:
-                if(isinstance(catergory, Electronics)):
-                    self.electrical_option.setChecked(True)
-                elif(isinstance(catergory, Fashion)):
-                    self.fashion_option.setChecked(True)
-                elif(isinstance(catergory, Utensils)):
-                    self.utensils_option.setChecked(True)
-                elif(isinstance(catergory, Furniture)):
-                    self.furniture_option.setChecked(True)
-                elif(isinstance(catergory, Collectibles)):
-                    self.collectibles_option.setChecked(True)
-                elif(isinstance(catergory, DryFood)):
-                    self.dryFood_option.setChecked(True)
-                elif(isinstance(catergory, Chemicals)):
-                    self.chemicals_option.setChecked(True)
-                elif(isinstance(catergory, Others)):
-                    self.others_option.setChecked(True)
+            self.input_categories(categories)
             return
+
+    def input_categories(self, categories: list[ProductCategory]):
+        for category in categories:
+            if(category.get_category() == "electrical"):
+                self.electrical_option.setChecked(True)
+            elif(category.get_category() == "fashion"):
+                self.fashion_option.setChecked(True)
+            elif(category.get_category() == "utensils"):
+                self.utensils_option.setChecked(True)
+            elif(category.get_category() == "furniture"):
+                self.furniture_option.setChecked(True)
+            elif(category.get_category() == "collectibles"):
+                self.collectibles_option.setChecked(True)
+            elif(category.get_category() == "dry_food"):
+                self.dryFood_option.setChecked(True)
+            elif(category.get_category() == "chemicals"):
+                self.chemicals_option.setChecked(True)
+            elif(category.get_category() == "others"):
+                self.others_option.setChecked(True)
 
     def set_event_search_input_change(self, function):
         self.search_product_le.textChanged.connect(function)
@@ -509,7 +536,11 @@ class ProductInputForm(QWidget):
             radioBt.clicked.connect(function)
 
     def update_current_filter(self):
+        self.set_enable_search_input(True)
         self.current_filter = self.sender().text()
+
+    def get_current_filter(self) -> str:
+        return self.current_filter
 
     def update_current_modifier(self):
         self.current_modify = self.sender().text()
@@ -531,7 +562,6 @@ class ProductInputForm(QWidget):
         self.set_enable_product_name(True)
         self.set_enable_batch_id(False)
         self.set_enable_quantity(True)
-        self.set_enable_choose_location_button(True)
         self.set_enable_weight(True)
         self.set_enable_length(True)
         self.set_enable_width(True)
@@ -544,7 +574,6 @@ class ProductInputForm(QWidget):
         self.set_enable_product_name(True)
         self.set_enable_batch_id(True)
         self.set_enable_quantity(True)
-        self.set_enable_choose_location_button(True)
         self.set_enable_weight(True)
         self.set_enable_length(True)
         self.set_enable_width(True)
@@ -557,7 +586,6 @@ class ProductInputForm(QWidget):
         self.set_enable_product_name(False)
         self.set_enable_batch_id(False)
         self.set_enable_quantity(True)
-        self.set_enable_choose_location_button(True)
         self.set_enable_weight(True)
         self.set_enable_length(True)
         self.set_enable_width(True)
@@ -570,7 +598,6 @@ class ProductInputForm(QWidget):
         self.set_enable_product_name(False)
         self.set_enable_batch_id(True)
         self.set_enable_quantity(False)
-        self.set_enable_choose_location_button(False)
         self.set_enable_weight(False)
         self.set_enable_length(False)
         self.set_enable_width(False)
@@ -582,8 +609,23 @@ class ProductInputForm(QWidget):
         categories = []
         for category in (self.electrical_option, self.fashion_option, self.utensils_option, self.furniture_option, self.collectibles_option, self.dryFood_option, self.chemicals_option, self.others_option):
             if category.isChecked():
-                categories.append(category.text())
+                text = category.text()
+                text = text.lower()
+                text = text.replace(" ", "_")
+                categories.append(text)
         return categories
 
-    def change_location(self, new_location: str):
-        self.choose_location_bt.setText(new_location)
+    def set_text_choose_location(self, new_text: str):
+        self.choose_location_bt.setText(new_text)
+
+    def set_event_all_le(self, function):
+        self.product_id_le.textChanged.connect(function)
+        self.product_name_le.textChanged.connect(function)
+        self.batch_id_le.textChanged.connect(function)
+        self.quantity_le.textChanged.connect(function)
+        self.weight_le.textChanged.connect(function)
+        self.length_le.textChanged.connect(function)
+        self.width_le.textChanged.connect(function)
+        self.height_le.textChanged.connect(function)
+        self.low_stock_quantity_le.textChanged.connect(function)
+        self.owner_id_le.textChanged.connect(function)

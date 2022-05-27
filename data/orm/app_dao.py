@@ -1,4 +1,4 @@
-from sqlalchemy import desc
+from sqlalchemy import desc, func
 from .schema import Session, engine
 from .schema import User, Customer, ProductCategory, ProductLocation, Shelf, QuarterlyReport, Log, Product
 from abc import ABC
@@ -391,20 +391,8 @@ class ProductDAO(DAO):
 
     def add_product(self, product: Product):
         """Adds a Product object to the PRODUCTS table"""
-        if product is None or self.exist(product):
+        if product is None:
             return
-
-        categories = product.get_category_list()
-        locations = product.get_locations()
-
-        if categories is None or locations is None:
-            return
-
-        for category in categories:
-            self.__category_dao.add_product_category(category)
-
-        for location in locations:
-            self.__location_dao.add_product_location(location)
 
         self.session.add(product)
         self.session.commit()
@@ -607,6 +595,13 @@ class ProductDAO(DAO):
         self.__category_dao.remove_all_product_categories(product_id)
         self.session.delete(product)
         self.session.commit()
+
+    def get_latest_product(self) -> Product:
+        """Returns the latest product object"""
+        id = self.session.query(func.max(Product.product_id))
+        product = self.session.query(Product).filter(
+            Product.product_id == id).first()
+        return product
 
 
 class ShelfDAO(DAO):

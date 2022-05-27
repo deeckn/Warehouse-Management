@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QWidget
 from datetime import date
 from views.forms.account_view import AccountView
 from views.forms.customer_list_page_view import CustomerListPageView
+from views.forms.home_view import HomePageView
 from views.forms.inventory_overview import InventoryOverviewView
 from views.forms.login_view import LoginView
 from views.forms.notifications_view import NotificationView
@@ -61,6 +62,9 @@ class LoginPage(Controller):
 
 
 class HomePage(Controller):
+    view: HomePageView
+    model: HomeModel
+
     def __init__(self, view: QWidget, model: Model):
         super().__init__(view, model)
         self.update_activity_logs()
@@ -103,7 +107,7 @@ class HomePage(Controller):
                         if new_quantity == 0:
                             return
                         self.model.export_product(
-                            temp.get_product(), new_quantity)
+                            temp.get_product_id(), temp.get_current_batch(), new_quantity)
                         temp.export_quantity(new_quantity)
                         temp.update_card()
                         temp.clear_quantity_input()
@@ -671,4 +675,310 @@ class ProductPage(Controller):
     def __init__(self, view: QWidget, model: Model):
         super().__init__(view, model)
 
-        self.view.set_event_choose_location(lambda: print("Hello"))
+        self.view.set_event_search_input_change(self.check_search)
+        self.view.set_event_search_bt(self.search)
+        self.view.set_event_confirm_button(self.confirm)
+        self.view.set_event_change_shelf(self.change_shelf)
+        self.view.set_event_change_height(self.check_for_location_enable)
+        self.view.set_event_change_width(self.check_for_location_enable)
+        self.view.set_event_change_length(self.check_for_location_enable)
+        self.view.set_event_clear_button(self.view.clear_form)
+        self.view.set_event_choose_location(self.choose_location)
+        self.view.set_event_back_button(self.back)
+        self.view.set_event_all_le(self.checker)
+        self.view.set_event_make_change_bt(self.make_change)
+
+    def checker(self):
+        """Check if required input is fulfilled"""
+        # Check for empty input
+        id = self.view.get_product_id() != 0
+        name = self.view.get_product_name() != ""
+        batch_id = self.view.get_batch_id() != 0
+        quantity = self.view.get_quantity() != 0
+        weight = self.view.get_weight() != 0
+        l = self.view.get_length() != 0
+        w = self.view.get_width() != 0
+        h = self.view.get_height() != 0
+        locate = self.view.get_location() != None
+        low_stock_quantity = self.view.get_low_stock_quantity() != 0
+        owner_id = self.view.get_owner_id() != 0
+
+        # Get current modify to decide what to check for
+        cur_modify = self.view.get_current_modify()
+
+        # Enable make change button when every needed input is fulfilled
+        if(cur_modify == "Add New"):
+            self.view.set_enable_make_change_button(name and quantity and locate and
+                                                    weight and l and w and h and
+                                                    low_stock_quantity and owner_id)
+            return
+
+        if(cur_modify == "Add Batch"):
+            self.view.set_enable_make_change_button(id and quantity and weight and locate
+                                                    and l and w and h)
+            return
+
+        if(cur_modify == "Edit"):
+            self.view.set_enable_make_change_button(id and name and batch_id and quantity
+                                                    and locate and weight and l and w and h and
+                                                    low_stock_quantity and owner_id)
+            return
+
+        if(cur_modify == "Delete"):
+            self.view.set_enable_make_change_button(id and batch_id)
+            return
+
+    def choose_location(self):
+        """Load all availables shelves using product dimension"""
+        # Get volume
+        product_vol = self.view.get_product_volume()
+
+        # Load all available shelf for the item
+        shelves = self.model.get_available_shelves(product_vol)
+
+        # Get current location
+        cur_location = self.view.get_location()
+
+        # Rerender page with new shelves
+        self.view.rerender_page(shelves)
+
+        # If cur_location is chose then move to the location and shelf
+        if cur_location != None:
+            str_cur_location = self.view.get_current_location()
+            location_id = int(str_cur_location[2:])
+            shelf_label = str_cur_location[:2]
+            self.view.set_current_shelf(shelf_label)
+            self.view.set_current_location(location_id)
+
+        # Load occupide slots
+        occupied_slots = self.model.get_occupied_slots(
+            self.view.get_current_shelf())
+
+        # Fill occupied slots to the table
+        self.view.fill_occupied(occupied_slots)
+
+        # Unhide the location page
+        self.view.show_location_page()
+
+    def back(self):
+        # Hide location_page
+        self.view.hide_location_page()
+
+    def check_for_location_enable(self):
+        """Product dimension must be filled before choose location button will be enable"""
+        self.view.set_enable_choose_location(self.view.check_dimension())
+
+    def change_shelf(self):
+        """Change shelf event"""
+        # set current shelf to the current dropdown
+        self.view.update_shelf()
+
+        # update table to represent current shelf
+        self.view.update_table()
+
+        # Load occupied slots
+        occupied_slots = self.model.get_occupied_slots(
+            self.view.get_current_shelf())
+
+        # Fill occupied slots to the table
+        self.view.fill_occupied(occupied_slots)
+
+    def confirm(self):
+        """Confirm function"""
+        # Get the current location
+        cur_location = self.view.get_selected()
+
+        # Set the choose location button text to match the location
+        self.view.set_text_choose_location(cur_location)
+
+        # Hide the location page
+        self.view.hide_location_page()
+
+        # Check if required data is filled
+        self.checker()
+
+    def add_new(self):
+        # Get current information
+        name = self.view.get_product_name()
+        quantity = self.view.get_quantity()
+        low_stock = self.view.get_low_stock_quantity()
+        weight = self.view.get_weight()
+        owner = self.view.get_owner_id()
+        length = self.view.get_length()
+        width = self.view.get_width()
+        height = self.view.get_height()
+
+        # Get current date
+        today = date.today()
+        last_stored = f"{today.day:02d}_{today.month:02d}_{today.year:02d}"
+
+        # Create the new product
+        new_product = Product(name, quantity, low_stock, weight,
+                              last_stored, owner, length, width, height)
+
+        # Add new product
+        self.model.add_new_product(new_product)
+
+        # Get the id of the added product (Latest product id)
+        id = self.model.get_latest_product_id()
+
+        # Edit categories
+        # Get selected categories
+        new_categories = self.view.get_categoires(id)
+        # Add categories
+        self.model.update_categories(id, new_categories)
+
+        # Edit location
+        # Get current location
+        str_cur_location = self.view.get_current_location()
+        location_id = int(str_cur_location[2:])
+        shelf_label = str_cur_location[:2]
+        # Add location where batch 1 only exist
+        self.model.update_locations(id, [ProductLocation(
+            id, 1, quantity, shelf_label, location_id)])
+
+    def add_batch(self):
+        # Get id and quantity from form
+        id = self.view.get_product_id()
+        quantity = self.view.get_quantity()
+
+        # Get selected location
+        str_cur_location = self.view.get_current_location()
+        location_id = int(str_cur_location[2:])
+        shelf_label = str_cur_location[:2]
+
+        # Add new batch
+        self.model.add_new_batch(id, quantity, shelf_label, location_id)
+
+    def edit(self):
+        # Get overall info of product from form
+        id = self.view.get_product_id()
+        name = self.view.get_product_name()
+        quantity = self.view.get_quantity()
+        low_stock = self.view.get_low_stock_quantity()
+        weight = self.view.get_weight()
+        owner = self.view.get_owner_id()
+        length = self.view.get_length()
+        width = self.view.get_width()
+        height = self.view.get_height()
+        batch_id = self.view.get_batch_id()
+
+        # Create old product
+        old_product = self.model.get_product(id)
+        # Create new product base on old product
+        new_product = self.model.get_product(id)
+
+        # Replace old info with new info
+        new_product.name = name
+        new_product.quantity = quantity
+        new_product.low_stock = low_stock
+        new_product.weight = weight
+        new_product.owner = owner
+        new_product.length = length
+        new_product.width = width
+        new_product.height = height
+        new_product.owner = owner
+
+        # Edit overall product info
+        self.model.edit_product(old_product, new_product)
+
+        # Edit categories
+        new_categories = self.view.get_categoires(id)
+        self.model.update_categories(id, new_categories)
+
+        # If batch id exist then edit location
+        if batch_id in range(1, old_product.get_num_of_batches+1):
+            # Get current locaiton
+            str_cur_location = self.view.get_current_location()
+            location_id = int(str_cur_location[2:])
+            shelf_label = str_cur_location[:2]
+
+            # Copy old location to new location
+            new_locations = []
+            for location in old_product.locations:
+
+                new_locations.append(ProductLocation(
+                    id,
+                    location.get_batch_number(),
+                    location.get_batch_quantity(),
+                    location.get_shelf_label(),
+                    location.get_shelf_number()
+                ))
+
+            # Edit the location by using batch id
+            new_locations[batch_id-1] = ProductLocation(
+                id, batch_id, quantity, shelf_label, location_id)
+
+            # Update location
+            self.model.update_locations(id, new_locations)
+
+    def delete(self):
+        # Get current product id and batch id
+        id = self.view.get_product_id()
+        batch_id = self.view.get_batch_id()
+
+        # Get product
+        product = self.model.get_product(id)
+
+        # If product have more than one batch then delete only the selected batch
+        if(product.get_num_of_batches() > 1):
+            # Delete batch
+            self.model.delete_batch(id, batch_id)
+            return
+        # Delete product info
+        self.model.delete_product(id)
+
+    def search(self):
+        # Get current input and filter
+        input = self.view.get_search_input()
+        filter = self.view.get_current_filter()
+
+        # Create result
+        result = None
+
+        # For each filter call different search
+        if(filter == "Client name"):
+            result = self.model.search_products_by_customer(input)
+        elif(filter == "Product ID"):
+            if input.isnumeric:
+                result = [self.model.search_product_by_id(int(input))]
+        elif(filter == "Product Name"):
+            result = self.model.search_products_by_name(input)
+
+        # If there are result
+        if result != None:
+            # Clear all current card
+            self.view.clear_all_card()
+
+            # Loop each product in result to add card
+            for prod in result:
+                self.view.add_card(prod)
+
+    def check_search(self):
+        """Check if input for search is filled"""
+        self.view.set_enable_search_button(
+            self.view.get_search_input() != "")
+
+    def make_change(self):
+        # For each modify use diffferen function
+        if(self.view.get_current_modify() == "Add New"):
+            self.add_new()
+
+        elif(self.view.get_current_modify() == "Add Batch"):
+            self.add_batch()
+
+        elif(self.view.get_current_modify() == "Edit"):
+            self.edit()
+
+        elif(self.view.get_current_modify() == "Delete"):
+            self.delete()
+
+        # Clear input form
+        self.view.clear_form()
+
+        # Clear all current card
+        self.view.clear_all_card()
+
+        # If there's a text in search line edit then research
+        if self.view.get_search_input() != "":
+            self.search()

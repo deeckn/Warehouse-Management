@@ -15,8 +15,6 @@ class RootContainer(QStackedWidget):
         self.main_app_view = MainAppView()
         self.admin_app_view = AdminAppView()
 
-        self.login_Page.set_login_button_listener(
-            self.move_login_to_admin)  # Tester
         self.main_app_view.set_logout_bt_listener(self.move_to_login)
         self.main_app_view.set_admin_bt_listener(self.move_main_to_admin)
         self.admin_app_view.set_logout_bt_listener(self.move_to_login)

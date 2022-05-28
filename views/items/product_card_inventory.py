@@ -45,8 +45,7 @@ class ProductCardInventory(QWidget):
             "Date Last Stored: " + str(product.get_last_stored()))
         self.categories = product.get_category_list()
         for i in range(len(self.categories)):
-            category = self.categories[i].get_category()
-            catergory_item = ProductCategoryItem(category)
+            catergory_item = ProductCategoryItem(self.categories[i])
             catergory_item.change_size(131, 35)
             self.grid_layout.addWidget(catergory_item, i, 2, 1, 1)
 

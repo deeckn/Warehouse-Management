@@ -1,4 +1,5 @@
 from abc import ABC
+from math import prod
 from models import *
 from PySide6.QtWidgets import QWidget
 from datetime import date
@@ -551,9 +552,10 @@ class SiteSettingPage(Controller):
     view: SiteSettingView
     model: SiteSettingsModel
 
-    def __init__(self, view: QWidget, model: Model):
+    def __init__(self, view: QWidget, model: Model, productListModel: ProductListModel):
         super().__init__(view, model)
 
+        self.product_list_model = productListModel
         # fill all of Shelves
         self.__fill_strorage_shelf(self.model.get_all_shelves())
 
@@ -659,7 +661,12 @@ class SiteSettingPage(Controller):
 
         # Delete Button
         if self.view.is_card_selected():
-            self.view.set_delete_button_enabled(True)
+            self.view.set_delete_button_enabled(True) 
+            for product in self.product_list_model.get_all_products():
+                locations = product.get_locations()
+                for location in locations:
+                    if location.get_shelf_label() == self.view.current_shelf.get_shelf_label():
+                        self.view.set_delete_button_enabled(False) 
         else:
             self.view.set_delete_button_enabled(False)
 
@@ -671,7 +678,7 @@ class SiteSettingPage(Controller):
 class ProductPage(Controller):
     view: ProductListPageView
     model: ProductListModel
-
+    
     def __init__(self, view: QWidget, model: Model):
         super().__init__(view, model)
 

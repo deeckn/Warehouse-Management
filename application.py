@@ -74,7 +74,8 @@ class Application(QStackedWidget):
 
             self.site_setting_page = SiteSettingPage(
                 SiteSettingView(),
-                SiteSettingsModel(self.current_user)
+                SiteSettingsModel(self.current_user),
+                ProductListModel(self.current_user)
             )
 
             self.inventory_page = InventoryOverviewPage(
